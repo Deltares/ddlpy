@@ -1,0 +1,79 @@
+{
+    "Zoekvraag": {
+        "AquoMetadataLijst": [
+            {
+                "Grootheid": {
+                    "Code": "H1/3"
+                },
+                "Eenheid": {
+                    "Code": "cm"
+                }
+            },
+            {
+                "Compartiment": {
+                    "Code": "OW"
+                },
+                "Eenheid": {
+                    "Code": "%"
+                },
+                "Grootheid": {
+                    "Code": "VERDGGD"
+                },
+                "Parameter": {
+                    "Code": "O2"
+                }
+            },
+            {
+                "Compartiment": {
+                    "Code": "OW"
+                },
+                "Eenheid": {
+                    "Code": "mg/l"
+                },
+                "Parameter": {
+                    "Code": "O2"
+                }
+            }
+        ],
+        "LocatieLijst": [
+            {
+                "X": 742469.913149676,
+                "Y": 5940708.14824459,
+                "Code": "HUIBGOT"
+            },
+            {
+                "X": 595875.376191307,
+                "Y" : 5790952.82210343,
+                "Code":
+                "NOORDWK2"
+            },
+            {
+                "X": 571670.054611366,
+                "Y" : 5822651.05560318,
+                "Code": "IJMDMNTSPS"
+            }
+        ],
+        "Periode": {
+            "Begindatumtijd" : "2009-01-01T00:00:00.000+01:00",
+            "Einddatumtijd" : "2011-12-31T23:59:59.999+01:00"
+        }
+    },
+    "Email_succes": {
+        "From": "info@rws.nl",
+        "To": "fedor.baart@deltares.nl",
+        "Subject": "Aanvraag bestand waarnemingen test",
+        "Body": "Uw bestand met waarnemingen kunt u downloaden via {link_bestand}."
+    },
+    "Email_fout": {
+        "From": "info@rws.nl",
+        "To": "aanvrager@rws.nl",
+        "Subject": "Aanvraag niet gelukt test",
+        "Body" : "Uw aanvraag voor het bestand met waarnemingen is mislukt."
+    },
+    "Email_bevestiging": {
+        "From": "info@rws.nl",
+        "To": "aanvrager@rws.nl",
+        "Subject" : "Bevestiging van aanvraag test",
+        "Body":"Uw aanvraag is ontvangen. U ontvangt binnen 24 uur een e-mail met daarin een link voor het downloaden van de aanvraag."
+    }
+}
