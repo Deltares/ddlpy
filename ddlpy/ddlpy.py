@@ -139,4 +139,5 @@ def measurements(location, start_date, end_date):
 
         measurements.append(measurement)
     measurements = pd.concat(measurements)
+    measurements = measurements.drop_duplicates()
     return measurements
