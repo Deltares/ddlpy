@@ -26,14 +26,14 @@ def location():
 
 def test_measurements(location):
     """measurements for a location """
-    start_date = datetime.datetime(1952, 11, 1)
+    start_date = datetime.datetime(1953, 1, 1)
     end_date = datetime.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
 def test_measurements_long(location):
     """measurements for a location """
-    start_date = datetime.datetime(1901, 11, 1)
+    start_date = datetime.datetime(1951, 11, 1)
     end_date = datetime.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
