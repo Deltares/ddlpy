@@ -32,7 +32,11 @@ class NoDataException(ValueError):
 logger = logging.getLogger(__name__)
 
 def locations():
-    "get station information from DDL (metadata uit Catalogus)"
+    """
+    get station information from DDL (metadata uit Catalogus). All metadata regarding stations.
+    The response (result) retrieves more keys
+    
+    """
     endpoint = ENDPOINTS['collect_catalogue']
     resp = requests.post(endpoint['url'], json=endpoint['request'])
     result = resp.json()
@@ -42,10 +46,13 @@ def locations():
 
 
     df_locations = pd.DataFrame(result['LocatieLijst'])
+    
     df_metadata = pd.io.json.json_normalize(
         result['AquoMetadataLijst']
     )
+   
     df_metadata_location = pd.DataFrame(result['AquoMetadataLocatieLijst'])
+    
 
     merged = df_metadata_location.set_index('Locatie_MessageID').join(
         df_locations.set_index('Locatie_MessageID'),
@@ -56,6 +63,7 @@ def locations():
     )
     # set station id as index
     return merged.set_index('Code')
+    
 
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
@@ -105,9 +113,7 @@ def _measurements_slice(location, start_date, end_date):
     for row in result['WaarnemingenLijst'][0]['MetingenLijst']:
         # metadata is a list of 1 value, flatten it
         new_row = {
-            'WaarnemingMetadata.' + key: value[0] if len(value) == 1 else value
-            for key, value
-            in row['WaarnemingMetadata'].items()
+            'WaarnemingMetadata.' + key: value[0] if len(value) == 1 else value for key, value in row['WaarnemingMetadata'].items()
         }
         # add remaining data
         for key, val in row.items():
@@ -119,25 +125,36 @@ def _measurements_slice(location, start_date, end_date):
     df = pd.io.json.json_normalize(rows)
     # set NA value
     df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
+    
+    # Adding more metadata
+    for key in list(result['WaarnemingenLijst'][0]['AquoMetadata'].keys())[2:]:
+        df[key+'.Code'] = result['WaarnemingenLijst'][0]['AquoMetadata'][key]['Code']
+
     try:
         df['t'] = pd.to_datetime(df['Tijdstip'])
     except KeyError:
         logger.exception('Cannot add time variable t because variable Tijdstip is not found')
     return df
 
+
 def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
-    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule.MONTHLY)):
+    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule.YEARLY)):
         "return measurements for station given by locations record \"location\", from start_date through end_date"
+        
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
+            measurements.append(measurement)
         except NoDataException:
             # logging in _measurements_slice
             # up to the next loop
             continue
-
-        measurements.append(measurement)
-    measurements = pd.concat(measurements)
-    measurements = measurements.drop_duplicates()
+        
+        #measurements.append(measurement)
+    if ( len(measurements)> 0 ):
+        measurements = pd.concat(measurements)
+        measurements = measurements.drop_duplicates()
+        
     return measurements
+    

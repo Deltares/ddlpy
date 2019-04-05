@@ -7,7 +7,9 @@
       "CatalogusFilter": {
         "Eenheden": true,
         "Grootheden": true,
-        "Hoedanigheden": true
+        "Hoedanigheden": true,
+        "Parameters": true,
+        "Compartimenten": true
       }
     }
   },
