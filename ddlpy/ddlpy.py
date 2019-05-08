@@ -134,7 +134,8 @@ def _measurements_slice(location, start_date, end_date):
     # normalize and return
     df = pd.io.json.json_normalize(rows)
     # set NA value
-    df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
+    if 'Meetwaarde.Waarde_Numeriek' in df.columns:
+        df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
 
     try:
         df['t'] = pd.to_datetime(df['Tijdstip'])
