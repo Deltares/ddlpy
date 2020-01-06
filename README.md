@@ -1,28 +1,44 @@
 # ddlpy
-API to Dutch archive of monitoring water data, for Python
+
+(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
+
+[![image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
+
+[![image](https://img.shields.io/travis/openearth/ddlpy.svg)](https://travis-ci.org/openearth/ddlpy)
+
+[![Documentation Status](https://readthedocs.org/projects/ddlpy/badge/?version=latest)](https://ddlpy.readthedocs.io/en/latest/?badge=latest)
+
+[![Updates](https://pyup.io/repos/github/openearth/ddlpy/shield.svg)](https://pyup.io/repos/github/openearth/ddlpy/)
+
+Service from Rijkswaterstaat for distributing water quantity data.
+
+-   Free software: GNU General Public License v3
+-   Documentation: <https://ddlpy.readthedocs.io>.
+
 
 See also https://github.com/wstolte/rwsapi for the R API.
 
+
+# Install
 Make sure you have installed:
 
-* Pandas
-
+* pandas
 * numpy
 
 To install this code, go to the directory where this code is located andy type in a console:
-python setup.py install
+
+    pip install ddlpy
 
 In the folder examples you will find the following files:
 
-* minimal exmaple.py -> minimal code to retrieve data from Water Info. 
+* minimal example.py -> minimal code to retrieve data.
 
-* 1_get_data_from_water_info_parallel.py -> Code to retrieve a bulk of observations per parameter and per station. 
+* 1_get_data_from_water_info_parallel.py -> Code to retrieve a bulk of observations per parameter and per station.
 
 This code is parallelized; therefore, you can specify the number of processors you want to use.
 
 The output of this code is the data in csv format.
 
-* 2_get_netcdf.py -> Code to transform the csv files run in the previous script into netcdf files. 
+* 2_get_netcdf.py -> Code to transform the csv files run in the previous script into netcdf files.
 
-More detailed explanation on the usage of these codes are inside the Python files.
-
+More detailed explanation on the usage of these codes are inside the `notebooks` directory.
