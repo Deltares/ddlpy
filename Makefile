@@ -35,6 +35,7 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
+	rm README.rst
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 
@@ -65,7 +66,10 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
+README.rst: README.md
+	pandoc --from=markdown --to=rst --output=README.rst  README.md
+
+docs: README.rst ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/ddlpy.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ ddlpy
