@@ -38,7 +38,12 @@ def locations():
 
     """
     endpoint = ENDPOINTS['collect_catalogue']
+    msg = '{} with {}'.format(endpoint['url'], json.dumps(endpoint['request']))
+    logger.debug('requesting: {}'.format(msg))
+
     resp = requests.post(endpoint['url'], json=endpoint['request'])
+    if not resp.ok:
+        raise IOError("Failed to request {}: {}".format(msg, resp.text))
     result = resp.json()
     if not result['Succesvol']:
         logger.exception(str(result))
