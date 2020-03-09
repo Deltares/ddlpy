@@ -39,6 +39,7 @@ def cli(verbose,  args=None):
     help='output file format',
     type=click.Choice(['csv', 'json'], case_sensitive=True)
 )
+
 def locations(output, station, quantity, format):
     """Write locations to output file"""
     locations = ddlpy.locations()
@@ -60,6 +61,38 @@ def locations(output, station, quantity, format):
         selected.to_json(output, orient='records')
     else:
         raise ValueError('Unexpected format {}'.format(format))
+
+@cli.command()
+@click.option(
+    '--quantity',
+    help='Quantity (Grootheid) codes'
+)
+@click.option(
+    '--station',
+    help='Station codes'
+)
+@click.option(
+    '--start-date',
+    help='Start date'
+)
+@click.option(
+    '--end-date',
+    help='End date'
+)
+@click.option(
+    'locations',
+    help='csv or json containing the locations'
+)
+def measurements(station, quantity, start_date, end_date, locations):
+    """
+    Obtain the measurements for a period of time.
+    """
+    l= pd.read_csv(locations)
+    for i in locations.index:
+        l= locations.loc[i, :]
+    measurements = ddlpy.measurements(l, start_date=start_date, end_date=end_date)
+
+
 
 
 if __name__ == "__main__":
