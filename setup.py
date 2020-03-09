@@ -33,7 +33,7 @@ setup(
     description="Service from Rijkswaterstaat for distributing water quantity data.",
     entry_points={
         'console_scripts': [
-            'ddlpy=ddlpy.cli:main',
+            'ddlpy=ddlpy.cli:cli',
         ],
     },
     install_requires=requirements,
