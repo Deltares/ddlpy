@@ -56,6 +56,14 @@ def check_observations_available_resp(endpoints):
 def test_check_observations_available(check_observations_available_resp):
     assert check_observations_available_resp.status_code == 200
 
+@pytest.fixture
+def collect_number_of_observations_resp(endpoints):
+    endpoint = endpoints['collect_number_of_observations']
+    resp = requests.post(endpoint['url'], json=endpoint['request'])
+    return resp
+
+def test_collect_number_of_observations(collect_number_of_observations_resp):
+    assert collect_number_of_observations_resp.status_code == 200
 
 @pytest.fixture
 def request_bulk_observations_resp(endpoints):

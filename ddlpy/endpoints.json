@@ -1,187 +1,214 @@
 {
-    "collect_catalogue": {
-        "name": "OphalenCatalogus",
-        "url": "https://waterwebservices.rijkswaterstaat.nl/METADATASERVICES_DBO/OphalenCatalogus",
-        "type": "POST",
-        "request": {
-            "CatalogusFilter": {
-                "Eenheden": true,
-                "Grootheden": true,
-                "Hoedanigheden": true
-            }
-        }
-    },
-    "collect_observations": {
-        "name": "OphalenWaarnemingen",
-        "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenWaarnemingen",
-        "type": "POST",
-        "_comment": "Make sre you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
-        "request": {
-            "Locatie": {
-                "X": 761899.770959577,
-                "Y": 5915790.48491405,
-                "Code": "DELFZL"
-            },
-            "AquoPlusWaarnemingMetadata": {
-                "AquoMetadata": {
-                    "Eenheid": {
-                        "Code": "cm"
-                    },
-                    "Grootheid": {
-                        "Code": "WATHTE"
-                    },
-                    "Hoedanigheid": {
-                        "Code": "NAP"
-                    }
-                }
-            },
-            "Periode": {
-                "Einddatumtijd": "2012-01-27T09:30:00.000+01:00",
-                "Begindatumtijd": "2012-01-27T09:00:00.000+01:00"
-            }
-        }
-    },
-    "collect_latest_observations": {
-        "name": "OphalenLaatsteWaarnemingen",
-        "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenLaatsteWaarnemingen",
-        "type": "POST",
-        "_comment": "Make sre you specify the request location to the exact number of decimals.",
-        "request": {
-            "AquoPlusWaarnemingMetadataLijst": [
-                {
-                    "AquoMetadata": {
-                        "Compartiment": {
-                            "Code": "OW"
-                        },
-                        "Eenheid": {
-                            "Code": "cm"
-                        },
-                        "Grootheid": {
-                            "Code": "H1/3"
-                        }
-                    }
-                }
-            ],
-            "LocatieLijst": [
-                {
-                    "X": 518882.333320247,
-                    "Y": 5760829.11729589,
-                    "Code": "EURPFM"
-                }
-            ]
-        }
-    },
-    "check_observations_available": {
-        "name": "CheckWaarnemingenAanwezig",
-        "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenAantalWaarnemingen",
-        "type": "POST",
-        "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
-        "request": {
-            "AquoMetadataLijst": [
-                {
-                    "Compartiment": {
-                        "Code": "OW"
-                    },
-                    "Eenheid": {
-                        "Code": "cm"
-                    }
-                }
-            ],
-            "LocatieLijst" : [
-                {
-                    "X": 518882.333320247,
-                    "Y": 5760829.11729589,
-                    "Code": "EURPFM"
-                }
-            ],
-            "Periode": {
-                "Begindatumtijd": "2012-01-16T14:00:00.000+01:00",
-                "Einddatumtijd": "2012-01-16T16:00:00.000+01:00"
-            }
-        }
-    },
-    "request_bulk_observations": {
-        "name": "AanvragenBulkWaarnemingen",
-        "url": "https://waterwebservices.rijkswaterstaat.nl/BULKWAARNEMINGSERVICES_DBO/AanvragenBulkWaarnemingen",
-        "type": "POST",
-        "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
-        "request": {
-            "Zoekvraag": {
-                "AquoMetadataLijst": [
-                    {
-                        "Grootheid": {
-                            "Code": "H1/3"
-                        },
-                        "Eenheid": {
-                            "Code": "cm"
-                        }
-                    },
-                    {
-                        "Compartiment": {
-                            "Code": "OW"
-                        },
-                        "Eenheid": {
-                            "Code": "%"
-                        },
-                        "Grootheid": {
-                            "Code": "VERDGGD"
-                        },
-                        "Parameter": {
-                            "Code": "O2"
-                        }
-                    },
-                    {
-                        "Compartiment": {
-                            "Code": "OW"
-                        },
-                        "Eenheid": {
-                            "Code": "mg/l"
-                        },
-                        "Parameter": {
-                            "Code": "O2"
-                        }
-                    }
-                ],
-                "LocatieLijst": [
-                    {
-                        "X": 742469.913149676,
-                        "Y": 5940708.14824459,
-                        "Code": "HUIBGOT"
-                    },
-                    {
-                        "X": 595875.376191307,
-                        "Y" : 5790952.82210343,
-                        "Code": "NOORDWK2"
-                    },
-                    {
-                        "X": 571670.054611366,
-                        "Y" : 5822651.05560318,
-                        "Code": "IJMDMNTSPS"
-                    }
-                ],
-                "Periode": {
-                    "Begindatumtijd" : "2009-01-01T00:00:00.000+01:00",
-                    "Einddatumtijd" : "2011-12-31T23:59:59.999+01:00"
-                }
-            },
-            "Email_succes": {
-                "From": "info@rws.nl",
-                "To": "fedor.baart@deltares.nl",
-                "Subject": "Aanvraag bestand waarnemingen",
-                "Body": "Uw bestand met waarnemingen kunt u downloaden via {link_bestand}."
-            },
-            "Email_fout": {
-                "From": "info@rws.nl",
-                "To": "fedor.baart@deltares.nl",
-                "Subject": "Aanvraag niet gelukt",
-                "Body" : "Uw aanvraag voor het bestand met waarnemingen is mislukt."
-            },
-            "Email_bevestiging": {
-                "From": "info@rws.nl",
-                "To": "fedor.baart@rws.nl",
-                "Subject" : "Dit is een test",
-                "Body":"Uw aanvraag voor data is binnengekomen."
-            }
-        }
+  "collect_catalogue": {
+    "name": "OphalenCatalogus",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/METADATASERVICES_DBO/OphalenCatalogus",
+    "type": "POST",
+    "request": {
+      "CatalogusFilter": {
+        "Eenheden": true,
+        "Grootheden": true,
+        "Hoedanigheden": true,
+        "Parameters": true,
+        "Compartimenten": true
+      }
     }
+  },
+  "collect_observations": {
+    "name": "OphalenWaarnemingen",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenWaarnemingen",
+    "type": "POST",
+    "_comment": "Make sre you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
+    "request": {
+      "Locatie": {
+        "X": 761899.770959577,
+        "Y": 5915790.48491405,
+        "Code": "DELFZL"
+      },
+      "AquoPlusWaarnemingMetadata": {
+        "AquoMetadata": {
+          "Eenheid": {
+            "Code": "cm"
+          },
+          "Grootheid": {
+            "Code": "WATHTE"
+          },
+          "Hoedanigheid": {
+            "Code": "NAP"
+          }
+        }
+      },
+      "Periode": {
+        "Einddatumtijd": "2012-01-27T09:30:00.000+01:00",
+        "Begindatumtijd": "2012-01-27T09:00:00.000+01:00"
+      }
+    }
+  },
+  "collect_latest_observations": {
+    "name": "OphalenLaatsteWaarnemingen",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenLaatsteWaarnemingen",
+    "type": "POST",
+    "_comment": "Make sre you specify the request location to the exact number of decimals.",
+    "request": {
+      "AquoPlusWaarnemingMetadataLijst": [
+        {
+          "AquoMetadata": {
+            "Compartiment": {
+              "Code": "OW"
+            },
+            "Eenheid": {
+              "Code": "cm"
+            },
+            "Grootheid": {
+              "Code": "H1/3"
+            }
+          }
+        }
+      ],
+      "LocatieLijst": [
+        {
+          "X": 518882.333320247,
+          "Y": 5760829.11729589,
+          "Code": "EURPFM"
+        }
+      ]
+    }
+  },
+  "check_observations_available": {
+    "name": "CheckWaarnemingenAanwezig",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/CheckWaarnemingenAanwezig",
+    "type": "POST",
+    "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
+    "request": {
+      "AquoMetadataLijst": [
+        {
+          "Compartiment": {
+            "Code": "OW"
+          },
+          "Eenheid": {
+            "Code": "cm"
+          }
+        }
+      ],
+      "LocatieLijst": [
+        {
+          "X": 518882.333320247,
+          "Y": 5760829.11729589,
+          "Code": "EURPFM"
+        }
+      ],
+      "Periode": {
+        "Begindatumtijd": "2012-01-16T14:00:00.000+01:00",
+        "Einddatumtijd": "2012-01-16T16:00:00.000+01:00"
+      }
+    }
+  },
+  "collect_number_of_observations": {
+    "name": "OphalenAantalWaarnemingen",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenAantalWaarnemingen",
+    "type": "POST",
+    "request": {
+      "AquoMetadataLijst": [
+        {
+          "Compartiment": { "Code": "OW" },
+          "Eenheid": { "Code": "cm" }
+        }
+      ],
+      "Groeperingsperiode": "Week",
+      "LocatieLijst": [
+        {
+          "X": 518882.333320247,
+          "Y": 5760829.11729589,
+          "Code": "EURPFM"
+        }
+      ],
+      "Periode": {
+        "Begindatumtijd": "2012-01-16T14:00:00.000+01:00",
+        "Einddatumtijd": "2012-01-16T16:00:00.000+01:00"
+      }
+    }
+  },
+  "request_bulk_observations": {
+    "name": "AanvragenBulkWaarnemingen",
+    "url": "https://waterwebservices.rijkswaterstaat.nl/BULKWAARNEMINGSERVICES_DBO/AanvragenBulkWaarnemingen",
+    "type": "POST",
+    "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
+    "request": {
+      "Zoekvraag": {
+        "AquoMetadataLijst": [
+          {
+            "Grootheid": {
+              "Code": "H1/3"
+            },
+            "Eenheid": {
+              "Code": "cm"
+            }
+          },
+          {
+            "Compartiment": {
+              "Code": "OW"
+            },
+            "Eenheid": {
+              "Code": "%"
+            },
+            "Grootheid": {
+              "Code": "VERDGGD"
+            },
+            "Parameter": {
+              "Code": "O2"
+            }
+          },
+          {
+            "Compartiment": {
+              "Code": "OW"
+            },
+            "Eenheid": {
+              "Code": "mg/l"
+            },
+            "Parameter": {
+              "Code": "O2"
+            }
+          }
+        ],
+        "LocatieLijst": [
+          {
+            "X": 742469.913149676,
+            "Y": 5940708.14824459,
+            "Code": "HUIBGOT"
+          },
+          {
+            "X": 595875.376191307,
+            "Y": 5790952.82210343,
+            "Code": "NOORDWK2"
+          },
+          {
+            "X": 571670.054611366,
+            "Y": 5822651.05560318,
+            "Code": "IJMDMNTSPS"
+          }
+        ],
+        "Periode": {
+          "Begindatumtijd": "2009-01-01T00:00:00.000+01:00",
+          "Einddatumtijd": "2011-12-31T23:59:59.999+01:00"
+        }
+      },
+      "Email_succes": {
+        "From": "info@rws.nl",
+        "To": "fedor.baart@deltares.nl",
+        "Subject": "Aanvraag bestand waarnemingen",
+        "Body": "Uw bestand met waarnemingen kunt u downloaden via {link_bestand}."
+      },
+      "Email_fout": {
+        "From": "info@rws.nl",
+        "To": "fedor.baart@deltares.nl",
+        "Subject": "Aanvraag niet gelukt",
+        "Body": "Uw aanvraag voor het bestand met waarnemingen is mislukt."
+      },
+      "Email_bevestiging": {
+        "From": "info@rws.nl",
+        "To": "fedor.baart@rws.nl",
+        "Subject": "Dit is een test",
+        "Body": "Uw aanvraag voor data is binnengekomen."
+      }
+    }
+  }
 }

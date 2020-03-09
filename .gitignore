@@ -1,3 +1,6 @@
+# README.rst is generated from README.md, see Makefile
+README.rst
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

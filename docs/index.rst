@@ -1,5 +1,6 @@
-Welcome to Data Distributie Laag. Service from Rijkswaterstaat for distributing water quantity data.'s documentation!
-======================================
+ddlpy documentation
+===================
+
 
 .. toctree::
    :maxdepth: 2
