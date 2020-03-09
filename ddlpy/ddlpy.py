@@ -95,7 +95,8 @@ def _measurements_slice(location, start_date, end_date):
             'X': location['X'],
             'Y': location['Y'],
             # assert code is used as index
-            'Code': location.name
+            # TODO: use  a numpy  compatible json encoder in requests
+            'Code': int(location.name)
         },
         "Periode": {
             "Begindatumtijd": start_date_str,

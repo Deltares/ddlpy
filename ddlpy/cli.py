@@ -6,8 +6,11 @@ import io
 import logging
 
 import click
+import pandas as pd
+import dateutil
 
 import ddlpy
+
 
 
 @click.group()
@@ -80,18 +83,32 @@ def locations(output, station, quantity, format):
     help='End date'
 )
 @click.option(
-    'locations',
-    help='csv or json containing the locations'
+    '--locations',
+    help='csv containing the locations (for speedup)'
 )
 def measurements(station, quantity, start_date, end_date, locations):
     """
     Obtain the measurements for a period of time.
     """
-    l= pd.read_csv(locations)
-    for i in locations.index:
-        l= locations.loc[i, :]
-    measurements = ddlpy.measurements(l, start_date=start_date, end_date=end_date)
+    locations_df = pd.read_csv(locations)
 
+    selected = locations_df[locations_df.Code ==  station]
+    if quantity:
+        selected = selected[selected['Grootheid.Code'] == quantity]
+
+
+    assert selected.shape[0] == 1, 'We should have 1 row but  we got: {}'.format(selected.shape)
+
+    location = selected.iloc[0]
+
+    # conver strings to dates
+    if start_date:
+        start_date = dateutil.parser.parse(start_date)
+    if end_date:
+        end_date = dateutil.parser.parse(end_date)
+
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    measurements.to_csv('test_out.csv')
 
 
 
