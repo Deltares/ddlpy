@@ -125,13 +125,12 @@ def locations(output,
 )
 def measurements(start_date, end_date, locations):
     """
-    Obtain the measurements for a period of time, given a file with locations
-    and codes
+    Obtain measurements from file with locations and codes
     """
     if (locations):
         locations_df = pd.read_csv(locations)
     else:
-        raise ValueError('You needto specify a location file')
+        raise ValueError('You need to specify a location file')
         
     # conver strings to dates
     if start_date:
@@ -144,9 +143,8 @@ def measurements(start_date, end_date, locations):
         measurements = ddlpy.measurements(selected, start_date=start_date, end_date=end_date)
         
         if (len(measurements) > 0):
-            print('Data was found in Waterbase')
-            measurements['locatie_code'] = selected['Code']
-            
+            print('Measurements of %s were obtained'%selected['Code'])
+            station = selected['Code']
             cc = selected['Compartiment.Code']
             ec = selected['Eenheid.Code']
             gc = selected['Grootheid.Code']
@@ -154,7 +152,7 @@ def measurements(start_date, end_date, locations):
             pc = selected['Parameter.Code']
             measurements.to_csv('%s_%s_%s_%s_%s_%s.csv'%(station,cc,ec,gc,hc,pc))
         else:
-            print('No Data were retrieved from Water Info')
+            print('No Data of station %s were retrieved from Water Info'%selected['Code'])
 
 
 if __name__ == "__main__":

@@ -164,7 +164,7 @@ def measurements(location, start_date, end_date):
         except NoDataException:
             # logging in _measurements_slice
             # up to the next loop
-            print('something wrong happened at calling measurements_slice')
+            #print('No data retreived from Water info')
             continue
  
     if ( len(measurements)> 0 ):
