@@ -11,21 +11,22 @@ import pandas as pd
 import os
 
 
-# get location
+# get all locations
 locations = ddlpy.locations()
 
-#select a parameter with specific hoede code.
-# This should be an input from console
+#select a set of parameters 
+# and a set of stations
 code= 'WATHTE'
 unit= 'NAP'
 station= ['IJMDBTHVN', 'DANTZGZD','HOEKVHLD' ]
-# Here we retrieve a dataframe with the desired parameters.
-# Note that each index corresponds to one location.
-parameter= locations[locations.index.isin(station)]
+
+# Filter the locations dataframe with the desired parameters and stations.
+selected= locations[locations.index.isin(station)]
 
 parameter = parameter[(parameter['Grootheid.Code'] == code) &
                       (parameter['Hoedanigheid.Code'] == unit) ].reset_index()
 
+# Obtain measurements per parameter row
 index= 1
 location= parameter.loc[index]
 
@@ -35,13 +36,7 @@ measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_
 
 if (len(measurements) > 0):
     print('Data was found in Waterbase')
-    measurements['locatie_code'] = location['Code']
-    
-    for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
-           measurements[name]= location[name] 
-    
     #measurements.to_csv(directory+"%s_%s.csv"%(location, donar_parcode), index= False)
-
 else:
     print('No Data!')
 

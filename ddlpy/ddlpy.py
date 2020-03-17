@@ -170,5 +170,10 @@ def measurements(location, start_date, end_date):
     if ( len(measurements)> 0 ):
         measurements = pd.concat(measurements)
         measurements = measurements.drop_duplicates()
+        # add other info
+        measurements['locatie_code'] = location['Code']
+        
+        for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
+           measurements[name]= location[name] 
 
     return measurements
