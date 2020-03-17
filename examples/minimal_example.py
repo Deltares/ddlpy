@@ -36,11 +36,17 @@ measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_
 if (len(measurements) > 0):
     print('Data was found in Waterbase')
     measurements['locatie_code'] = location['Code']
-
-    for name, value in zip(location.index, location.values):
-        measurements[name] = value
-
+    
+    for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
+           measurements[name]= location[name] 
+    
     #measurements.to_csv(directory+"%s_%s.csv"%(location, donar_parcode), index= False)
 
 else:
     print('No Data!')
+
+    
+    
+    
+    
+    

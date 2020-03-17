@@ -73,10 +73,11 @@ def locations():
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS['collect_observations']
-
+    
     start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
     end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
 
+    
     request = {
         "AquoPlusWaarnemingMetadata": {
             "AquoMetadata": {
@@ -96,8 +97,7 @@ def _measurements_slice(location, start_date, end_date):
             'Y': location['Y'],
             # assert code is used as index
             # TODO: use  a numpy  compatible json encoder in requests
-            #'Code': int(location.name)
-            'Code': location['Naam']
+            'Code': location['Code']
         },
         "Periode": {
             "Begindatumtijd": start_date_str,
@@ -166,10 +166,7 @@ def measurements(location, start_date, end_date):
             # up to the next loop
             print('something wrong happened at calling measurements_slice')
             continue
-        
-        #measurements.append(measurement)
-    print('len measurements', len(measurements))
-    
+ 
     if ( len(measurements)> 0 ):
         measurements = pd.concat(measurements)
         measurements = measurements.drop_duplicates()
