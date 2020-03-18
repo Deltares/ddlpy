@@ -8,7 +8,6 @@ import logging
 import click
 import pandas as pd
 import dateutil
-import dateparser
 import ddlpy
 #import click
 
@@ -39,25 +38,25 @@ def cli(verbose,  args=None):
     '--hoedanigheid',
     '-h',
     help= 'Hoedanigheid code',
-    multiple = True       
+    multiple = True
 )
 @click.option(
     '--eenheid',
     '-e',
     help= 'Eenheid code',
-    multiple = True       
+    multiple = True
 )
 @click.option(
     '--pcode',
     '-p',
     help= 'Parameter code',
-    multiple = True       
+    multiple = True
 )
 @click.option(
     '--ccode',
     '-c',
     help= 'Compartment code',
-    multiple = True       
+    multiple = True
 )
 @click.option(
     '--station',
@@ -70,8 +69,8 @@ def cli(verbose,  args=None):
     help='output file format',
     type=click.Choice(['csv', 'json'], case_sensitive=True)
 )
-def locations(output, 
-              station, 
+def locations(output,
+              station,
               grootheid,
               hoedanigheid,
               eenheid,
@@ -97,7 +96,7 @@ def locations(output,
 
     if (stations):
         selected = selected[selected.index.isin(stations)]
-        
+
     for q in quantities.keys():
         if (len(quantities[q])!=0 ):
             selected = selected[selected[q].isin(quantities[q])]
@@ -131,17 +130,17 @@ def measurements(start_date, end_date, locations):
         locations_df = pd.read_csv(locations)
     else:
         raise ValueError('You need to specify a location file')
-        
+
     # conver strings to dates
     if start_date:
-        start_date = dateparser.parse(start_date)
+        start_date = dateutil.parser.parse(start_date)
     if end_date:
-        end_date = dateparser.parse(end_date)
-        
+        end_date = dateutil.parser.parse(end_date)
+
     for obs in range(locations_df.shape[0]):
         selected = locations_df.loc[obs]
         measurements = ddlpy.measurements(selected, start_date=start_date, end_date=end_date)
-        
+
         if (len(measurements) > 0):
             print('Measurements of %s were obtained'%selected['Code'])
             station = selected['Code']
@@ -157,4 +156,3 @@ def measurements(start_date, end_date, locations):
 
 if __name__ == "__main__":
     sys.exit(cli())  # pragma: no cover
-    
