@@ -155,9 +155,12 @@ def _measurements_slice(location, start_date, end_date):
 def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
-    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule.YEARLY)):
-        "return measurements for station given by locations record \"location\", from start_date through end_date"
-
+    
+    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule. MONTHLY)):
+        """return measurements for station given by locations record \"location\", from start_date through end_date
+         IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
+         Please, DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
+        """
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
             measurements.append(measurement)
