@@ -24,8 +24,10 @@ Make sure you have installed:
 
 * pandas
 * numpy
+* click
+* python-dateutil>=2.8
 
-To install this code, go to the directory where this code is located andy type in a console:
+To install this ddlpy, go to the directory where this code is located and type in a console:
 
     pip install ddlpy
 
@@ -42,3 +44,13 @@ The output of this code is the data in csv format.
 * 2_get_netcdf.py -> Code to transform the csv files run in the previous script into netcdf files.
 
 More detailed explanation on the usage of these codes are inside the `notebooks` directory.
+
+# Run ddlpy from console
+
+You can also run ddlpy from the console. The options you can use are the following:
+	  
+	ddlpy locations:  Write locations metadata to output file, given input codes. To get access to the help menu, type in a termnal: ddlpy locations --help
+
+	ddlpy measurements: Obtain measurements from file with locations and codes. To get access to the help menu, type in a terminal: ddlpy measurements --help
+
+
