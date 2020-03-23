@@ -27,32 +27,32 @@ def cli(verbose,  args=None):
 @cli.command()
 @click.argument('output', type=click.File('w'))
 @click.option(
-    '--grootheid',
-    '-g',
+    '--quantity',
+    '-qa',
     help='Grootheid code',
     multiple=True
 )
 @click.option(
-    '--hoedanigheid',
-    '-h',
+    '--quality',
+    '-ql',
     help= 'Hoedanigheid code',
     multiple = True
 )
 @click.option(
-    '--eenheid',
-    '-e',
+    '--unit',
+    '-u',
     help= 'Eenheid code',
     multiple = True
 )
 @click.option(
-    '--pcode',
-    '-p',
+    '--parameter-code',
+    '-pc',
     help= 'Parameter code',
     multiple = True
 )
 @click.option(
-    '--ccode',
-    '-c',
+    '--compartment-code',
+    '-cc',
     help= 'Compartment code',
     multiple = True
 )
@@ -69,11 +69,11 @@ def cli(verbose,  args=None):
 )
 def locations(output,
               station,
-              grootheid,
-              hoedanigheid,
-              eenheid,
-              pcode,
-              ccode,
+              quantity,
+              quality,
+              unit,
+              parameter_code,
+              compartment_code,
               format):
     """
     Write locations metadata to output file, given input codes.
@@ -82,11 +82,11 @@ def locations(output,
     locations_df = ddlpy.locations()
 
     stations = station
-    quantities = {'Grootheid.Code':list(grootheid),
-                  'Hoedanigheid.Code':list(hoedanigheid),
-                  'Eenheid.Code':list(eenheid),
-                  'Parameter.Code':list(pcode),
-                  'Compartiment.Code':list(ccode)
+    quantities = {'Grootheid.Code':list(quantity),
+                  'Hoedanigheid.Code':list(quality),
+                  'Eenheid.Code':list(unit),
+                  'Parameter.Code':list(parameter_code),
+                  'Compartiment.Code':list(compartment_code)
                   }
 
     selected = locations_df.copy()
@@ -107,6 +107,7 @@ def locations(output,
 
 # Another command to get the masurements from locations
 @cli.command()
+#@click.argument('input', type=click.File('r'))
 @click.option(
     '--start-date',
     help='Start date of the measurements'
@@ -117,9 +118,10 @@ def locations(output,
 )
 @click.option(
     '--locations',
+    default= 'locations.csv',
     help='csv containing locations and codes'
 )
-def measurements(start_date, end_date, locations):
+def measurements(locations, start_date, end_date):
     """
     Obtain measurements from file with locations and codes
     """
@@ -136,6 +138,8 @@ def measurements(start_date, end_date, locations):
 
     for obs in range(locations_df.shape[0]):
         selected = locations_df.loc[obs]
+        print(selected)
+        #measurements= ddlpy._measurements_slice(selected, start_date=start_date_i, end_date=end_date_i)
         measurements = ddlpy.measurements(selected, start_date=start_date, end_date=end_date)
 
         if (len(measurements) > 0):

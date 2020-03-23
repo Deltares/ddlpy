@@ -101,7 +101,6 @@ def _measurements_slice(location, start_date, end_date):
         }
     }
 
-
     try:
         resp = requests.post(endpoint['url'], json=request)
         result = resp.json()
@@ -157,14 +156,18 @@ def measurements(location, start_date, end_date):
          IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
          Please, DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
         """
+
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
-            measurements.append(measurement)
+            print(measurement.shape)
+            #measurements.append(measurement)
         except NoDataException:
             # logging in _measurements_slice
             # up to the next loop
             #print('No data retreived from Water info')
+            print('not working!')
             continue
+
 
     if ( len(measurements)> 0 ):
         measurements = pd.concat(measurements)
@@ -174,5 +177,6 @@ def measurements(location, start_date, end_date):
 
         for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
            measurements[name]= location[name]
+    
 
     return measurements
