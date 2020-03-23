@@ -51,11 +51,13 @@ You can also run ddlpy from the console. The options you can use are the followi
 * Write locations metadata to output file, given input codes:
 	  
 	ddlpy locations 
+
 To get access to the help menu, type in a termnal: ddlpy locations --help.
 
 * Obtain measurements from file with locations and codes:
 
 	ddlpy measurements
+
 To get access to the help menu, type in a terminal: ddlpy measurements --help
 
 
