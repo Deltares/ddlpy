@@ -48,9 +48,14 @@ More detailed explanation on the usage of these codes are inside the `notebooks`
 # Run ddlpy from console
 
 You can also run ddlpy from the console. The options you can use are the following:
+* Write locations metadata to output file, given input codes:
 	  
-	ddlpy locations:  Write locations metadata to output file, given input codes. To get access to the help menu, type in a termnal: ddlpy locations --help
+	ddlpy locations 
+To get access to the help menu, type in a termnal: ddlpy locations --help.
 
-	ddlpy measurements: Obtain measurements from file with locations and codes. To get access to the help menu, type in a terminal: ddlpy measurements --help
+* Obtain measurements from file with locations and codes:
+
+	ddlpy measurements
+To get access to the help menu, type in a terminal: ddlpy measurements --help
 
 
