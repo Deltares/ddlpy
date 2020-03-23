@@ -24,16 +24,12 @@ class NoDataException(ValueError):
     pass
 
 # Web Feature Service
-# Locaties
-# LocatiesMetLaatsteWaarneming
-
 # Web Mapping Service
-
 logger = logging.getLogger(__name__)
 
 def locations():
     """
-    get station information from DDL (metadata uit Catalogus). All metadata regarding stations.
+    get station information from DDL (metadata from Catalogue). All metadata regarding stations.
     The response (result) retrieves more keys
 
     """
@@ -73,11 +69,11 @@ def locations():
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS['collect_observations']
-    
+
     start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
     end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
 
-    
+
     request = {
         "AquoPlusWaarnemingMetadata": {
             "AquoMetadata": {
@@ -155,7 +151,7 @@ def _measurements_slice(location, start_date, end_date):
 def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
-    
+
     for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule. MONTHLY)):
         """return measurements for station given by locations record \"location\", from start_date through end_date
          IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
@@ -169,14 +165,14 @@ def measurements(location, start_date, end_date):
             # up to the next loop
             #print('No data retreived from Water info')
             continue
- 
+
     if ( len(measurements)> 0 ):
         measurements = pd.concat(measurements)
         measurements = measurements.drop_duplicates()
         # add other info
         measurements['locatie_code'] = location['Code']
-        
+
         for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
-           measurements[name]= location[name] 
+           measurements[name]= location[name]
 
     return measurements

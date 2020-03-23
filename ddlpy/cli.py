@@ -9,8 +9,6 @@ import click
 import pandas as pd
 import dateutil
 import ddlpy
-#import click
-
 
 
 @click.group()
@@ -83,7 +81,6 @@ def locations(output,
     """
     locations_df = ddlpy.locations()
 
-    # we have multiple of these, let's rename them
     stations = station
     quantities = {'Grootheid.Code':list(grootheid),
                   'Hoedanigheid.Code':list(hoedanigheid),

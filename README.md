@@ -58,6 +58,8 @@ To get access to the help menu, type in a termnal: ddlpy locations --help.
 
 	ddlpy measurements
 
-To get access to the help menu, type in a terminal: ddlpy measurements --help. Important: You can not run this option before running ddlpy locations, unless you already have a .csv file listing the stations and the parameters you need data from. 
+To get access to the help menu, type in a terminal: ddlpy measurements --help. 
+
+IMPORTANT: You can not run this option before running ddlpy locations, unless you already have a .csv file listing the stations and the parameters you need data from. 
 
 
