@@ -105,9 +105,8 @@ def locations(output,
     else:
         raise ValueError('Unexpected format {}'.format(format))
 
-# Another command to get the masurements from locations
+# Another command to get the measurements from locations
 @cli.command()
-# @click.argument('input', type=click.File('r'))
 @click.option(
     '--start-date',
     help='Start date of the measurements'
@@ -138,8 +137,7 @@ def measurements(locations, start_date, end_date):
 
     for obs in range(locations_df.shape[0]):
         selected = locations_df.loc[obs]
-        print(selected)
-        #measurements= ddlpy._measurements_slice(selected, start_date=start_date_i, end_date=end_date_i)
+
         measurements = ddlpy.measurements(
             selected, start_date=start_date, end_date=end_date)
 

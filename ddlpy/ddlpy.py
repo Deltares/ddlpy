@@ -102,9 +102,11 @@ def _measurements_slice(location, start_date, end_date):
     }
 
     try:
+        logger.debug('requesting:  {}'.format(request))
         resp = requests.post(endpoint['url'], json=request)
         result = resp.json()
         if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
             raise NoDataException(result.get('Foutmelding', 'No error returned'))
     except NoDataException as e:
         logger.debug('No data availble for {} {}'.format(start_date, end_date))
@@ -159,13 +161,7 @@ def measurements(location, start_date, end_date):
 
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
-            print(measurement.shape)
-            #measurements.append(measurement)
         except NoDataException:
-            # logging in _measurements_slice
-            # up to the next loop
-            #print('No data retreived from Water info')
-            print('not working!')
             continue
 
 
@@ -177,6 +173,6 @@ def measurements(location, start_date, end_date):
 
         for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
            measurements[name]= location[name]
-    
+
 
     return measurements
