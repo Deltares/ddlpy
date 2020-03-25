@@ -24,21 +24,22 @@ class NoDataException(ValueError):
     pass
 
 # Web Feature Service
-# Locaties
-# LocatiesMetLaatsteWaarneming
-
 # Web Mapping Service
-
 logger = logging.getLogger(__name__)
 
 def locations():
     """
-    get station information from DDL (metadata uit Catalogus). All metadata regarding stations.
+    get station information from DDL (metadata from Catalogue). All metadata regarding stations.
     The response (result) retrieves more keys
 
     """
     endpoint = ENDPOINTS['collect_catalogue']
+    msg = '{} with {}'.format(endpoint['url'], json.dumps(endpoint['request']))
+    logger.debug('requesting: {}'.format(msg))
+
     resp = requests.post(endpoint['url'], json=endpoint['request'])
+    if not resp.ok:
+        raise IOError("Failed to request {}: {}".format(msg, resp.text))
     result = resp.json()
     if not result['Succesvol']:
         logger.exception(str(result))
@@ -72,6 +73,7 @@ def _measurements_slice(location, start_date, end_date):
     start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
     end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
 
+
     request = {
         "AquoPlusWaarnemingMetadata": {
             "AquoMetadata": {
@@ -90,7 +92,8 @@ def _measurements_slice(location, start_date, end_date):
             'X': location['X'],
             'Y': location['Y'],
             # assert code is used as index
-            'Code': location.name
+            # TODO: use  a numpy  compatible json encoder in requests
+            'Code': location['Code']
         },
         "Periode": {
             "Begindatumtijd": start_date_str,
@@ -98,11 +101,12 @@ def _measurements_slice(location, start_date, end_date):
         }
     }
 
-
     try:
+        logger.debug('requesting:  {}'.format(request))
         resp = requests.post(endpoint['url'], json=request)
         result = resp.json()
         if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
             raise NoDataException(result.get('Foutmelding', 'No error returned'))
     except NoDataException as e:
         logger.debug('No data availble for {} {}'.format(start_date, end_date))
@@ -148,20 +152,28 @@ def _measurements_slice(location, start_date, end_date):
 def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
-    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule.YEARLY)):
-        "return measurements for station given by locations record \"location\", from start_date through end_date"
+
+    for (start_date_i, end_date_i) in tqdm.tqdm(date_series(start_date, end_date, freq=dateutil.rrule. MONTHLY)):
+        """return measurements for station given by locations record \"location\", from start_date through end_date
+         IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
+         Please, DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
+        """
 
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
             measurements.append(measurement)
         except NoDataException:
-            # logging in _measurements_slice
-            # up to the next loop
             continue
 
-        #measurements.append(measurement)
+
     if ( len(measurements)> 0 ):
         measurements = pd.concat(measurements)
         measurements = measurements.drop_duplicates()
+        # add other info
+        measurements['locatie_code'] = location['Code']
+
+        for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
+           measurements[name]= location[name]
+
 
     return measurements

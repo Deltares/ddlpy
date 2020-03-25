@@ -13,7 +13,7 @@ def date_series(start, end, freq=dateutil.rrule.MONTHLY):
         # merge to a list of pairs
         return zip(i0, i1)
 
-    # go over the rrule, also incklude the end, return consequitive pairs
+    # go over the rrule, also include the end, return consequitive pairs
     result = list(
         pairwise(
             list(

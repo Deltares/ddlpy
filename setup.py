@@ -11,7 +11,8 @@ with open('README.md') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=6.0', ]
+with open('requirements.txt') as requirements_file:
+    requirements = requirements_file.readlines()
 
 setup_requirements = ['pytest-runner', ]
 
@@ -33,7 +34,7 @@ setup(
     description="Service from Rijkswaterstaat for distributing water quantity data.",
     entry_points={
         'console_scripts': [
-            'ddlpy=ddlpy.cli:main',
+            'ddlpy=ddlpy.cli:cli',
         ],
     },
     install_requires=requirements,
