@@ -48,18 +48,18 @@ More detailed explanation on the usage of these codes are inside the `notebooks`
 # Run ddlpy from console
 
 You can also run ddlpy from the console. The options you can use are the following:
-* Write locations metadata to output file, given input codes:
+* Write locations metadata to output file, given input station codes and parameter codes:
 	  
-	ddlpy locations 
+    ddlpy locations 
 
-To get access to the help menu, type in a termnal: ddlpy locations --help.
+To get access to the help menu, type in a terminal: ddlpy locations --help.
 
-* Obtain measurements from file with locations and codes:
+* Obtain measurements from json file containing locations and codes:
 
-	ddlpy measurements
+    ddlpy measurements
 
 To get access to the help menu, type in a terminal: ddlpy measurements --help. 
 
-IMPORTANT: You can not run this option before running ddlpy locations, unless you already have a .json file listing the stations and the parameters you need data from. 
+IMPORTANT: You can not run `ddlpy measurements` before running `ddlpy locations`, unless you already have a .json file listing the stations and the parameters you need data from. 
 
 
