@@ -161,6 +161,7 @@ def measurements(location, start_date, end_date):
 
         try:
             measurement = _measurements_slice(location, start_date=start_date_i, end_date=end_date_i)
+            measurements.append(measurement)
         except NoDataException:
             continue
 

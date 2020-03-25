@@ -25,34 +25,29 @@ def cli(verbose,  args=None):
 # Define a command
 # Each command has options which are read from the console.
 @cli.command()
-@click.argument('output', type=click.File('w'))
+@click.argument('output', type=click.STRING )
 @click.option(
     '--quantity',
-    '-qa',
     help='Grootheid code',
     multiple=True
 )
 @click.option(
     '--quality',
-    '-ql',
     help='Hoedanigheid code',
     multiple=True
 )
 @click.option(
     '--unit',
-    '-u',
     help='Eenheid code',
     multiple=True
 )
 @click.option(
     '--parameter-code',
-    '-pc',
     help='Parameter code',
     multiple=True
 )
 @click.option(
     '--compartment-code',
-    '-cc',
     help='Compartment code',
     multiple=True
 )
@@ -63,9 +58,9 @@ def cli(verbose,  args=None):
 )
 @click.option(
     '--format',
-    default='csv',
-    help='output file format',
-    type=click.Choice(['csv', 'json'], case_sensitive=True)
+    default='json',
+    help='output file format. Must be json',
+    type=click.Choice(['json'], case_sensitive=True)
 )
 def locations(output,
               station,
@@ -98,10 +93,11 @@ def locations(output,
         if (len(quantities[q]) != 0):
             selected = selected[selected[q].isin(quantities[q])]
 
-    if format == 'csv':
-        selected.to_csv(output)
-    elif format == 'json':
-        selected.to_json(output, orient='records')
+    selected.reset_index(inplace= True)
+
+    if format == 'json':
+        output= output.split('.')[0] # make sure that extension is always json
+        selected.to_json(output+'.json', orient='records')
     else:
         raise ValueError('Unexpected format {}'.format(format))
 
@@ -117,17 +113,17 @@ def locations(output,
 )
 @click.option(
     '--locations',
-    default='locations.csv',
-    help='csv containing locations and codes'
+    default='locations.json',
+    help='file in json or parquet format containing locations and codes'
 )
 def measurements(locations, start_date, end_date):
     """
     Obtain measurements from file with locations and codes
     """
-    if (locations):
-        locations_df = pd.read_csv(locations)
-    else:
-        raise ValueError('You need to specify a location file')
+    try:
+        locations_df = pd.read_json(locations, orient='records')
+    except:
+        raise ValueError('location file not existing. Create one or specify its name.')
 
     # conver strings to dates
     if start_date:
@@ -135,7 +131,7 @@ def measurements(locations, start_date, end_date):
     if end_date:
         end_date = dateutil.parser.parse(end_date)
 
-    for obs in range(locations_df.shape[0]):
+    for obs in range(locations_df.shape[0]): #goes through rows in table
         selected = locations_df.loc[obs]
 
         measurements = ddlpy.measurements(
@@ -149,6 +145,7 @@ def measurements(locations, start_date, end_date):
             gc = selected['Grootheid.Code']
             hc = selected['Hoedanigheid.Code']
             pc = selected['Parameter.Code']
+
             measurements.to_csv('%s_%s_%s_%s_%s_%s.csv' %
                                 (station, cc, ec, gc, hc, pc))
         else:
