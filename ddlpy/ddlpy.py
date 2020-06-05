@@ -48,7 +48,7 @@ def locations():
 
     df_locations = pd.DataFrame(result['LocatieLijst'])
 
-    df_metadata = pd.io.json.json_normalize(
+    df_metadata = pd.json_normalize(
         result['AquoMetadataLijst']
     )
 
