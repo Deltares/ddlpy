@@ -130,13 +130,13 @@ def _measurements_slice(location, start_date, end_date):
                 new_row[key] = val
 
             # add metadata
-            for key in list(result['WaarnemingenLijst'][i]['AquoMetadata'].keys())[2:]:
-                new_row[key+'.code']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Code']
-                new_row[key+'.Omschrijving']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Omschrijving']
+#            for key in list(result['WaarnemingenLijst'][i]['AquoMetadata'].keys())[2:]:
+#                new_row[key+'.code']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Code']
+#                new_row[key+'.Omschrijving']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Omschrijving']
 
             rows.append(new_row)
     # normalize and return
-    df = pd.io.json.json_normalize(rows)
+    df = pd.json.json_normalize(rows)
     # set NA value
     if 'Meetwaarde.Waarde_Numeriek' in df.columns:
         df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
