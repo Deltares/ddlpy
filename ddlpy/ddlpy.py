@@ -136,7 +136,7 @@ def _measurements_slice(location, start_date, end_date):
 
             rows.append(new_row)
     # normalize and return
-    df = pd.json.json_normalize(rows)
+    df = pd.json_normalize(rows)
     # set NA value
     if 'Meetwaarde.Waarde_Numeriek' in df.columns:
         df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
