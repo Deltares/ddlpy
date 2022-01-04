@@ -130,10 +130,13 @@ def _measurements_slice(location, start_date, end_date):
                 new_row[key] = val
 
             # add metadata
-#            for key in list(result['WaarnemingenLijst'][i]['AquoMetadata'].keys())[2:]:
-#                new_row[key+'.code']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Code']
-#                new_row[key+'.Omschrijving']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Omschrijving']
-
+            for key in list(result['WaarnemingenLijst'][i]['AquoMetadata'].keys())[2:]:
+                try:
+                    new_row[key+'.code']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Code']
+                    new_row[key+'.Omschrijving']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Omschrijving']
+                except:
+                    continue
+                
             rows.append(new_row)
     # normalize and return
     df = pd.json_normalize(rows)
