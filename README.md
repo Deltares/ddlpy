@@ -2,7 +2,7 @@
 
 (D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
 
-[![pypi-image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
+[![pypi-image](https://img.shields.io/pypi/v/rws-ddlpy.svg)](https://pypi.python.org/pypi/rws-ddlpy)
 
 [![image](https://img.shields.io/travis/openearth/ddlpy.svg)](https://travis-ci.org/openearth/ddlpy)
 
@@ -49,8 +49,8 @@ More detailed explanation on the usage of these codes are inside the `notebooks`
 
 You can also run ddlpy from the console. The options you can use are the following:
 * Write locations metadata to output file, given input station codes and parameter codes:
-	  
-    ddlpy locations 
+
+    ddlpy locations
 
 To get access to the help menu, type in a terminal: ddlpy locations --help.
 
@@ -58,8 +58,6 @@ To get access to the help menu, type in a terminal: ddlpy locations --help.
 
     ddlpy measurements
 
-To get access to the help menu, type in a terminal: ddlpy measurements --help. 
+To get access to the help menu, type in a terminal: ddlpy measurements --help.
 
-IMPORTANT: You can not run `ddlpy measurements` before running `ddlpy locations`, unless you already have a .json file listing the stations and the parameters you need data from. 
-
-
+IMPORTANT: You can not run `ddlpy measurements` before running `ddlpy locations`, unless you already have a .json file listing the stations and the parameters you need data from.
