@@ -43,7 +43,7 @@ setup(
     long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='ddlpy',
-    name='ddlpy',
+    name='rws-ddlpy',
     packages=find_packages(include=['ddlpy']),
     setup_requires=setup_requirements,
     test_suite='tests',
