@@ -93,7 +93,7 @@ def _measurements_slice(location, start_date, end_date):
             'Y': location['Y'],
             # assert code is used as index
             # TODO: use  a numpy  compatible json encoder in requests
-            'Code': location['Code']
+            'Code': location.get('Code', location.name)
         },
         "Periode": {
             "Begindatumtijd": start_date_str,
@@ -182,7 +182,7 @@ def measurements(location, start_date, end_date):
         measurements = pd.concat(measurements)
         measurements = measurements.drop_duplicates()
         # add other info
-        measurements['locatie_code'] = location['Code']
+        measurements['locatie_code'] = location.get('Code', location.name)
 
         for name in ['Coordinatenstelsel', 'Naam', 'X', 'Y', 'Parameter_Wat_Omschrijving']:
            measurements[name]= location[name]
