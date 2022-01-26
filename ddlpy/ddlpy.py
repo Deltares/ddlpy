@@ -145,10 +145,9 @@ def _measurements_slice(location, start_date, end_date):
                     new_row[new_key] = new_val
                 else:
                     new_row[key] = val
-
             rows.append(new_row)
     # normalize and return
-    df = pd.io.json.json_normalize(rows)
+    df = pd.json_normalize(rows)
     # set NA value
     if 'Meetwaarde.Waarde_Numeriek' in df.columns:
         df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
