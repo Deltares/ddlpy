@@ -6,7 +6,7 @@
 
 [![image](https://img.shields.io/travis/openearth/ddlpy.svg)](https://travis-ci.org/openearth/ddlpy)
 
-[![Documentation Status](https://readthedocs.org/projects/ddlpy/badge/?version=latest)](https://ddlpy.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/rws-ddlpy/badge/?version=latest)](https://rws-ddlpy.readthedocs.io/en/latest/?badge=latest)
 
 [![Updates](https://pyup.io/repos/github/openearth/ddlpy/shield.svg)](https://pyup.io/repos/github/openearth/ddlpy/)
 
