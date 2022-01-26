@@ -117,12 +117,15 @@ def _measurements_slice(location, start_date, end_date):
     #assert len(result['WaarnemingenLijst']) == 1
     # flatten the datastructure
     rows = []
-    for i in range(0, len(result['WaarnemingenLijst']) ):
-        for row in result['WaarnemingenLijst'][i]['MetingenLijst']:
+    for waarneming in result['WaarnemingenLijst']:
+        for row in waarneming['MetingenLijst']:
         # metadata is a list of 1 value, flatten it
-            new_row = {
-                'WaarnemingMetadata.' + key: value[0] if len(value) == 1 else value for key, value in row['WaarnemingMetadata'].items()
-                }
+            new_row = {}
+            for key, value in row['WaarnemingMetadata'].items():
+                new_key = 'WaarnemingMetadata.' + key
+                new_val = value[0] if len(value) == 1 else value
+                new_row[new_key] = new_val
+
             # add remaining data
             for key, val in row.items():
                 if key == 'WaarnemingMetadata':
@@ -130,9 +133,18 @@ def _measurements_slice(location, start_date, end_date):
                 new_row[key] = val
 
             # add metadata
-            for key in list(result['WaarnemingenLijst'][i]['AquoMetadata'].keys())[2:]:
-                new_row[key+'.code']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Code']
-                new_row[key+'.Omschrijving']= result['WaarnemingenLijst'][i]['AquoMetadata'][key]['Omschrijving']
+            for key, val in list(waarneming['AquoMetadata'].items()):
+                if isinstance(val, dict) and 'Code' in val and 'Omschrijving' in val:
+                    # some values have a code/omschrijving pair, flatten them
+                    new_key = key + '.code'
+                    new_val = val['Code']
+                    new_row[new_key] = new_val
+
+                    new_key = key + '.Omschrijving'
+                    new_val = val['Omschrijving']
+                    new_row[new_key] = new_val
+                else:
+                    new_row[key] = val
 
             rows.append(new_row)
     # normalize and return
