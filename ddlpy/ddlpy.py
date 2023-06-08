@@ -186,3 +186,145 @@ def measurements(location, start_date, end_date):
             measurements[name] = location[name]
 
     return measurements
+
+
+def measurements_available(location, start_date, end_date):
+    """checks if there are measurements for location, for the period start_date, end_date
+    gives None if check was unsuccesfull
+    gives True/False if there are / are no measurement available
+    """
+    endpoint = ENDPOINTS['check_observations_available']
+
+    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
+    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+
+
+    request = {
+        "AquoMetadataLijst": [{
+            "Eenheid": {
+                "Code": location['Eenheid.Code']
+            },
+            "Grootheid": {
+                "Code": location['Grootheid.Code']
+            },
+            "Hoedanigheid": {
+                "Code": location['Hoedanigheid.Code']
+            }
+        }],
+        "LocatieLijst": [{
+            "Code": location.get('Code', location.name),
+            "X": location['X'],
+            "Y": location['Y']
+            
+        }],
+        "Periode": {
+            "Begindatumtijd": start_date_str,
+            "Einddatumtijd": end_date_str
+        }
+    }
+
+    try:
+        logger.debug('requesting:  {}'.format(request))
+        resp = requests.post(endpoint['url'], json=request)
+        result = resp.json()
+        if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
+            raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    except NoDataException as e:
+        logger.debug('No data availble for {} {}'.format(start_date, end_date))
+        raise e
+    
+    if not result['Succesvol']:
+        return None
+    else :
+        if result['WaarnemingenAanwezig'] == 'true' :
+            return True
+        else:
+            return False        
+
+
+def last_observation(location):
+    """get last observation for the given location"""
+    endpoint = ENDPOINTS['collect_latest_observations']
+    
+    request = {
+        "AquoPlusWaarnemingMetadataLijst": [{
+            "AquoMetadata": {
+                "Eenheid": {
+                    "Code": location['Eenheid.Code']
+                },
+                "Grootheid": {
+                    "Code": location['Grootheid.Code']
+                },
+                "Hoedanigheid": {
+                    "Code": location['Hoedanigheid.Code']
+                }
+            }
+        }],
+        "LocatieLijst": [{
+            "Code": location.get('Code', location.name),
+            "X": location['X'],
+            "Y": location['Y']
+            
+        }]
+    }
+
+    try:
+        logger.debug('requesting:  {}'.format(request))
+        resp = requests.post(endpoint['url'], json=request)
+    
+        result = resp.json()
+        if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
+            raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    except NoDataException as e:
+        logger.debug('No data availble')
+        raise e
+
+    assert 'WaarnemingenLijst' in result
+
+    #assert len(result['WaarnemingenLijst']) == 1
+    # flatten the datastructure
+    rows = []
+    for waarneming in result['WaarnemingenLijst']:
+        for row in waarneming['MetingenLijst']:
+        # metadata is a list of 1 value, flatten it
+            new_row = {}
+            for key, value in row['WaarnemingMetadata'].items():
+                new_key = 'WaarnemingMetadata.' + key
+                new_val = value[0] if len(value) == 1 else value
+                new_row[new_key] = new_val
+
+            # add remaining data
+            for key, val in row.items():
+                if key == 'WaarnemingMetadata':
+                    continue
+                new_row[key] = val
+
+            # add metadata
+            for key, val in list(waarneming['AquoMetadata'].items()):
+                if isinstance(val, dict) and 'Code' in val and 'Omschrijving' in val:
+                    # some values have a code/omschrijving pair, flatten them
+                    new_key = key + '.code'
+                    new_val = val['Code']
+                    new_row[new_key] = new_val
+
+                    new_key = key + '.Omschrijving'
+                    new_val = val['Omschrijving']
+                    new_row[new_key] = new_val
+                else:
+                    new_row[key] = val
+
+            rows.append(new_row)
+    # normalize and return
+    df = pd.json_normalize(rows)
+    # set NA value
+    if 'Meetwaarde.Waarde_Numeriek' in df.columns:
+        df[df['Meetwaarde.Waarde_Numeriek'] == 999999999] = None
+
+    try:
+        df['t'] = pd.to_datetime(df['Tijdstip'])
+    except KeyError:
+        logger.exception('Cannot add time variable t because variable Tijdstip is not found')
+    return df
+
