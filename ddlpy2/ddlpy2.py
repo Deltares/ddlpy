@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+" Based on ddlpy by Fedor Baart (Deltares); https://github.com/openearth/ddlpy "
+
 """Main module."""
 import json
 import pathlib
@@ -39,9 +41,10 @@ def locations():
     msg = "{} with {}".format(endpoint["url"], json.dumps(endpoint["request"]))
     logger.debug("requesting: {}".format(msg))
 
-    resp = requests.post(endpoint["url"], json=endpoint["request"])
+    resp = requests.post(endpoint["url"], json=endpoint["request"], timeout=5)
     if not resp.ok:
         raise IOError("Failed to request {}: {}".format(msg, resp.text))
+    
     result = resp.json()
     if not result["Succesvol"]:
         logger.exception(str(result))
@@ -92,7 +95,7 @@ def _measurements_slice(location, start_date, end_date):
 
     try:
         logger.debug("requesting:  {}".format(request))
-        resp = requests.post(endpoint["url"], json=request)
+        resp = requests.post(endpoint["url"], json=request, timeout=5)
         result = resp.json()
         if not result["Succesvol"]:
             logger.debug("Got  invalid response: {}".format(result))
@@ -225,7 +228,7 @@ def measurements_available(location, start_date, end_date):
 
     try:
         logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request)
+        resp = requests.post(endpoint['url'], json=request, timeout=5)
         result = resp.json()
         if not result['Succesvol']:
             logger.debug('Got  invalid response: {}'.format(result))
@@ -271,7 +274,7 @@ def last_observation(location):
 
     try:
         logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request)
+        resp = requests.post(endpoint['url'], json=request, timeout=5)
     
         result = resp.json()
         if not result['Succesvol']:

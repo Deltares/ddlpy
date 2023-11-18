@@ -1,3 +1,5 @@
+" Based on ddlpy by Fedor Baart (Deltares); https://github.com/openearth/ddlpy "
+
 import pandas as pd
 import xarray as xr
 from datetime import datetime, timedelta

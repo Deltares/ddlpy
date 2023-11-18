@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+" Based on ddlpy by Fedor Baart (Deltares); https://github.com/openearth/ddlpy "
+
 """Console script for ddlpy."""
 import sys
 import io

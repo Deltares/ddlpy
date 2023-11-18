@@ -1,12 +1,15 @@
-include CONTRIBUTING.rst
-include HISTORY.rst
 include LICENSE
-include README.rst
-
-include ddlpy/endpoints.json
+include README.md
 
 recursive-include tests *
+recursive-include examples *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+
+include src/ddlpy2/endpoints.json
+exclude examples/createReadme.py
+exclude examples/1_get_data_from_waterInfo_parallel.py
+exclude examples/2_get_netcdf.py
+exclude examples/minimal_example.py
