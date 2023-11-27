@@ -9,7 +9,6 @@ import datetime
 import pandas as pd
 import os
 
-
 #select a set of parameters 
 # and a set of stations
 station = 'DEVE' # Deventer
@@ -34,10 +33,6 @@ else :
 index= 0
 location= selected.loc[index]
 
-start_date = datetime.datetime(2023, 11, 14) # also inputs for the code
-end_date = datetime.datetime(2023, 11, 15)
-
-#if ddlpy2.measurements_available(location, start_date, end_date):
 observation = ddlpy2.last_observation(location)
 if 'Meetwaarde.Waarde_Numeriek' in observation.columns:
     meetwaarde = observation['Meetwaarde.Waarde_Numeriek'][0]
@@ -48,5 +43,4 @@ tijd = observation['Tijdstip'][0]
 eenheid = observation['Eenheid.code'][0]
 
 print ("%s %s om %s" % (meetwaarde, eenheid, tijd))
-#else :
-#    print ("Geen recente data")
+

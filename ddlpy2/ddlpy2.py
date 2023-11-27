@@ -265,7 +265,8 @@ def last_observation(location):
             }
         }],
         "LocatieLijst": [{
-            "Code": location.get('Code', location.name),
+            #"Code": location.get('Code', location.name),
+            "Code": location['Code'],
             "X": location['X'],
             "Y": location['Y']
             
