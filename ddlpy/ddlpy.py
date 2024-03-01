@@ -289,5 +289,7 @@ def measurements(location, start_date, end_date, clean_df=True):
             measurements = measurements.drop_duplicates()
             # sort dataframe on time, ddl returns non-sorted data
             measurements = measurements.sort_values("t")
-        
+            # reset index to be contiguous again
+            measurements = measurements.reset_index(drop=True)
+    
     return measurements
