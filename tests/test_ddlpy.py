@@ -47,6 +47,7 @@ def test_measurements_long(location):
     assert measurements.shape[0] > 1
     
 def test_measurements_sorted(location):
+    """https://github.com/openearth/ddlpy/issues/27"""
     # input parameters
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
@@ -61,6 +62,12 @@ def test_measurements_sorted(location):
     assert isinstance(meas_wathte_raw.index, pd.RangeIndex)
 
 def test_measurements_duplicated(location):
+    """
+    WALSODN 2010 contains all values three times, ddlpy drops duplicates
+    https://github.com/openearth/ddlpy/issues/24
+    if the data is cleaned in ddl, this test will fail and can be removed or adjusted
+    
+    """
     locations = ddlpy.locations()
     location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['WALSODN']
     start_date = dt.datetime(2010, 1, 1)
