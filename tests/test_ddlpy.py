@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `ddlpy` package."""
-import datetime
+import datetime as dt
 
 import pytest
 
@@ -24,15 +24,15 @@ def location():
     return location
 
 def test_measurements_available(location):
-    start_date = datetime.datetime(1953, 1, 1)
-    end_date = datetime.datetime(1953, 4, 1)
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
     data_present = ddlpy.ddlpy._measurements_available(location, start_date=start_date, end_date=end_date)
     assert isinstance(data_present, bool)
 
 def test_measurements(location):
     """measurements for a location """
-    start_date = datetime.datetime(1953, 1, 1)
-    end_date = datetime.datetime(1953, 4, 1)
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
@@ -43,10 +43,24 @@ def test_measurements_latest(location):
 
 def test_measurements_long(location):
     """measurements for a location """
-    start_date = datetime.datetime(1951, 11, 1)
-    end_date = datetime.datetime(1953, 4, 1)
+    start_date = dt.datetime(1951, 11, 1)
+    end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
+    
+def test_measurements_sorted(location):
+    # input parameters
+    start_date  = dt.datetime(2019,11,24)
+    end_date = dt.datetime(2019,12,5)
+    
+    meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    assert meas_wathte["t"].is_monotonic_increasing == True
+    
+    meas_wathte_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
+    assert meas_wathte_clean["t"].is_monotonic_increasing == True
+
+    meas_wathte_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
+    assert meas_wathte_raw["t"].is_monotonic_increasing == False
 
 def test_command_line_interface():
     """Test the CLI."""
