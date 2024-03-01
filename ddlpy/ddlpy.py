@@ -252,7 +252,7 @@ def _measurements_slice(location, start_date, end_date):
     df = _combine_waarnemingenlijst(result, location)
     return df
 
-
+ 
 def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
