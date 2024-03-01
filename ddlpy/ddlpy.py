@@ -170,7 +170,7 @@ def measurements(location, start_date, end_date):
             bool_nan = measurements["WaarnemingMetadata.KwaliteitswaardecodeLijst"] == "99"
             if "Meetwaarde.Waarde_Numeriek" in measurements.columns:
                 measurements.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
-        
+        a
         try:
             measurements["t"] = pd.to_datetime(measurements["Tijdstip"])
         except KeyError:
