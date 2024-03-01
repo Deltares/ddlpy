@@ -10,6 +10,7 @@ import pandas as pd
 import pytz
 import tqdm
 import dateutil
+import numpy as np
 
 from .utils import date_series
 
@@ -137,16 +138,6 @@ def _measurements_slice(location, start_date, end_date):
             rows.append(new_row)
     # normalize and return
     df = pd.json_normalize(rows)
-    # set NA value
-    if "Meetwaarde.Waarde_Numeriek" in df.columns:
-        df[df["Meetwaarde.Waarde_Numeriek"] == 999999999] = None
-
-    try:
-        df["t"] = pd.to_datetime(df["Tijdstip"])
-    except KeyError:
-        logger.exception(
-            "Cannot add time variable t because variable Tijdstip is not found"
-        )
     return df
 
 
@@ -159,7 +150,8 @@ def measurements(location, start_date, end_date):
     ):
         """return measurements for station given by locations record \"location\", from start_date through end_date
         IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
-        Please, DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
+        For instance if many duplicate timesteps are present, it will fail or timeout.
+        Therefore, Please DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
         """
 
         try:
@@ -172,7 +164,23 @@ def measurements(location, start_date, end_date):
 
     if len(measurements) > 0:
         measurements = pd.concat(measurements)
+
+        # set NA value
+        if "WaarnemingMetadata.KwaliteitswaardecodeLijst" in measurements.columns:
+            bool_nan = measurements["WaarnemingMetadata.KwaliteitswaardecodeLijst"] == "99"
+            if "Meetwaarde.Waarde_Numeriek" in measurements.columns:
+                measurements.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
+        
+        try:
+            measurements["t"] = pd.to_datetime(measurements["Tijdstip"])
+        except KeyError:
+            logger.exception(
+                "Cannot add time variable t because variable Tijdstip is not found"
+            )
+
+        # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
         measurements = measurements.drop_duplicates()
+        
         # add other info
         measurements["locatie_code"] = location.get("Code", location.name)
 
