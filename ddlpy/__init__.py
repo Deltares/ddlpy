@@ -7,6 +7,6 @@ __email__ = 'fedor.baart@deltares.nl'
 __version__ = '0.1.0'
 
 from ddlpy.ddlpy import locations
-from ddlpy.ddlpy import measurements
+from ddlpy.ddlpy import measurements, measurements_latest
 
 __all__ = ['locations', 'measurements']
