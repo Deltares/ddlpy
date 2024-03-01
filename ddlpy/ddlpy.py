@@ -285,11 +285,14 @@ def measurements(location, start_date, end_date, clean_df=True):
         measurements = pd.concat(measurements)
 
         if clean_df:
+            len_raw = len(measurements)
             # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
             measurements = measurements.drop_duplicates()
             # sort dataframe on time, ddl returns non-sorted data
             measurements = measurements.sort_values("t")
             # reset index to be contiguous again
             measurements = measurements.reset_index(drop=True)
+            ndropped = len_raw - len(measurements)
+            logger.debug(f"{ndropped} duplicated values dropped")
     
     return measurements
