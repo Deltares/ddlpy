@@ -8,7 +8,7 @@ import pytest
 
 from click.testing import CliRunner
 
-from ddlpy import ddlpy
+import ddlpy
 from ddlpy import cli
 
 
@@ -23,6 +23,11 @@ def location():
     location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['DENHDR']
     return location
 
+def test_measurements_available(location):
+    start_date = datetime.datetime(1953, 1, 1)
+    end_date = datetime.datetime(1953, 4, 1)
+    data_present = ddlpy.ddlpy._measurements_available(location, start_date=start_date, end_date=end_date)
+    assert isinstance(data_present, bool)
 
 def test_measurements(location):
     """measurements for a location """
