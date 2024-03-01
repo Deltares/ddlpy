@@ -66,29 +66,81 @@ def locations():
     return merged.set_index("Code")
 
 
+def _get_request_dicts(location):
+    aquometadata_dict = {
+        "Eenheid": {"Code": location["Eenheid.Code"]},
+        "Grootheid": {"Code": location["Grootheid.Code"]},
+        "Hoedanigheid": {"Code": location["Hoedanigheid.Code"]},
+    }
+    
+    locatie_dict = {
+        "X": location["X"],
+        "Y": location["Y"],
+        # assert code is used as index
+        # TODO: use  a numpy  compatible json encoder in requests
+        "Code": location.get("Code", location.name),
+    }
+    
+    request_dicts = {"AquoMetadata": aquometadata_dict,
+                     "Locatie": locatie_dict}
+    return request_dicts
+
+
+def _measurements_available(location, start_date, end_date):
+    """checks if there are measurements for location, for the period start_date, end_date
+    gives None if check was unsuccesfull
+    gives True/False if there are / are no measurement available
+    """
+    endpoint = ENDPOINTS['check_observations_available']
+
+    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
+    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+
+    request_dicts = _get_request_dicts(location)
+
+    request = {
+        "AquoMetadataLijst": [request_dicts["AquoMetadata"]],
+        "LocatieLijst": [request_dicts["Locatie"]],
+        "Periode": {
+            "Begindatumtijd": start_date_str,
+            "Einddatumtijd": end_date_str
+        }
+    }
+
+    try:
+        logger.debug('requesting:  {}'.format(request))
+        resp = requests.post(endpoint['url'], json=request, timeout=5)
+        result = resp.json()
+        if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
+            raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    except NoDataException as e:
+        logger.debug('No data availble for {} {}'.format(start_date, end_date))
+        raise e
+
+    if result['Succesvol']:
+        if result['WaarnemingenAanwezig'] == 'true' :
+            return True
+        else:
+            return False  
+
+
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
 
     start_date_str = pytz.UTC.localize(start_date).isoformat(timespec="milliseconds")
     end_date_str = pytz.UTC.localize(end_date).isoformat(timespec="milliseconds")
-
+    
+    request_dicts = _get_request_dicts(location)
+    
     request = {
         "AquoPlusWaarnemingMetadata": {
-            "AquoMetadata": {
-                "Eenheid": {"Code": location["Eenheid.Code"]},
-                "Grootheid": {"Code": location["Grootheid.Code"]},
-                "Hoedanigheid": {"Code": location["Hoedanigheid.Code"]},
-            }
-        },
-        "Locatie": {
-            "X": location["X"],
-            "Y": location["Y"],
-            # assert code is used as index
-            # TODO: use  a numpy  compatible json encoder in requests
-            "Code": location.get("Code", location.name),
-        },
-        "Periode": {"Begindatumtijd": start_date_str, "Einddatumtijd": end_date_str},
+            "AquoMetadata": request_dicts["AquoMetadata"]
+            },
+        "Locatie": request_dicts["Locatie"],
+        "Periode": {"Begindatumtijd": start_date_str, 
+                    "Einddatumtijd": end_date_str},
     }
 
     try:
@@ -145,6 +197,13 @@ def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
 
+    data_present = _measurements_available(
+            location, start_date=start_date, end_date=end_date)
+    if not data_present:
+        # early return in case of no data
+        print("[NO DATA]")
+        return measurements
+    
     for (start_date_i, end_date_i) in tqdm.tqdm(
         date_series(start_date, end_date, freq=dateutil.rrule.MONTHLY)
     ):
