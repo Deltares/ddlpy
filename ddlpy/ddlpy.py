@@ -10,6 +10,7 @@ import pandas as pd
 import pytz
 import tqdm
 import dateutil
+import numpy as np
 
 from .utils import date_series
 
@@ -138,8 +139,10 @@ def _measurements_slice(location, start_date, end_date):
     # normalize and return
     df = pd.json_normalize(rows)
     # set NA value
-    if "Meetwaarde.Waarde_Numeriek" in df.columns:
-        df[df["Meetwaarde.Waarde_Numeriek"] == 999999999] = None
+    if "WaarnemingMetadata.KwaliteitswaardecodeLijst" in df.columns:
+        bool_nan = df["WaarnemingMetadata.KwaliteitswaardecodeLijst"] == "99"
+        if "Meetwaarde.Waarde_Numeriek" in df.columns:
+            df.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
 
     try:
         df["t"] = pd.to_datetime(df["Tijdstip"])
