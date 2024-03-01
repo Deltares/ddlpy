@@ -5,6 +5,8 @@ History
 UNRELEASED
 ------------------
 * improved nan filtering of measurements in https://github.com/openearth/ddlpy/pull/30
+* add early return when no data in entire requested period in https://github.com/openearth/ddlpy/pull/33
+
 
 0.1.0 (2019-01-03)
 ------------------
