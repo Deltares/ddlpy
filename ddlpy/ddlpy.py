@@ -286,5 +286,6 @@ def measurements(location, start_date, end_date):
 
         # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
         measurements = measurements.drop_duplicates()
+        measurements = measurements.sort_values("t")
         
     return measurements
