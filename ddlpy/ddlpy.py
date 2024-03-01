@@ -253,7 +253,7 @@ def _measurements_slice(location, start_date, end_date):
     return df
 
 
-def measurements(location, start_date, end_date):
+def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
 
@@ -284,7 +284,15 @@ def measurements(location, start_date, end_date):
     if len(measurements) > 0:
         measurements = pd.concat(measurements)
 
-        # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
-        measurements = measurements.drop_duplicates()
-        
+        if clean_df:
+            len_raw = len(measurements)
+            # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
+            measurements = measurements.drop_duplicates()
+            # sort dataframe on time, ddl returns non-sorted data
+            measurements = measurements.sort_values("t")
+            # reset index to be contiguous again
+            measurements = measurements.reset_index(drop=True)
+            ndropped = len_raw - len(measurements)
+            logger.debug(f"{ndropped} duplicated values dropped")
+    
     return measurements
