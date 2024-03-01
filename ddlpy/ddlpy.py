@@ -197,7 +197,6 @@ def measurements(location, start_date, end_date):
     """return measurements for the given location and time window (start_date, end_date)"""
     measurements = []
 
-
     data_present = _measurements_available(
             location, start_date=start_date, end_date=end_date)
     if not data_present:
@@ -213,7 +212,7 @@ def measurements(location, start_date, end_date):
         For instance if many duplicate timesteps are present, it will fail or timeout.
         Therefore, Please DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
         """
-        
+
         try:
             measurement = _measurements_slice(
                 location, start_date=start_date_i, end_date=end_date_i
