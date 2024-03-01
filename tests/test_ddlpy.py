@@ -66,7 +66,6 @@ def test_measurements_duplicated(location):
     WALSODN 2010 contains all values three times, ddlpy drops duplicates
     https://github.com/openearth/ddlpy/issues/24
     if the data is cleaned in ddl, this test will fail and can be removed or adjusted
-    
     """
     locations = ddlpy.locations()
     location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['WALSODN']
