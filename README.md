@@ -27,9 +27,13 @@ Make sure you have installed:
 * click
 * python-dateutil>=2.8
 
-To install this ddlpy, go to the directory where this code is located and type in a console:
+The latest ddlpy PyPI release is outdated, but it can be installed with:
 
-    pip install ddlpy
+	pip install rws-ddlpy
+
+The newest version is currently installed directly from github with:
+
+    pip install git+https://github.com/openearth/ddlpy
 
 In the folder examples you will find the following files:
 
