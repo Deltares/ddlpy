@@ -34,6 +34,13 @@ def test_measurements(location):
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
+def test_measurements_string(location):
+    """measurements for a location """
+    start_date = "1953-01-01"
+    end_date = "1953-04-01"
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    assert measurements.shape[0] > 1
+
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)

@@ -93,6 +93,9 @@ def _measurements_available(location, start_date, end_date):
     """
     endpoint = ENDPOINTS['check_observations_available']
 
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+    
     start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
     end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
 
@@ -255,6 +258,9 @@ def _measurements_slice(location, start_date, end_date):
 
 def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+    
     measurements = []
 
     data_present = _measurements_available(
