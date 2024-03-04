@@ -194,35 +194,6 @@ def _combine_waarnemingenlijst(result, location):
     return df
 
 
-def measurements_latest(location):
-    """checks if there are measurements for location, for the period start_date, end_date
-    gives None if check was unsuccesfull
-    gives True/False if there are / are no measurement available
-    """
-    endpoint = ENDPOINTS['collect_latest_observations']
-
-    request_dicts = _get_request_dicts(location)
-    
-    request = {"AquoPlusWaarnemingMetadataLijst":[{"AquoMetadata":request_dicts["AquoMetadata"]}],
-               "LocatieLijst":[request_dicts["Locatie"]]
-               }
-
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request, timeout=5)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
-        logger.debug('No data availble')
-        raise e
-
-    if result['Succesvol']:
-        df = _combine_waarnemingenlijst(result, location)
-        return df
-
-
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
@@ -302,3 +273,52 @@ def measurements(location, start_date, end_date, clean_df=True):
             logger.debug(f"{ndropped} duplicated values dropped")
     
     return measurements
+
+
+def measurements_latest(location):
+    """checks if there are measurements for location, for the period start_date, end_date
+    gives None if check was unsuccesfull
+    gives True/False if there are / are no measurement available
+    """
+    endpoint = ENDPOINTS['collect_latest_observations']
+
+    request_dicts = _get_request_dicts(location)
+    
+    request = {"AquoPlusWaarnemingMetadataLijst":[{"AquoMetadata":request_dicts["AquoMetadata"]}],
+               "LocatieLijst":[request_dicts["Locatie"]]
+               }
+
+    try:
+        logger.debug('requesting:  {}'.format(request))
+        resp = requests.post(endpoint['url'], json=request, timeout=5)
+        result = resp.json()
+        if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
+            raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    except NoDataException as e:
+        logger.debug('No data availble')
+        raise e
+
+    if result['Succesvol']:
+        df = _combine_waarnemingenlijst(result, location)
+        return df
+
+
+def simplify_dataframe(df):
+    """
+    drop columns with constant values from the dataframe
+    and collect them in a dictionary which is 
+    added as attrs of the dataframe
+    """
+    
+    bool_constant = (df == df.iloc[0]).all()
+    
+    # constant columns are flattened and converted to dict of attrs
+    df_attrs = df.loc[:, bool_constant].iloc[0].to_dict()
+    
+    # varying columns are kept in output dataframe
+    df_simple = df.loc[:, ~bool_constant]
+    
+    df_simple.attrs = df_attrs
+    
+    return df_simple
