@@ -189,7 +189,7 @@ def _combine_waarnemingenlijst(result, location):
         df = df.set_index("time")
     except KeyError:
         logger.exception(
-            "Cannot add time variable t because variable Tijdstip is not found"
+            "Cannot add time variable time because variable Tijdstip is not found"
         )
 
     return df
@@ -239,8 +239,8 @@ def measurements(location, start_date, end_date, clean_df=True):
             location, start_date=start_date, end_date=end_date)
     if not data_present:
         # early return in case of no data
-        print("[NO DATA]")
-        return measurements
+        logger.debug("no data found for this station and time extent")
+        return
     
     for (start_date_i, end_date_i) in tqdm.tqdm(
         date_series(start_date, end_date, freq=dateutil.rrule.MONTHLY)
@@ -259,20 +259,22 @@ def measurements(location, start_date, end_date, clean_df=True):
         except NoDataException:
             continue
 
-    if len(measurements) > 0:
-        measurements = pd.concat(measurements)
-
-        if clean_df:
-            len_raw = len(measurements)
-            # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
-            measurements = measurements.drop_duplicates()
-            # sort dataframe on time, ddl returns non-sorted data
-            measurements = measurements.sort_values("t")
-            # reset index to be contiguous again
-            measurements = measurements.reset_index(drop=True)
-            ndropped = len_raw - len(measurements)
-            logger.debug(f"{ndropped} duplicated values dropped")
+    if len(measurements) == 0:
+        # early return in case of no data
+        logger.debug("no data found for this station and time extent")
+        return
     
+    measurements = pd.concat(measurements)
+
+    if clean_df:
+        len_raw = len(measurements)
+        # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
+        measurements = measurements.drop_duplicates()
+        # sort dataframe on time, ddl returns non-sorted data
+        measurements = measurements.sort_values("t")
+        ndropped = len_raw - len(measurements)
+        logger.debug(f"{ndropped} duplicated values dropped")
+
     return measurements
 
 
