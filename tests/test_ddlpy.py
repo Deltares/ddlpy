@@ -59,14 +59,15 @@ def test_measurements_sorted(location):
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
     meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    assert meas_wathte["t"].is_monotonic_increasing == True
+    assert meas_wathte.index.is_monotonic_increasing == True
     meas_wathte_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
-    assert meas_wathte_clean["t"].is_monotonic_increasing == True
+    assert meas_wathte_clean.index.is_monotonic_increasing == True
     meas_wathte_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
-    assert meas_wathte_raw["t"].is_monotonic_increasing == False
-    # check wheter indexes are contiguous (due to reset_index)
-    assert isinstance(meas_wathte_clean.index, pd.RangeIndex)
-    assert isinstance(meas_wathte_raw.index, pd.RangeIndex)
+    assert meas_wathte_raw.index.is_monotonic_increasing == False
+    # check wheter indexes are DatetimeIndex
+    assert isinstance(meas_wathte.index, pd.DatetimeIndex)
+    assert isinstance(meas_wathte_clean.index, pd.DatetimeIndex)
+    assert isinstance(meas_wathte_raw.index, pd.DatetimeIndex)
 
 def test_measurements_duplicated(location):
     """
@@ -82,19 +83,19 @@ def test_measurements_duplicated(location):
     measurements_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
     assert len(measurements_clean) == 3
     assert len(measurements_raw) == 9
-    # check wheter indexes are contiguous (due to reset_index)
-    assert isinstance(measurements_clean.index, pd.RangeIndex)
-    assert isinstance(measurements_raw.index, pd.RangeIndex)
+    # check wheter indexes are DatetimeIndex
+    assert isinstance(measurements_clean.index, pd.DatetimeIndex)
+    assert isinstance(measurements_raw.index, pd.DatetimeIndex)
 
 def test_simplify_dataframe(location):
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
     meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)    
-    assert len(meas_wathte.columns) == 55
+    assert len(meas_wathte.columns) == 54
     meas_simple = ddlpy.simplify_dataframe(meas_wathte)
     assert hasattr(meas_simple, "attrs")
     assert len(meas_simple.attrs) == 45
-    assert len(meas_simple.columns) == 10
+    assert len(meas_simple.columns) == 9
 
 def test_command_line_interface():
     """Test the CLI."""
