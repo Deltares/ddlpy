@@ -185,7 +185,8 @@ def _combine_waarnemingenlijst(result, location):
             df.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
     
     try:
-        df["t"] = pd.to_datetime(df["Tijdstip"])
+        df["time"] = pd.to_datetime(df["Tijdstip"])
+        df = df.set_index("time")
     except KeyError:
         logger.exception(
             "Cannot add time variable t because variable Tijdstip is not found"
