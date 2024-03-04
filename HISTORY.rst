@@ -9,6 +9,7 @@ UNRELEASED
 * add `ddlpy.measurements_latest()` to retrieve latest measurements in https://github.com/openearth/ddlpy/pull/35
 * add optional time-sorting of returned measurements dataframe and made drop_duplicates optional in https://github.com/openearth/ddlpy/pull/37
 * add support for time strings in addition to `pd.Timestamp` and `dt.datetime` in https://github.com/openearth/ddlpy/pull/41
+* add `simplify_dataframe` function which drops constant columns and adds the properties as attrs in https://github.com/openearth/ddlpy/pull/43
 
 0.1.0 (2019-01-03)
 ------------------
