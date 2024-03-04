@@ -167,7 +167,7 @@ def _combine_waarnemingenlijst(result, location):
     df = pd.json_normalize(rows)
     
     # add other info
-    df["locatie_code"] = location.get("Code", location.name)
+    df["Code"] = location.get("Code", location.name)
 
     for name in [
         "Coordinatenstelsel",
