@@ -304,7 +304,7 @@ def measurements_latest(location):
         return df
 
 
-def simplify_dataframe(df):
+def simplify_dataframe(df: pd.DataFrame):
     """
     drop columns with constant values from the dataframe
     and collect them in a dictionary which is 
@@ -319,6 +319,7 @@ def simplify_dataframe(df):
     # varying columns are kept in output dataframe
     df_simple = df.loc[:, ~bool_constant]
     
+    # attach as attrs to dataframe
     df_simple.attrs = df_attrs
     
     return df_simple
