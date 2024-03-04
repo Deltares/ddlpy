@@ -86,6 +86,16 @@ def test_measurements_duplicated(location):
     assert isinstance(measurements_clean.index, pd.RangeIndex)
     assert isinstance(measurements_raw.index, pd.RangeIndex)
 
+def test_simplify_dataframe(location):
+    start_date  = dt.datetime(2019,11,24)
+    end_date = dt.datetime(2019,12,5)
+    meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)    
+    assert len(meas_wathte.columns) == 55
+    meas_simple = ddlpy.simplify_dataframe(meas_wathte)
+    assert hasattr(meas_simple, "attrs")
+    assert len(meas_simple.attrs) == 45
+    assert len(meas_simple.columns) == 10
+
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
