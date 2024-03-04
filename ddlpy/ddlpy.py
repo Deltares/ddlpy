@@ -271,7 +271,7 @@ def measurements(location, start_date, end_date, clean_df=True):
         # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
         measurements = measurements.drop_duplicates()
         # sort dataframe on time, ddl returns non-sorted data
-        measurements = measurements.sort_values("t")
+        measurements = measurements.sort_index()
         ndropped = len_raw - len(measurements)
         logger.debug(f"{ndropped} duplicated values dropped")
 
