@@ -34,6 +34,19 @@ def test_measurements(location):
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
+def test_measurements_noindex(location):
+    # pandas dataframe with Code as column instead of index
+    locations_noindex = pd.DataFrame(location).T
+    locations_noindex.index.name = "Code"
+    locations_noindex = locations_noindex.reset_index(drop=False)
+    
+    # normal subsetting and retrieving
+    location_sel = locations_noindex.iloc[0]
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
+    measurements = ddlpy.measurements(location_sel, start_date=start_date, end_date=end_date)
+    assert measurements.shape[0] > 1
+
 def test_measurements_string(location):
     """measurements for a location """
     start_date = "1953-01-01"
