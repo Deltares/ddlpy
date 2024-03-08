@@ -14,6 +14,7 @@ def test_locations():
     locations = ddlpy.locations()
     assert locations.shape[0] > 1
 
+
 @pytest.fixture
 def location():
     """return sample location"""
@@ -21,11 +22,13 @@ def location():
     location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['DENHDR']
     return location
 
+
 def test_measurements_available(location):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
     data_present = ddlpy.ddlpy._measurements_available(location, start_date=start_date, end_date=end_date)
     assert isinstance(data_present, bool)
+
 
 def test_measurements(location):
     """measurements for a location """
@@ -33,6 +36,7 @@ def test_measurements(location):
     end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
+
 
 def test_measurements_noindex(location):
     # pandas dataframe with Code as column instead of index
@@ -47,6 +51,7 @@ def test_measurements_noindex(location):
     measurements = ddlpy.measurements(location_sel, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
+
 def test_measurements_string(location):
     """measurements for a location """
     start_date = "1953-01-01"
@@ -54,10 +59,12 @@ def test_measurements_string(location):
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
 
+
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
     assert latest.shape[0] > 1
+
 
 def test_measurements_long(location):
     """measurements for a location """
@@ -65,7 +72,8 @@ def test_measurements_long(location):
     end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
-    
+
+
 def test_measurements_sorted(location):
     """https://github.com/openearth/ddlpy/issues/27"""
     # input parameters
@@ -81,6 +89,7 @@ def test_measurements_sorted(location):
     assert isinstance(meas_wathte.index, pd.DatetimeIndex)
     assert isinstance(meas_wathte_clean.index, pd.DatetimeIndex)
     assert isinstance(meas_wathte_raw.index, pd.DatetimeIndex)
+
 
 def test_measurements_duplicated(location):
     """
@@ -100,6 +109,7 @@ def test_measurements_duplicated(location):
     assert isinstance(measurements_clean.index, pd.DatetimeIndex)
     assert isinstance(measurements_raw.index, pd.DatetimeIndex)
 
+
 def test_simplify_dataframe(location):
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
@@ -110,12 +120,14 @@ def test_simplify_dataframe(location):
     assert len(meas_simple.attrs) == 45
     assert len(meas_simple.columns) == 9
 
+
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
     result = runner.invoke(cli.cli)
     assert result.exit_code == 0
-    assert 'ddlpy.cli' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+    assert 'Show this message and exit.' in result.output
+    help_result = runner.invoke(cli.cli, ['--help'])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    assert 'Show this message and exit.' in help_result.output
+
