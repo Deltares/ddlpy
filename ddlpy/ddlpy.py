@@ -187,6 +187,7 @@ def _combine_waarnemingenlijst(result, location):
     
     try:
         df["time"] = pd.to_datetime(df["Tijdstip"])
+        df = df.drop("Tijdstip", axis=1)
         df = df.set_index("time")
     except KeyError:
         logger.exception(
