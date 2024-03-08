@@ -13,9 +13,10 @@ locations = ddlpy.locations()
 #select a set of parameters 
 # Filter the locations dataframe with the desired parameters and stations.
 bool_stations = locations.index.isin(['IJMDBTHVN', 'DANTZGZD','HOEKVHLD'])
-bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-bool_hoedanigheid = locations['Hoedanigheid.Code'] == 'NAP'
-selected = locations.loc[bool_stations & bool_grootheid & bool_hoedanigheid]
+bool_grootheid = locations['Grootheid.Code'] == 'WATHTE' # measured (WATHTE) versus computed/astro
+bool_groepering = locations['Groepering.Code'] == 'NVT' # timeseries (NVT) versus extremes
+bool_hoedanigheid = locations['Hoedanigheid.Code'] == 'NAP' # vertical reference (NAP/MSL)
+selected = locations.loc[bool_stations & bool_grootheid & bool_groepering & bool_hoedanigheid]
 
 # Obtain measurements per parameter row
 index = 1
