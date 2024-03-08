@@ -112,6 +112,17 @@ def test_measurements_duplicated(location):
     assert isinstance(measurements_raw.index, pd.DatetimeIndex)
 
 
+def test_measurements_remove_duplicates_nottoomuch(location):
+    """
+    to prevent issue https://github.com/openearth/ddlpy/issues/53
+    """
+    start_date = dt.datetime(2014, 1, 1)
+    end_date = dt.datetime(2014, 1, 7)
+    measurements_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
+    measurements_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
+    assert len(measurements_clean) == len(measurements_raw)
+
+
 def test_simplify_dataframe(location):
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
