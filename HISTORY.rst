@@ -12,7 +12,7 @@ UNRELEASED
 * add `ddlpy.simplify_dataframe()` function which drops constant columns and adds the properties as attrs in https://github.com/openearth/ddlpy/pull/43
 * consistency improvements for `ddlpy.measurements()` output dataframe in https://github.com/openearth/ddlpy/pull/45
 * add distinction for Groepering (timeseries vs. extremes) to `ddlpy.locations()` dataframe in https://github.com/openearth/ddlpy/pull/49
-* drop `Tijdstip` column in `ddlpy.measurements()` output dataframe to avoid duplication with time index in https://github.com/openearth/ddlpy/pull/52
+* drop `Tijdstip` column in `ddlpy.measurements()` output dataframe to avoid duplication with time index in https://github.com/openearth/ddlpy/pull/52 and https://github.com/openearth/ddlpy/pull/54
 
 0.1.0 (2019-01-03)
 ------------------

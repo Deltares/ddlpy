@@ -187,7 +187,6 @@ def _combine_waarnemingenlijst(result, location):
     
     try:
         df["time"] = pd.to_datetime(df["Tijdstip"])
-        df = df.drop("Tijdstip", axis=1)
         df = df.set_index("time")
     except KeyError:
         logger.exception(
@@ -272,6 +271,10 @@ def measurements(location, start_date, end_date, clean_df=True):
         len_raw = len(measurements)
         # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
         measurements = measurements.drop_duplicates()
+        
+        # remove Tijdstap column, has to be done after drop_duplicates to avoid too much to be dropped
+        measurements = measurements.drop("Tijdstip", axis=1)
+        
         # sort dataframe on time, ddl returns non-sorted data
         measurements = measurements.sort_index()
         ndropped = len_raw - len(measurements)
