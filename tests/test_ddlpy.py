@@ -19,7 +19,9 @@ def test_locations():
 def location():
     """return sample location"""
     locations = ddlpy.locations()
-    location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['DENHDR']
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_groepering = locations['Groepering.Code'] == 'NVT'
+    location = locations[bool_grootheid & bool_groepering].loc['DENHDR']
     return location
 
 
