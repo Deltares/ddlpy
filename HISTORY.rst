@@ -11,6 +11,7 @@ UNRELEASED
 * add support for time strings in addition to `pd.Timestamp` and `dt.datetime` in https://github.com/openearth/ddlpy/pull/41
 * add `ddlpy.simplify_dataframe()` function which drops constant columns and adds the properties as attrs in https://github.com/openearth/ddlpy/pull/43
 * consistency improvements for `ddlpy.measurements()` output dataframe in https://github.com/openearth/ddlpy/pull/45
+* add distinction for Groepering (timeseries vs. extremes) to `ddlpy.locations()` dataframe https://github.com/openearth/ddlpy/pull/49
 
 0.1.0 (2019-01-03)
 ------------------
