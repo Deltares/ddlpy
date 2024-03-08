@@ -71,6 +71,7 @@ def _get_request_dicts(location):
         "Eenheid": {"Code": location["Eenheid.Code"]},
         "Grootheid": {"Code": location["Grootheid.Code"]},
         "Hoedanigheid": {"Code": location["Hoedanigheid.Code"]},
+        "Groepering": {"Code": location["Groepering.Code"]},
     }
     
     locatie_dict = {

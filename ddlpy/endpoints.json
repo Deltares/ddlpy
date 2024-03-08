@@ -8,6 +8,7 @@
         "Eenheden": true,
         "Grootheden": true,
         "Hoedanigheden": true,
+        "Groeperingen": true,
         "Parameters": true,
         "Compartimenten": true
       }
@@ -17,7 +18,7 @@
     "name": "OphalenWaarnemingen",
     "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenWaarnemingen",
     "type": "POST",
-    "_comment": "Make sre you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
+    "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
       "Locatie": {
         "X": 761899.770959577,
@@ -47,7 +48,7 @@
     "name": "OphalenLaatsteWaarnemingen",
     "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenLaatsteWaarnemingen",
     "type": "POST",
-    "_comment": "Make sre you specify the request location to the exact number of decimals.",
+    "_comment": "Make sure you specify the request location to the exact number of decimals.",
     "request": {
       "AquoPlusWaarnemingMetadataLijst": [
         {
