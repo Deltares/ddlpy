@@ -119,8 +119,8 @@ def test_simplify_dataframe(location):
     assert len(meas_wathte.columns) == 54
     meas_simple = ddlpy.simplify_dataframe(meas_wathte)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 45
-    assert len(meas_simple.columns) == 9
+    assert len(meas_simple.attrs) == 51
+    assert len(meas_simple.columns) == 3
 
 
 def test_command_line_interface():
