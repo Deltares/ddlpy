@@ -87,7 +87,7 @@ def _get_request_dicts(location):
     return request_dicts
 
 
-def _measurements_available(location, start_date, end_date):
+def measurements_available(location, start_date, end_date):
     """checks if there are measurements for location, for the period start_date, end_date
     gives None if check was unsuccesfull
     gives True/False if there are / are no measurement available
@@ -236,12 +236,12 @@ def measurements(location, start_date, end_date, clean_df=True):
     
     measurements = []
 
-    data_present = _measurements_available(
-            location, start_date=start_date, end_date=end_date)
-    if not data_present:
-        # early return in case of no data
-        logger.debug("no data found for this station and time extent")
-        return
+    # data_present = measurements_available(
+    #         location, start_date=start_date, end_date=end_date)
+    # if not data_present:
+    #     # early return in case of no data
+    #     logger.debug("no data found for this station and time extent")
+    #     return
     
     for (start_date_i, end_date_i) in tqdm.tqdm(
         date_series(start_date, end_date, freq=dateutil.rrule.MONTHLY)

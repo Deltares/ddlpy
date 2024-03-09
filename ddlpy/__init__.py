@@ -7,6 +7,15 @@ __email__ = 'fedor.baart@deltares.nl'
 __version__ = '0.2.0'
 
 from ddlpy.ddlpy import locations
-from ddlpy.ddlpy import measurements, measurements_latest, simplify_dataframe
+from ddlpy.ddlpy import (measurements, 
+                         measurements_latest, 
+                         measurements_available, 
+                         simplify_dataframe,
+                         )
 
-__all__ = ['locations', 'measurements']
+__all__ = ['locations', 
+           'measurements',
+           'measurements_latest', 
+           'measurements_available', 
+           'simplify_dataframe',
+           ]

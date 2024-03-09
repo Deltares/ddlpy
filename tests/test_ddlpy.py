@@ -28,7 +28,7 @@ def location():
 def test_measurements_available(location):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
-    data_present = ddlpy.ddlpy._measurements_available(location, start_date=start_date, end_date=end_date)
+    data_present = ddlpy.measurements_available(location, start_date=start_date, end_date=end_date)
     assert isinstance(data_present, bool)
 
 
