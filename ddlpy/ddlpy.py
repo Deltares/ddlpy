@@ -66,6 +66,21 @@ def locations():
     return merged.set_index("Code")
 
 
+def _check_convert_dates(start_date, end_date, return_str=True):
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+    
+    if start_date > end_date:
+        raise ValueError("start_date is larger than end_date")
+    
+    if return_str:
+        start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
+        end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+        return start_date_str, end_date_str
+    else:
+        return start_date, end_date
+
+
 def _get_request_dicts(location):
     aquometadata_dict = {
         "Eenheid": {"Code": location["Eenheid.Code"]},
@@ -94,11 +109,7 @@ def measurements_available(location, start_date, end_date):
     """
     endpoint = ENDPOINTS['check_observations_available']
 
-    start_date = pd.Timestamp(start_date)
-    end_date = pd.Timestamp(end_date)
-    
-    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
-    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
 
     request_dicts = _get_request_dicts(location)
 
@@ -140,12 +151,8 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
         raise ValueError(f"period should be one of {accepted_period}, not '{period}'")
     
     endpoint = ENDPOINTS['collect_number_of_observations']
-
-    start_date = pd.Timestamp(start_date)
-    end_date = pd.Timestamp(end_date)
     
-    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
-    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
 
     request_dicts = _get_request_dicts(location)
 
@@ -264,9 +271,8 @@ def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
 
-    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec="milliseconds")
-    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec="milliseconds")
-    
+    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
+
     request_dicts = _get_request_dicts(location)
     
     request = {
@@ -295,8 +301,7 @@ def _measurements_slice(location, start_date, end_date):
 
 def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
-    start_date = pd.Timestamp(start_date)
-    end_date = pd.Timestamp(end_date)
+    start_date, end_date = _check_convert_dates(start_date, end_date, return_str=False)
     
     measurements = []
 
