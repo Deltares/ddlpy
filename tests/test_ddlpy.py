@@ -68,14 +68,6 @@ def test_measurements_noindex(location):
     assert measurements.shape[0] > 1
 
 
-def test_measurements_string(location):
-    """measurements for a location """
-    start_date = "1953-01-01"
-    end_date = "1953-04-01"
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    assert measurements.shape[0] > 1
-
-
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
@@ -138,7 +130,7 @@ def test_measurements_remove_duplicates_nottoomuch(location):
 
 
 def test_simplify_dataframe(location):
-    start_date  = dt.datetime(2019,11,24)
+    start_date = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
     meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     assert len(meas_wathte.columns) == 53
@@ -146,6 +138,37 @@ def test_simplify_dataframe(location):
     assert hasattr(meas_simple, "attrs")
     assert len(meas_simple.attrs) == 51
     assert len(meas_simple.columns) == 2
+
+
+datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
+@pytest.mark.parametrize("datetype", datetype_list)
+def test_check_convert_dates(datetype):
+    if datetype == "string":
+        start_date = "1953-01-01"
+        end_date = "1953-04-01"
+    elif datetype == "pd.Timestamp":
+        start_date = pd.Timestamp("1953-01-01")
+        end_date = pd.Timestamp("1953-04-01")
+    elif datetype == "dt.datetime":
+        start_date = dt.datetime(1953,1,1)
+        end_date = dt.datetime(1953,4,1)
+    elif datetype == "mixed":
+        start_date = "1953-01-01"
+        end_date = dt.datetime(1953,4,1)
+
+    # assert output
+    start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(start_date, end_date)
+    assert start_date_out=='1953-01-01T00:00:00.000+00:00'
+    assert end_date_out=='1953-04-01T00:00:00.000+00:00'
+
+
+def test_check_convert_wrongorder():
+    start_date = "1953-01-01"
+    end_date = "1953-04-01"
+    
+    # assert output
+    with pytest.raises(ValueError):
+        start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(end_date, start_date)
 
 
 def test_command_line_interface():
