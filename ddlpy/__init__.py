@@ -10,6 +10,7 @@ from ddlpy.ddlpy import locations
 from ddlpy.ddlpy import (measurements, 
                          measurements_latest, 
                          measurements_available, 
+                         measurements_amount,
                          simplify_dataframe,
                          )
 
@@ -17,5 +18,6 @@ __all__ = ['locations',
            'measurements',
            'measurements_latest', 
            'measurements_available', 
+           'measurements_amount',
            'simplify_dataframe',
            ]

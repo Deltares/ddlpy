@@ -13,6 +13,7 @@ UNRELEASED
 * consistency improvements for `ddlpy.measurements()` output dataframe in https://github.com/deltares/ddlpy/pull/45
 * add distinction for Groepering (timeseries vs. extremes) to `ddlpy.locations()` dataframe in https://github.com/deltares/ddlpy/pull/49
 * drop `Tijdstip` column in `ddlpy.measurements()` output dataframe to avoid duplication with time index in https://github.com/deltares/ddlpy/pull/52 and https://github.com/deltares/ddlpy/pull/54
+* add `ddlpy.measurements_amount()` to retrieve the number of available measurements grouped by day/month/year in https://github.com/Deltares/ddlpy/pull/63
 
 0.1.0 (2019-01-03)
 ------------------
