@@ -40,11 +40,11 @@ classifiers = [
 
 [project.urls]
 Home = "https://github.com/deltares/ddlpy"
-Code = "hhttps://github.com/deltares/ddlpy"
+Code = "https://github.com/deltares/ddlpy"
 Issues = "https://github.com/deltares/ddlpy/issues"
 
 [project.optional-dependencies]
-dev = [
+dev = [ #TODO: maybe remove some of these
 	"bump2version>=0.5.11",
 	"flake8",
 	"pytest>=3.8.2",
@@ -70,19 +70,9 @@ ddlpy = "ddlpy.cli:cli"
 [tool.setuptools]
 packages = ["ddlpy"]
 
-[tool.setuptools.packages.find]
-where = ["ddlpy"]
-
 [tool.pytest.ini_options]
-console_output_style = "count"
 testpaths = ["tests"]
-addopts = "-v --tb=short --durations=0"
-filterwarnings = ["ignore::UserWarning"]
-markers = [
-	"unittest: mark a test as unittest. Used for testing single methods",
-	"systemtest: mark a test as systemtest. Used for testing at a higher level, verifying a given input returns the expected output",
-	"acceptance: mark a test as acceptance. Used for non-functional requirements and data that needs to be human-verified",
-]
+addopts = "--durations=0"
 
 [tool.flake8]
 exclude = "docs"

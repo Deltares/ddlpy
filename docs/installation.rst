@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/SiggyF/ddlpy
+    $ git clone git://github.com/deltares/ddlpy
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/SiggyF/ddlpy/tarball/master
+    $ curl  -OL https://github.com/deltares/ddlpy/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/SiggyF/ddlpy
-.. _tarball: https://github.com/SiggyF/ddlpy/tarball/master
+.. _Github repo: https://github.com/deltares/ddlpy
+.. _tarball: https://github.com/deltares/ddlpy/tarball/master
