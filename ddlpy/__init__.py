@@ -4,7 +4,7 @@
 
 __author__ = """Fedor Baart"""
 __email__ = 'fedor.baart@deltares.nl'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 from ddlpy.ddlpy import locations
 from ddlpy.ddlpy import (measurements, 

@@ -1,47 +1,40 @@
+[![pypi-image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
+[![image](https://img.shields.io/travis/deltares/ddlpy.svg)](https://travis-ci.org/deltares/ddlpy)
+[![Documentation Status](https://readthedocs.org/projects/rws-ddlpy/badge/?version=latest)](https://rws-ddlpy.readthedocs.io/en/latest/?badge=latest)
+[![Updates](https://pyup.io/repos/github/deltares/ddlpy/shield.svg)](https://pyup.io/repos/github/deltares/ddlpy/)
+[![pytest](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml)
+[![codecov](https://img.shields.io/codecov/c/github/deltares/ddlpy.svg?style=flat-square)](https://app.codecov.io/gh/deltares/ddlpy?displayType=list)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Deltares_ddlpy&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Deltares_ddlpy)
+[![Supported versions](https://img.shields.io/pypi/pyversions/ddlpy.svg)](https://pypi.org/project/ddlpy)
+[![Downloads](https://img.shields.io/pypi/dm/ddlpy.svg)](https://pypistats.org/packages/ddlpy)
+
 # ddlpy
 
 (D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
 
-[![pypi-image](https://img.shields.io/pypi/v/rws-ddlpy.svg)](https://pypi.python.org/pypi/rws-ddlpy)
-
-[![image](https://img.shields.io/travis/openearth/ddlpy.svg)](https://travis-ci.org/openearth/ddlpy)
-
-[![Documentation Status](https://readthedocs.org/projects/rws-ddlpy/badge/?version=latest)](https://rws-ddlpy.readthedocs.io/en/latest/?badge=latest)
-
-[![Updates](https://pyup.io/repos/github/openearth/ddlpy/shield.svg)](https://pyup.io/repos/github/openearth/ddlpy/)
-
 Service from Rijkswaterstaat for distributing water quantity data.
 
--   Free software: GNU General Public License v3
 -   Documentation: <https://ddlpy.readthedocs.io>.
-
 
 See also https://github.com/wstolte/rwsapi for the R API.
 
 
 # Install
-Make sure you have installed:
 
-* pandas
-* numpy
-* click
-* python-dateutil>=2.8
-
+This text will be updated soon and a new pypi release will also happen soon.
 The latest ddlpy PyPI release is outdated, but it can be installed with:
 
 	pip install rws-ddlpy
 
 The newest version is currently installed directly from github with:
 
-    pip install git+https://github.com/openearth/ddlpy
+    pip install git+https://github.com/deltares/ddlpy
 
 In the folder examples you will find the following files:
 
 * minimal example.py -> minimal code to retrieve data.
 
 * 1_get_data_from_water_info_parallel.py -> Code to retrieve a bulk of observations per parameter and per station.
-
-This code is parallelized; therefore, you can specify the number of processors you want to use.
 
 The output of this code is the data in csv format.
 

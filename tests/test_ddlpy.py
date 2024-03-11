@@ -77,7 +77,7 @@ def test_measurements_long(location):
 
 
 def test_measurements_sorted(location):
-    """https://github.com/openearth/ddlpy/issues/27"""
+    """https://github.com/deltares/ddlpy/issues/27"""
     # input parameters
     start_date  = dt.datetime(2019,11,24)
     end_date = dt.datetime(2019,12,5)
@@ -96,7 +96,7 @@ def test_measurements_sorted(location):
 def test_measurements_duplicated(location):
     """
     WALSODN 2010 contains all values three times, ddlpy drops duplicates
-    https://github.com/openearth/ddlpy/issues/24
+    https://github.com/deltares/ddlpy/issues/24
     if the data is cleaned in ddl, this test will fail and can be removed or adjusted
     """
     locations = ddlpy.locations()
@@ -114,7 +114,7 @@ def test_measurements_duplicated(location):
 
 def test_measurements_remove_duplicates_nottoomuch(location):
     """
-    to prevent issue https://github.com/openearth/ddlpy/issues/53
+    to prevent issue https://github.com/deltares/ddlpy/issues/53
     """
     start_date = dt.datetime(2014, 1, 1)
     end_date = dt.datetime(2014, 1, 7)

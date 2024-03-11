@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=64.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddlpy"
+version = "0.2.1"
+maintainers = [
+	{ name = "Fedor Baart", email = "fedor.baart@deltares.nl"},
+	{ name = "Jelmer Veenstra", email = "jelmer.veenstra@deltares.nl"},
+]
+description = "Service from Rijkswaterstaat for distributing water quantity data."
+readme = "README.md"
+keywords = ["ddlpy"]
+license = { text = "GPLv3" }
+requires-python = ">=3.8"
+dependencies = [
+	#numpy 1.21 is EOL since june 2023
+	"numpy>=1.22",
+	"pandas",
+	"python-dateutil>=2.8",
+	"tqdm",
+	"click",
+]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Developers",
+	"Intended Audience :: Science/Research",
+	"Operating System :: OS Independent",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.8", # TODO: update this
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Home = "https://github.com/deltares/ddlpy"
+Code = "https://github.com/deltares/ddlpy"
+Issues = "https://github.com/deltares/ddlpy/issues"
+
+[project.optional-dependencies]
+dev = [ #TODO: maybe remove some of these
+	"bump2version>=0.5.11",
+	"flake8",
+	"pytest>=3.8.2",
+	"pytest-cov",
+	"twine",
+	"build",
+	"watchdog>=0.9.0",
+	"flake8>=3.5.0",
+	"tox>=3.5.2",
+	"coverage>=4.5.1",
+	"Sphinx>=1.8.1",
+	"twine>=1.12.1",
+	"pytest-runner>=4.2",
+]
+examples = [
+	"jupyter",
+	"notebook",
+]
+
+[project.scripts]
+ddlpy = "ddlpy.cli:cli"
+
+[tool.setuptools]
+packages = ["ddlpy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--durations=0"
+
+[tool.flake8]
+exclude = "docs"
