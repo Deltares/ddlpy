@@ -30,8 +30,6 @@ jobs:
         python -m pip install -e .[dev]
     - name: list env contents
       run: |
-        conda info
-        conda list
         pip list
     - name: Lint with flake8
       run: |
