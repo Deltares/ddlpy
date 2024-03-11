@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ddlpy"
-version = "0.2.0"
+version = "0.2.1"
 maintainers = [
 	{ name = "Fedor Baart", email = "fedor.baart@deltares.nl"},
 	{ name = "Jelmer Veenstra", email = "jelmer.veenstra@deltares.nl"},
