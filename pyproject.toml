@@ -13,7 +13,7 @@ description = "Service from Rijkswaterstaat for distributing water quantity data
 readme = "README.md"
 keywords = ["ddlpy"]
 license = { text = "GPLv3" }
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 dependencies = [
 	#numpy 1.21 is EOL since june 2023
 	"numpy>=1.22",
