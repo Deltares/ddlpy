@@ -178,16 +178,18 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
             # combine columns to a period string
             df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
             if period in ["Maand", "Dag"]:
-                df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}")
+                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                            df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
             if period in ["Dag"]:
-                df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}")
+                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                            df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
             
             # select columns from dataframe and append to list
             df = df[["Groeperingsperiode","AantalMetingen"]]
             df_list.append(df)
         
         # concatenate
-        amount_all = pd.concat(df_list).sort_values("Groeperingsperiode")
+        amount_all = pd.concat(df_list).sort_values("Groeperingsperiode").reset_index(drop=True)
         return amount_all
 
 
