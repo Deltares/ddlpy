@@ -129,6 +129,68 @@ def measurements_available(location, start_date, end_date):
             return False  
 
 
+def measurements_amount(location, start_date, end_date, groupby="Jaar"):
+    """checks how much measurements are available for a location, for the period start_date, end_date
+    returns a DataFrame with columns Groeperingsperiode and AantalMetingen
+    possible for Jaar/Maand/Dag
+    """
+    # TODO: there are probably more Groeperingsperiodes accepted by ddl, but not supported by ddlpy yet
+    accepted_groupby = ["Jaar","Maand","Dag"]
+    if groupby not in accepted_groupby:
+        raise ValueError(f"groupby should be one of {accepted_groupby}, not '{groupby}'")
+    
+    endpoint = ENDPOINTS['collect_number_of_observations']
+
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+    
+    start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
+    end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+
+    request_dicts = _get_request_dicts(location)
+
+    request = {
+        "AquoMetadataLijst": [request_dicts["AquoMetadata"]],
+        "LocatieLijst": [request_dicts["Locatie"]],
+        "Groeperingsperiode": groupby,
+        "Periode": {
+            "Begindatumtijd": start_date_str,
+            "Einddatumtijd": end_date_str
+        }
+    }
+
+    try:
+        logger.debug('requesting:  {}'.format(request))
+        resp = requests.post(endpoint['url'], json=request)
+        result = resp.json()
+        if not result['Succesvol']:
+            logger.debug('Got  invalid response: {}'.format(result))
+            raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    except NoDataException as e:
+        logger.debug('No data availble for {} {}'.format(start_date, end_date))
+        raise e
+
+    if result['Succesvol']:
+        df_list = []
+        for one in result['AantalWaarnemingenPerPeriodeLijst']:
+            df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
+            
+            # combine columns to a period string
+            df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
+            if groupby in ["Maand", "Dag"]:
+                df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}")
+            if groupby in ["Dag"]:
+                df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}")
+            
+            # select columns from dataframe and append to list
+            df = df[["Groeperingsperiode","AantalMetingen"]]
+            df_list.append(df)
+        
+        # concatenate
+        amount_all = pd.concat(df_list).sort_values("Groeperingsperiode")
+        return amount_all
+
+
 def _combine_waarnemingenlijst(result, location):
     assert "WaarnemingenLijst" in result
     
