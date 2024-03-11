@@ -32,6 +32,20 @@ def test_measurements_available(location):
     assert isinstance(data_present, bool)
 
 
+def test_measurements_amount(location):
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 5)
+    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    assert data_amount_dag.shape[0] > 50
+    assert data_amount_dag["Groeperingsperiode"].str.len().iloc[0] == 10
+    data_amount_maand = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Maand")
+    assert data_amount_maand.shape[0] == 4
+    assert data_amount_maand["Groeperingsperiode"].str.len().iloc[0] == 7
+    data_amount_jaar = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Jaar")
+    assert data_amount_jaar.shape[0] == 1
+    assert data_amount_jaar["Groeperingsperiode"].str.len().iloc[0] == 4
+
+
 def test_measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)

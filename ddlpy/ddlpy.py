@@ -129,15 +129,15 @@ def measurements_available(location, start_date, end_date):
             return False  
 
 
-def measurements_amount(location, start_date, end_date, groupby="Jaar"):
+def measurements_amount(location, start_date, end_date, period="Jaar"):
     """checks how much measurements are available for a location, for the period start_date, end_date
     returns a DataFrame with columns Groeperingsperiode and AantalMetingen
     possible for Jaar/Maand/Dag
     """
     # TODO: there are probably more Groeperingsperiodes accepted by ddl, but not supported by ddlpy yet
-    accepted_groupby = ["Jaar","Maand","Dag"]
-    if groupby not in accepted_groupby:
-        raise ValueError(f"groupby should be one of {accepted_groupby}, not '{groupby}'")
+    accepted_period = ["Jaar","Maand","Dag"]
+    if period not in accepted_period:
+        raise ValueError(f"period should be one of {accepted_period}, not '{period}'")
     
     endpoint = ENDPOINTS['collect_number_of_observations']
 
@@ -152,7 +152,7 @@ def measurements_amount(location, start_date, end_date, groupby="Jaar"):
     request = {
         "AquoMetadataLijst": [request_dicts["AquoMetadata"]],
         "LocatieLijst": [request_dicts["Locatie"]],
-        "Groeperingsperiode": groupby,
+        "Groeperingsperiode": period,
         "Periode": {
             "Begindatumtijd": start_date_str,
             "Einddatumtijd": end_date_str
@@ -177,9 +177,9 @@ def measurements_amount(location, start_date, end_date, groupby="Jaar"):
             
             # combine columns to a period string
             df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
-            if groupby in ["Maand", "Dag"]:
+            if period in ["Maand", "Dag"]:
                 df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}")
-            if groupby in ["Dag"]:
+            if period in ["Dag"]:
                 df["Groeperingsperiode"] = df["Groeperingsperiode"] + "-" + df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}")
             
             # select columns from dataframe and append to list
