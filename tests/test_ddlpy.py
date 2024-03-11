@@ -143,24 +143,18 @@ def test_simplify_dataframe(location):
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
 @pytest.mark.parametrize("datetype", datetype_list)
 def test_check_convert_dates(datetype):
-    start_date_str = "1953-01-01"
-    end_date_str = "1953-04-01"
-    start_date_pd = pd.Timestamp(start_date_str)
-    end_date_pd = pd.Timestamp(start_date_str)
-    start_date_dt = dt.datetime(start_date_pd)
-    end_date_dt = dt.datetime(end_date_pd)
     if datetype == "string":
-        start_date = start_date_str
-        end_date = end_date_str
+        start_date = "1953-01-01"
+        end_date = "1953-04-01"
     elif datetype == "pd.Timestamp":
-        start_date = start_date_pd
-        end_date = end_date_pd
+        start_date = pd.Timestamp("1953-01-01")
+        end_date = pd.Timestamp("1953-04-01")
     elif datetype == "dt.datetime":
-        start_date = start_date_dt
-        end_date = end_date_dt
+        start_date = dt.datetime(1953,1,1)
+        end_date = dt.datetime(1953,4,1)
     elif datetype == "mixed":
-        start_date = start_date_str
-        end_date = end_date_dt
+        start_date = "1953-01-01"
+        end_date = dt.datetime(1953,4,1)
 
     # assert output
     start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(start_date, end_date)
