@@ -330,9 +330,9 @@ def measurements(location, start_date, end_date, clean_df=True):
             continue
 
     if len(measurements) == 0:
-        # early return in case of no data
+        # return empty dataframe in case of no data
         logger.debug("no data found for this station and time extent")
-        return
+        return pd.DataFrame()
     
     measurements = pd.concat(measurements)
 
