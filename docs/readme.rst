@@ -1,1 +1,5 @@
-.. include:: ../README.rst
+============
+ddlpy
+============
+
+.. mdinclude:: ../README.md

@@ -55,11 +55,13 @@ dev = [ #TODO: maybe remove some of these
 	"flake8>=3.5.0",
 	"tox>=3.5.2",
 	"coverage>=4.5.1",
-	"Sphinx>=1.8.1",
 	"twine>=1.12.1",
 	"pytest-runner>=4.2",
 ]
-docs = ["sphinx"
+docs = [
+	"sphinx>=1.8.1",
+	"sphinx_mdinclude",
+	"pydata-sphinx-theme",
 ]
 examples = [
 	"jupyter",
