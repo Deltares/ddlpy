@@ -1,7 +1,18 @@
-modules
+Modules
 =========
 
-.. toctree::
-   :maxdepth: 4
+ddlpy.cli module
+----------------
 
-   ddlpy
+.. automodule:: ddlpy.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ddlpy module
+---------------
+
+.. automodule:: ddlpy
+   :members:
+   :undoc-members:
+   :show-inheritance:
