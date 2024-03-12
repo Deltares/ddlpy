@@ -8,12 +8,13 @@ Created on Tue Mar 12 15:33:59 2024
 from ddlpy.waterinfo import waterinfo_read
 import os
 
+dir_tests = os.path.dirname(os.path.abspath(__file__))
+
 
 def test_waterinfo_read():
     # example in May, during DST
-    folder = r'c:\DATA\ddlpy\tests'
-    f = os.path.join(folder,'20200608_069_20200507.csv')
-    g = os.path.join(folder,'NVT_WATHTE_SCHE_20200507.csv')
+    f = os.path.join(dir_tests, '20200608_069_20200507.csv')
+    g = os.path.join(dir_tests, 'NVT_WATHTE_SCHE_20200507.csv')
     
     dxf_list = waterinfo_read(f)
     dxg = waterinfo_read(g)
