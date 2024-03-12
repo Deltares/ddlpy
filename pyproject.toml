@@ -59,6 +59,8 @@ dev = [ #TODO: maybe remove some of these
 	"twine>=1.12.1",
 	"pytest-runner>=4.2",
 ]
+docs = ["sphinx"
+]
 examples = [
 	"jupyter",
 	"notebook",
