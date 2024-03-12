@@ -54,6 +54,14 @@ def test_measurements_empty(location):
     assert measurements.empty
 
 
+def test_measurements_typerror(locations):
+    locations = ddlpy.locations()
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
+    with pytest.raises(TypeError):
+        _ = ddlpy.measurements(locations, start_date=start_date, end_date=end_date)
+
+
 def test_measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)
