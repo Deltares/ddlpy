@@ -1,8 +1,7 @@
 include CONTRIBUTING.rst
 include HISTORY.rst
 include LICENSE
-include README.rst
-include requirements.txt
+include README.md
 
 include ddlpy/endpoints.json
 
