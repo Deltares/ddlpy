@@ -3,12 +3,8 @@
 
 """Tests for `utils` package."""
 
-import pytest
-
 from ddlpy import utils
-
 import datetime
-
 
 
 def test_content():
