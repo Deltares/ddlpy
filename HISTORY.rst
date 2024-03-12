@@ -15,6 +15,7 @@ UNRELEASED
 * drop `Tijdstip` column in `ddlpy.measurements()` output dataframe to avoid duplication with time index in https://github.com/deltares/ddlpy/pull/52 and https://github.com/deltares/ddlpy/pull/54
 * add `ddlpy.measurements_amount()` to retrieve the number of available measurements grouped by day/month/year in https://github.com/Deltares/ddlpy/pull/63
 * catch accidentally switched start/end dates in https://github.com/Deltares/ddlpy/pull/65
+* in case of no measurements, return empty dataframe instead of None or empty list in https://github.com/Deltares/ddlpy/pull/75
 
 0.1.0 (2019-01-03)
 ------------------
