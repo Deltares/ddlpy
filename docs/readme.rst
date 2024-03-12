@@ -1,5 +1,1 @@
-============
-ddlpy
-============
-
 .. mdinclude:: ../README.md

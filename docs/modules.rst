@@ -1,5 +1,5 @@
-ddlpy
-=====
+modules
+=========
 
 .. toctree::
    :maxdepth: 4

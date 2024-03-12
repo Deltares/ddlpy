@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Data Distributie Laag. Service from Rijkswaterstaat for distributing water quantity data.'
+project = u'ddlpy'
 copyright = u"2019, Fedor Baart"
 author = u"Fedor Baart"
 
@@ -90,7 +90,25 @@ html_theme = 'pydata_sphinx_theme'
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {"navigation_with_keys": False}
+html_theme_options = {
+    "navigation_with_keys": False,
+    "navbar_align": "content",
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Deltares/ddlpy",  # required
+            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "type": "url",
+        },
+        {
+            "name": "Deltares",
+            "url": "https://deltares.nl/en/",
+            "icon": "_static/deltares-white.svg",
+            "type": "local",
+        },
+    ],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

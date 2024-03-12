@@ -1,9 +1,6 @@
 # ddlpy
 
 [![pypi-image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
-[![image](https://img.shields.io/travis/deltares/ddlpy.svg)](https://travis-ci.org/deltares/ddlpy)
-[![Documentation Status](https://readthedocs.org/projects/rws-ddlpy/badge/?version=latest)](https://rws-ddlpy.readthedocs.io/en/latest/?badge=latest)
-[![Updates](https://pyup.io/repos/github/deltares/ddlpy/shield.svg)](https://pyup.io/repos/github/deltares/ddlpy/)
 [![pytest](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml)
 [![codecov](https://img.shields.io/codecov/c/github/deltares/ddlpy.svg?style=flat-square)](https://app.codecov.io/gh/deltares/ddlpy?displayType=list)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Deltares_ddlpy&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Deltares_ddlpy)
@@ -12,9 +9,7 @@
 
 (D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
 
-Service from Rijkswaterstaat for distributing water quantity data.
-
--   Documentation: <https://ddlpy.readthedocs.io>.
+Documentation: <https://deltares.github.io/ddlpy>
 
 See also https://github.com/wstolte/rwsapi for the R API.
 
