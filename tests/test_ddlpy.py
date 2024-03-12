@@ -55,7 +55,6 @@ def test_measurements_empty(location):
 
 
 def test_measurements_typerror(locations):
-    locations = ddlpy.locations()
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
     with pytest.raises(TypeError):
