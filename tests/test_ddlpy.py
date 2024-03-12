@@ -10,19 +10,24 @@ import ddlpy
 from ddlpy import cli
 
 
-def test_locations():
+@pytest.fixture
+def locations():
+    """return all locations"""
     locations = ddlpy.locations()
-    assert locations.shape[0] > 1
+    return locations
 
 
 @pytest.fixture
-def location():
+def location(locations):
     """return sample location"""
-    locations = ddlpy.locations()
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
     bool_groepering = locations['Groepering.Code'] == 'NVT'
     location = locations[bool_grootheid & bool_groepering].loc['DENHDR']
     return location
+
+
+def test_locations(locations):
+    assert locations.shape[0] > 1
 
 
 def test_measurements_available(location):
@@ -55,7 +60,6 @@ def test_measurements_empty(location):
 
 
 def test_measurements_typerror(locations):
-    locations = ddlpy.locations()
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
     with pytest.raises(TypeError):
@@ -115,13 +119,12 @@ def test_measurements_sorted(location):
     assert isinstance(meas_wathte_raw.index, pd.DatetimeIndex)
 
 
-def test_measurements_duplicated(location):
+def test_measurements_duplicated(locations):
     """
     WALSODN 2010 contains all values three times, ddlpy drops duplicates
     https://github.com/deltares/ddlpy/issues/24
     if the data is cleaned in ddl, this test will fail and can be removed or adjusted
     """
-    locations = ddlpy.locations()
     location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['WALSODN']
     start_date = dt.datetime(2010, 1, 1)
     end_date = dt.datetime(2010, 1, 1, 0, 20)
