@@ -46,6 +46,14 @@ def test_measurements_amount(location):
     assert data_amount_jaar["Groeperingsperiode"].str.len().iloc[0] == 4
 
 
+def test_measurements_empty(location):
+    """measurements for a location """
+    start_date = dt.datetime(2153, 1, 1)
+    end_date = dt.datetime(2153, 1, 2)
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    assert measurements.empty
+
+
 def test_measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)
