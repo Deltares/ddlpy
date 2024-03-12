@@ -303,8 +303,8 @@ def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
     
     if isinstance(location, pd.DataFrame):
-        raise TypeError("'location' is a pandas.DataFrame, but should be a pandas.Series, "
-                        "supply only one row instead, for instance by doing 'location.iloc[0]'")
+        raise TypeError("The provided location is a pandas.DataFrame, but should be a pandas.Series, "
+                        "supply only one location/row instead, for instance by doing 'location.iloc[0]'")
     
     start_date, end_date = _check_convert_dates(start_date, end_date, return_str=False)
     
