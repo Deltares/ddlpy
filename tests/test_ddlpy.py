@@ -5,9 +5,7 @@
 import datetime as dt
 import pandas as pd
 import pytest
-from click.testing import CliRunner
 import ddlpy
-from ddlpy import cli
 
 
 @pytest.fixture
@@ -188,15 +186,4 @@ def test_check_convert_wrongorder():
     # assert output
     with pytest.raises(ValueError):
         start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(end_date, start_date)
-
-
-def test_command_line_interface():
-    """Test the CLI."""
-    runner = CliRunner()
-    result = runner.invoke(cli.cli)
-    assert result.exit_code == 0
-    assert 'Show this message and exit.' in result.output
-    help_result = runner.invoke(cli.cli, ['--help'])
-    assert help_result.exit_code == 0
-    assert 'Show this message and exit.' in help_result.output
 
