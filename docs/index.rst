@@ -1,6 +1,3 @@
-ddlpy documentation
-===================
-
 .. mdinclude:: ../README.md
 
 .. toctree::

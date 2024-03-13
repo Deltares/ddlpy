@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-"""Console script for ddlpy."""
+"""
+Console script for ddlpy.
+    - ``ddlpy --help``
+    - ``ddlpy locations --help``
+    - ``ddlpy measurements --help``
+"""
 import sys
 import logging
 import click
@@ -29,17 +34,22 @@ def cli(verbose,  args=None):
     )
 @click.option(
     '--quantity',
-    help='Grootheid code',
+    help='Grootheid code, e.g. WATHTE',
     multiple=True
 )
 @click.option(
-    '--quality',
-    help='Hoedanigheid code',
+    '--group',
+    help='Groepering code, e.g. NVT',
+    multiple=True
+)
+@click.option(
+    '--vertref',
+    help='Hoedanigheid code, e.g. NAP',
     multiple=True
 )
 @click.option(
     '--unit',
-    help='Eenheid code',
+    help='Eenheid code, e.g. cm',
     multiple=True
 )
 @click.option(
@@ -49,37 +59,31 @@ def cli(verbose,  args=None):
 )
 @click.option(
     '--compartment-code',
-    help='Compartment code',
+    help='Compartment code, e.g. OW',
     multiple=True
 )
 @click.option(
     '--station',
-    help='Station codes',
+    help='Station codes, e.g. HOEKVHLD',
     multiple=True
-)
-@click.option(
-    '--format',
-    default='json',
-    help='output file format. Must be json',
-    type=click.Choice(['json'], case_sensitive=True)
 )
 def locations(output,
               station,
               quantity,
-              quality,
+              vertref,
               unit,
               parameter_code,
-              compartment_code,
-              format):
+              compartment_code):
     """
-    Write locations metadata to output file, given input codes.
+    Subset locations dataframe based on input codes and write locations.json.
 
     """
     locations_df = ddlpy.locations()
 
     stations = station
     quantities = {'Grootheid.Code': list(quantity),
-                  'Hoedanigheid.Code': list(quality),
+                  'Hoedanigheid.Code': list(vertref),
+                  'Groepering.Code': list(group),
                   'Eenheid.Code': list(unit),
                   'Parameter.Code': list(parameter_code),
                   'Compartiment.Code': list(compartment_code)
@@ -96,11 +100,8 @@ def locations(output,
 
     selected.reset_index(inplace= True)
 
-    if format == 'json':
-        output= output.split('.')[0] # make sure that extension is always json
-        selected.to_json(output+'.json', orient='records')
-    else:
-        raise ValueError('Unexpected format {}'.format(format))
+    output= output.split('.')[0] # make sure that extension is always json
+    selected.to_json(output+'.json', orient='records')
 
 # Another command to get the measurements from locations
 @cli.command()
@@ -117,7 +118,9 @@ def locations(output,
 )
 def measurements(locations, start_date, end_date):
     """
-    Obtain measurements from file with locations and codes
+    Obtain measurements from file with locations and codes. 
+    The arguments start_date and end_date should be formatted 
+    like "YYYY-MM-DD" or something else that `pandas.Timestamp` understands.
     """
     try:
         locations_df = pd.read_json(locations, orient='records')
