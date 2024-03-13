@@ -4,7 +4,6 @@
    :titlesonly:
    :hidden:
 
-   installation
    usage
    modules
    contributing

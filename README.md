@@ -9,42 +9,45 @@
 
 (D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
 
-Documentation: <https://deltares.github.io/ddlpy>
-
 See also https://github.com/wstolte/rwsapi for the R API.
 
 
 # Install
 
-If you had ddlpy installed before please uninstall since the package was renamed on PyPI:
+If you had ddlpy installed before please uninstall it first, since the package was renamed from rws-ddlpy to ddlpy on PyPI:
 
 	pip uninstall rws-ddlpy -y
 
-Install the latest ddlpy PyPI release with:
+Install the latest ddlpy PyPI release with (extra dependencies between `[]` are optional):
 
-	pip install ddlpy
+	pip install ddlpy[netcdf,examples]
 
-In the examples/notebooks folders you will find the following files:
+# Examples
 
-* `examples/minimal example.py` -> minimal code to retrieve data.
+Documentation: <https://deltares.github.io/ddlpy>
 
-* `examples/retrieve_parallel_to_netcdf.py` -> Code to retrieve a bulk of observations and write to netcdf files for each station.
+In the examples/notebooks folders you will find the following examples to get you started:
 
-* `notebooks/measurements.ipynb` -> interactive notebook to subset/inspect locations and download/plot measurements
+* [minimal_example.py](https://github.com/Deltares/ddlpy/blob/main/examples/minimal_example.py) -> minimal code to retrieve data.
 
-* `notebooks/waterinfo.ipynb` -> interactive notebook to read csv's obained from waterinfo.rws.nl
+* [retrieve_parallel_to_netcdf.py](https://github.com/Deltares/ddlpy/blob/main/examples/retrieve_parallel_to_netcdf.py) -> Code to retrieve a bulk of observations and write to netcdf files for each station.
+
+* [measurements.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/measurements.ipynb) -> interactive notebook to subset/inspect locations and download/plot measurements
+
+* [waterinfo.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/waterinfo.ipynb) -> interactive notebook to read csv's obained from waterinfo.rws.nl
 
 
 # Run ddlpy from console
 
-You can also run ddlpy from the console. With `ddlpy locations` you can generate a (subsetted) locations.json file, for instance:
+With `ddlpy locations` you can generate a (subsetted) locations.json file, for instance:
 
 	ddlpy locations --quantity WATHTE --station HOEKVHLD
 
-To get access to the help menu, type: `ddlpy locations --help`.
-
-With `ddlpy measurements` you can obtain measurements for locations/parameters in an existing locations.json:
+With `ddlpy measurements` you can obtain measurements for locations/parameters in an existing locations.json, for instance:
 
 	ddlpy measurements 2023-01-01 2023-01-03
 
-To get access to the help menu, type: `ddlpy measurements --help`.
+
+# Something broke?
+
+Check the [status of the DDL](https://rijkswaterstaatdata.nl/waterdata/#hfd2f5e23-5092-4169-9f36-41e9734e7d87) (at the *Updates* heading). If you have a suggestion or found a bug in ddlpy, please [create an issue](https://github.com/Deltares/ddlpy/issues).

@@ -126,3 +126,19 @@ $ git push
 $ git push --tags
 
 Travis will then deploy to PyPI if tests pass.
+
+
+Releasing (non-travis)
+----------------------
+
+- make sure the ``main`` branch is up to date
+- bump the versionnumber with ``bumpversion minor``
+- update heading (including date) in ``HISTORY.rst``
+- run testbank
+- local check with: ``python -m build`` and ``twine check dist/*``
+- create a [new release](https://github.com/Deltares/dfm_tools/releases/new)
+- click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag: v0.3.0 on publish``
+- set the release title to the tagname (e.g. ``v0.3.0``)
+- click `Generate release notes`
+- if all is set, click ``Publish release``
+- a release is created and the github action publishes it [on PyPI](https://pypi.org/project/ddlpy)
