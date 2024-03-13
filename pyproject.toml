@@ -60,6 +60,7 @@ docs = [
 	"sphinx>=1.8.1",
 	"sphinx_mdinclude",
 	"nbsphinx",
+	"pandoc",
 	"pydata-sphinx-theme",
 ]
 examples = [
