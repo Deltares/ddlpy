@@ -142,4 +142,4 @@ Releasing (non-travis)
 - set the release title to the tagname (e.g. ``v0.3.0``)
 - click `Generate release notes`
 - if all is set, click ``Publish release``
-- a release is created and published on PyPI (https://pypi.org/project/ddlpy) by the github action
+- a release is created and published on PyPI by the github action
