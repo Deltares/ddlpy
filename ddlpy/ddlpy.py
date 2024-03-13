@@ -299,6 +299,21 @@ def _measurements_slice(location, start_date, end_date):
     return df
 
 
+def _clean_dataframe(measurements):
+    len_raw = len(measurements)
+    # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
+    measurements = measurements.drop_duplicates()
+    
+    # remove Tijdstap column, has to be done after drop_duplicates to avoid too much to be dropped
+    measurements = measurements.drop("Tijdstip", axis=1, errors='ignore')
+    
+    # sort dataframe on time, ddl returns non-sorted data
+    measurements = measurements.sort_index()
+    ndropped = len_raw - len(measurements)
+    logger.debug(f"{ndropped} duplicated values dropped")
+    return measurements
+
+
 def measurements(location, start_date, end_date, clean_df=True):
     """return measurements for the given location and time window (start_date, end_date)"""
     
@@ -342,17 +357,7 @@ def measurements(location, start_date, end_date, clean_df=True):
     measurements = pd.concat(measurements)
 
     if clean_df:
-        len_raw = len(measurements)
-        # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
-        measurements = measurements.drop_duplicates()
-        
-        # remove Tijdstap column, has to be done after drop_duplicates to avoid too much to be dropped
-        measurements = measurements.drop("Tijdstip", axis=1)
-        
-        # sort dataframe on time, ddl returns non-sorted data
-        measurements = measurements.sort_index()
-        ndropped = len_raw - len(measurements)
-        logger.debug(f"{ndropped} duplicated values dropped")
+        measurements = _clean_dataframe(measurements)
 
     return measurements
 

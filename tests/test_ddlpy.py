@@ -24,8 +24,21 @@ def location(locations):
     return location
 
 
+@pytest.fixture
+def measurements(location):
+    """measurements for a location """
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    return measurements
+
+
 def test_locations(locations):
     assert locations.shape[0] > 1
+
+
+def test_measurements(measurements):
+    assert measurements.shape[0] > 1
 
 
 def test_measurements_available(location):
@@ -64,14 +77,6 @@ def test_measurements_typerror(locations):
         _ = ddlpy.measurements(locations, start_date=start_date, end_date=end_date)
 
 
-def test_measurements(location):
-    """measurements for a location """
-    start_date = dt.datetime(1953, 1, 1)
-    end_date = dt.datetime(1953, 4, 1)
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    assert measurements.shape[0] > 1
-
-
 def test_measurements_noindex(location):
     # pandas dataframe with Code as column instead of index
     locations_noindex = pd.DataFrame(location).T
@@ -100,61 +105,48 @@ def test_measurements_long(location):
     assert measurements.shape[0] > 1
 
 
-def test_measurements_sorted(location):
+def test_measurements_sorted(measurements):
     """https://github.com/deltares/ddlpy/issues/27"""
-    # input parameters
-    start_date  = dt.datetime(2019,11,24)
-    end_date = dt.datetime(2019,12,5)
-    meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    assert meas_wathte.index.is_monotonic_increasing == True
-    meas_wathte_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
-    assert meas_wathte_clean.index.is_monotonic_increasing == True
-    meas_wathte_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
-    assert meas_wathte_raw.index.is_monotonic_increasing == False
+    
+    # sort dataframe on values so it will not be sorted on time
+    meas_wrongorder = measurements.sort_values("Meetwaarde.Waarde_Numeriek")
+    assert meas_wrongorder.index.is_monotonic_increasing == False
+    meas_clean = ddlpy.ddlpy._clean_dataframe(meas_wrongorder)
+    assert meas_clean.index.is_monotonic_increasing == True
+    # assert meas_clean.index.duplicated().sum() == 0
+    
     # check wheter indexes are DatetimeIndex
-    assert isinstance(meas_wathte.index, pd.DatetimeIndex)
-    assert isinstance(meas_wathte_clean.index, pd.DatetimeIndex)
-    assert isinstance(meas_wathte_raw.index, pd.DatetimeIndex)
+    assert isinstance(meas_wrongorder.index, pd.DatetimeIndex)
+    assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
-def test_measurements_duplicated(locations):
+def test_measurements_duplicated(measurements):
     """
     WALSODN 2010 contains all values three times, ddlpy drops duplicates
     https://github.com/deltares/ddlpy/issues/24
     if the data is cleaned in ddl, this test will fail and can be removed or adjusted
+    
+    length assertion of meas_clean is important, to prevent issue 
+    https://github.com/deltares/ddlpy/issues/53
     """
-    location = locations[locations['Grootheid.Code'] == 'WATHTE'].loc['WALSODN']
-    start_date = dt.datetime(2010, 1, 1)
-    end_date = dt.datetime(2010, 1, 1, 0, 20)
-    measurements_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
-    measurements_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
-    assert len(measurements_clean) == 3
-    assert len(measurements_raw) == 9
+    
+    # deliberately duplicate values in a measurements dataframe
+    meas_duplicated = pd.concat([measurements, measurements, measurements], axis=0)
+    meas_clean = ddlpy.ddlpy._clean_dataframe(meas_duplicated)
+    assert len(meas_duplicated) == 3024
+    assert len(meas_clean) == 392
+    
     # check wheter indexes are DatetimeIndex
-    assert isinstance(measurements_clean.index, pd.DatetimeIndex)
-    assert isinstance(measurements_raw.index, pd.DatetimeIndex)
+    assert isinstance(meas_duplicated.index, pd.DatetimeIndex)
+    assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
-def test_measurements_remove_duplicates_nottoomuch(location):
-    """
-    to prevent issue https://github.com/deltares/ddlpy/issues/53
-    """
-    start_date = dt.datetime(2014, 1, 1)
-    end_date = dt.datetime(2014, 1, 7)
-    measurements_clean = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=True)
-    measurements_raw = ddlpy.measurements(location, start_date=start_date, end_date=end_date, clean_df=False)
-    assert len(measurements_clean) == len(measurements_raw)
-
-
-def test_simplify_dataframe(location):
-    start_date = dt.datetime(2019,11,24)
-    end_date = dt.datetime(2019,12,5)
-    meas_wathte = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    assert len(meas_wathte.columns) == 53
-    meas_simple = ddlpy.simplify_dataframe(meas_wathte)
+def test_simplify_dataframe(measurements):
+    assert len(measurements.columns) == 53
+    meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 51
-    assert len(meas_simple.columns) == 2
+    assert len(meas_simple.attrs) == 50
+    assert len(meas_simple.columns) == 3
 
 
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
