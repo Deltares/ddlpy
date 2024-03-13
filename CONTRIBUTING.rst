@@ -114,8 +114,8 @@ To run a subset of tests::
 $ py.test tests.test_ddlpy
 
 
-Deploying
----------
+Deploying (old)
+---------------
 
 A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in HISTORY.rst).
@@ -126,6 +126,11 @@ $ git push
 $ git push --tags
 
 Travis will then deploy to PyPI if tests pass.
+
+
+Generate documentation
+----------------------
+- `sphinx-build docs docs/_build`
 
 
 Releasing (non-travis)
