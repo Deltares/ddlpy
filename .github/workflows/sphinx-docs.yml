@@ -21,11 +21,10 @@ jobs:
           python -m pip install -e .[docs]
       - name: Sphinx build
         run: |
-          cp notebooks/measurements.ipynb docs
-          sphinx-build docs _build
+          sphinx-build docs docs/_build
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: _build/
+          path: docs/_build/
 
   # Deploy the artifact to GitHub pages.
   # This is a separate job so that only actions/deploy-pages has the necessary permissions.
