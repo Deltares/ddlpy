@@ -26,16 +26,9 @@ start_date = dt.datetime(2015, 1, 1) # also inputs for the code
 end_date = dt.datetime(2015, 6, 1)
 measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
 
-
 if (len(measurements) > 0):
     print('Data was found in Waterbase')
     #measurements.to_csv("%s_%s_%s.csv"%(location.Code, code, unit), index= False)
     measurements.plot(y="Meetwaarde.Waarde_Numeriek")
 else:
     print('No Data!')
-
-    
-    
-    
-    
-    

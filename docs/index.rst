@@ -8,7 +8,7 @@ ddlpy documentation
    :hidden:
 
    installation
-   measurements
+   usage
    modules
    contributing
    history
