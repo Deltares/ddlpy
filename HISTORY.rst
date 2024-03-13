@@ -2,7 +2,7 @@
 History
 =======
 
-UNRELEASED
+0.3.0 (2023-03-13)
 ------------------
 * improved nan filtering of measurements in https://github.com/deltares/ddlpy/pull/30
 * add `ddlpy.measurements_available()` check in https://github.com/deltares/ddlpy/pull/33 and https://github.com/deltares/ddlpy/pull/58

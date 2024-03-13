@@ -136,6 +136,7 @@ Releasing (non-travis)
 - update heading (including date) in ``HISTORY.rst``
 - run testbank
 - local check with: ``python -m build`` and ``twine check dist/*``
+- push+merge all changes
 - create a [new release](https://github.com/Deltares/dfm_tools/releases/new)
 - click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag: v0.3.0 on publish``
 - set the release title to the tagname (e.g. ``v0.3.0``)
