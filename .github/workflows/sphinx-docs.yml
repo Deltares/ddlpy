@@ -21,15 +21,8 @@ jobs:
           python -m pip install -e .[docs]
       - name: Sphinx build
         run: |
+          cp notebooks/measurements.ipynb docs
           sphinx-build docs _build
-      #- name: Deploy to GitHub Pages
-      #  uses: peaceiris/actions-gh-pages@v3
-      #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      #  with:
-      #    publish_branch: gh-pages
-      #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    publish_dir: _build/
-      #    force_orphan: true
       - uses: actions/upload-pages-artifact@v1
         with:
           path: _build/
