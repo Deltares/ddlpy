@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-"""Console script for ddlpy."""
+"""
+Console script for ddlpy.
+    - ``ddlpy --help``
+    - ``ddlpy locations --help``
+    - ``ddlpy measurements --help``
+"""
 import sys
 import logging
 import click
@@ -24,22 +29,32 @@ def cli(verbose,  args=None):
 @cli.command()
 @click.option(
     '--output', 
-    help='output of locations json file',
+    help='the locations json filename that will be created',
     default='locations.json'
     )
 @click.option(
-    '--quantity',
-    help='Grootheid code',
+    '--station',
+    help='Station codes, e.g. HOEKVHLD',
     multiple=True
 )
 @click.option(
-    '--quality',
-    help='Hoedanigheid code',
+    '--grootheid-code',
+    help='Grootheid code, e.g. WATHTE',
     multiple=True
 )
 @click.option(
-    '--unit',
-    help='Eenheid code',
+    '--groepering-code',
+    help='Groepering code, e.g. NVT',
+    multiple=True
+)
+@click.option(
+    '--hoedanigheid-code',
+    help='Hoedanigheid code, e.g. NAP',
+    multiple=True
+)
+@click.option(
+    '--eenheid-code',
+    help='Eenheid code, e.g. cm',
     multiple=True
 )
 @click.option(
@@ -49,38 +64,28 @@ def cli(verbose,  args=None):
 )
 @click.option(
     '--compartment-code',
-    help='Compartment code',
+    help='Compartment code, e.g. OW',
     multiple=True
-)
-@click.option(
-    '--station',
-    help='Station codes',
-    multiple=True
-)
-@click.option(
-    '--format',
-    default='json',
-    help='output file format. Must be json',
-    type=click.Choice(['json'], case_sensitive=True)
 )
 def locations(output,
               station,
-              quantity,
-              quality,
-              unit,
+              grootheid_code,
+              groepering_code,
+              hoedanigheid_code,
+              eenheid_code,
               parameter_code,
-              compartment_code,
-              format):
+              compartment_code):
     """
-    Write locations metadata to output file, given input codes.
+    Subset locations dataframe based on input codes and write locations.json.
 
     """
     locations_df = ddlpy.locations()
 
     stations = station
-    quantities = {'Grootheid.Code': list(quantity),
-                  'Hoedanigheid.Code': list(quality),
-                  'Eenheid.Code': list(unit),
+    quantities = {'Grootheid.Code': list(grootheid_code),
+                  'Groepering.Code': list(groepering_code),
+                  'Hoedanigheid.Code': list(hoedanigheid_code),
+                  'Eenheid.Code': list(eenheid_code),
                   'Parameter.Code': list(parameter_code),
                   'Compartiment.Code': list(compartment_code)
                   }
@@ -96,11 +101,8 @@ def locations(output,
 
     selected.reset_index(inplace= True)
 
-    if format == 'json':
-        output= output.split('.')[0] # make sure that extension is always json
-        selected.to_json(output+'.json', orient='records')
-    else:
-        raise ValueError('Unexpected format {}'.format(format))
+    output= output.split('.')[0] # make sure that extension is always json
+    selected.to_json(output+'.json', orient='records')
 
 # Another command to get the measurements from locations
 @cli.command()
@@ -117,7 +119,9 @@ def locations(output,
 )
 def measurements(locations, start_date, end_date):
     """
-    Obtain measurements from file with locations and codes
+    Obtain measurements from file with locations and codes. 
+    The arguments start_date and end_date should be formatted 
+    like "YYYY-MM-DD" or something else that `pandas.Timestamp` understands.
     """
     try:
         locations_df = pd.read_json(locations, orient='records')
@@ -136,11 +140,12 @@ def measurements(locations, start_date, end_date):
             cc = selected['Compartiment.Code']
             ec = selected['Eenheid.Code']
             gc = selected['Grootheid.Code']
+            grc = selected['Groepering.Code']
             hc = selected['Hoedanigheid.Code']
             pc = selected['Parameter.Code']
 
-            measurements.to_csv('%s_%s_%s_%s_%s_%s.csv' %
-                                (station, cc, ec, gc, hc, pc))
+            measurements.to_csv('%s_%s_%s_%s_%s_%s_%s.csv' %
+                                (station, cc, ec, gc, grc, hc, pc))
         else:
             print('No Data of station %s were retrieved from Water Info' %
                   selected['Code'])

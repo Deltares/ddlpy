@@ -1,5 +1,3 @@
-# ddlpy
-
 [![pypi-image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
 [![pytest](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml)
 [![codecov](https://img.shields.io/codecov/c/github/deltares/ddlpy.svg?style=flat-square)](https://app.codecov.io/gh/deltares/ddlpy?displayType=list)
@@ -7,49 +5,49 @@
 [![Supported versions](https://img.shields.io/pypi/pyversions/ddlpy.svg)](https://pypi.org/project/ddlpy)
 [![Downloads](https://img.shields.io/pypi/dm/ddlpy.svg)](https://pypistats.org/packages/ddlpy)
 
-(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
+# ddlpy
 
-Documentation: <https://deltares.github.io/ddlpy>
+(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
 
 See also https://github.com/wstolte/rwsapi for the R API.
 
 
 # Install
 
-This text will be updated soon and a new pypi release will also happen soon.
-The latest ddlpy PyPI release is outdated, but it can be installed with:
+If you had ddlpy installed before please uninstall it first, since the package was renamed from rws-ddlpy to ddlpy on PyPI:
 
-	pip install rws-ddlpy
+	pip uninstall rws-ddlpy -y
 
-The newest version is currently installed directly from github with:
+Install the latest ddlpy PyPI release with (extra dependencies between `[]` are optional):
 
-    pip install git+https://github.com/deltares/ddlpy
+	pip install ddlpy[netcdf,examples]
 
-In the folder examples you will find the following files:
+# Examples
 
-* minimal example.py -> minimal code to retrieve data.
+Documentation: <https://deltares.github.io/ddlpy>
 
-* 1_get_data_from_water_info_parallel.py -> Code to retrieve a bulk of observations per parameter and per station.
+In the examples/notebooks folders you will find the following examples to get you started:
 
-The output of this code is the data in csv format.
+* [minimal_example.py](https://github.com/Deltares/ddlpy/blob/main/examples/minimal_example.py) -> minimal code to retrieve data.
 
-* 2_get_netcdf.py -> Code to transform the csv files run in the previous script into netcdf files.
+* [retrieve_parallel_to_netcdf.py](https://github.com/Deltares/ddlpy/blob/main/examples/retrieve_parallel_to_netcdf.py) -> Code to retrieve a bulk of observations and write to netcdf files for each station.
 
-More detailed explanation on the usage of these codes are inside the `notebooks` directory.
+* [measurements.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/measurements.ipynb) -> interactive notebook to subset/inspect locations and download/plot measurements
+
+* [waterinfo.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/waterinfo.ipynb) -> interactive notebook to read csv's obained from waterinfo.rws.nl
+
 
 # Run ddlpy from console
 
-You can also run ddlpy from the console. The options you can use are the following:
-* Write locations metadata to output file, given input station codes and parameter codes:
+With `ddlpy locations` you can generate a (subsetted) locations.json file, for instance:
 
-    ddlpy locations
+	ddlpy locations --quantity WATHTE --station HOEKVHLD
 
-To get access to the help menu, type in a terminal: ddlpy locations --help.
+With `ddlpy measurements` you can obtain measurements for locations/parameters in an existing locations.json, for instance:
 
-* Obtain measurements from json file containing locations and codes:
+	ddlpy measurements 2023-01-01 2023-01-03
 
-    ddlpy measurements
 
-To get access to the help menu, type in a terminal: ddlpy measurements --help.
+# Something broke?
 
-IMPORTANT: You can not run `ddlpy measurements` before running `ddlpy locations`, unless you already have a .json file listing the stations and the parameters you need data from.
+Check the [status of the DDL](https://rijkswaterstaatdata.nl/waterdata/#hfd2f5e23-5092-4169-9f36-41e9734e7d87) (at the *Updates* heading). If you have a suggestion or found a bug in ddlpy, please [create an issue](https://github.com/Deltares/ddlpy/issues).

@@ -1,13 +1,11 @@
 """
-This is a minimal example on how to retrieve data from water info.
-Make sure to set up a path to store the resulting dataframe. Also, decomment
-the line of code
+This is a minimal example on how to retrieve data from the DDL with ddlpy.
 """
 
-from ddlpy import ddlpy
+import ddlpy
 import datetime as dt
 
-# get all locations
+# get the dataframe with locations and their available parameters
 locations = ddlpy.locations()
 
 #select a set of parameters 
@@ -22,17 +20,14 @@ bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP'])
 selected = locations.loc[bool_stations & bool_grootheid & 
                          bool_groepering & bool_hoedanigheid]
 
-# Obtain measurements per parameter row
-index = 1
-location = selected.reset_index().iloc[index]
+start_date = dt.datetime(2023, 1, 1)
+end_date = dt.datetime(2023, 1, 15)
 
-start_date = dt.datetime(2015, 1, 1) # also inputs for the code
-end_date = dt.datetime(2015, 6, 1)
-measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+# provide a single row of the locations dataframe to ddlpy.measurements
+measurements = ddlpy.measurements(selected.iloc[0], start_date=start_date, end_date=end_date)
 
-if (len(measurements) > 0):
+if not measurements.empty:
     print('Data was found in Waterbase')
-    #measurements.to_csv("%s_%s_%s.csv"%(location.Code, code, unit), index= False)
-    measurements.plot(y="Meetwaarde.Waarde_Numeriek")
+    measurements.plot(y="Meetwaarde.Waarde_Numeriek", linewidth=0.8)
 else:
     print('No Data!')
