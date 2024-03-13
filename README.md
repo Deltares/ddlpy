@@ -1,26 +1,20 @@
-[![pypi-image](https://img.shields.io/pypi/v/ddlpy.svg)](https://pypi.python.org/pypi/ddlpy)
+[![pypi-image](https://img.shields.io/pypi/v/rws-ddlpy.svg)](https://pypi.python.org/pypi/rws-ddlpy)
 [![pytest](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml)
 [![codecov](https://img.shields.io/codecov/c/github/deltares/ddlpy.svg?style=flat-square)](https://app.codecov.io/gh/deltares/ddlpy?displayType=list)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Deltares_ddlpy&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Deltares_ddlpy)
-[![Supported versions](https://img.shields.io/pypi/pyversions/ddlpy.svg)](https://pypi.org/project/ddlpy)
-[![Downloads](https://img.shields.io/pypi/dm/ddlpy.svg)](https://pypistats.org/packages/ddlpy)
+[![Supported versions](https://img.shields.io/pypi/pyversions/rws-ddlpy.svg)](https://pypi.org/project/rws-ddlpy)
+[![Downloads](https://img.shields.io/pypi/dm/rws-ddlpy.svg)](https://pypistats.org/packages/rws-ddlpy)
 
 # ddlpy
 
-(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for python.
-
-See also https://github.com/wstolte/rwsapi for the R API.
+(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for Python. See also https://github.com/wstolte/rwsapi for the R API.
 
 
 # Install
 
-If you had ddlpy installed before please uninstall it first, since the package was renamed from rws-ddlpy to ddlpy on PyPI:
-
-	pip uninstall rws-ddlpy -y
-
 Install the latest ddlpy PyPI release with (extra dependencies between `[]` are optional):
 
-	pip install ddlpy[netcdf,examples]
+	pip install rws-ddlpy[netcdf,examples]
 
 # Examples
 
