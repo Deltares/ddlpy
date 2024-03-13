@@ -1,7 +1,5 @@
 """
-This is a minimal example on how to retrieve data from water info.
-Make sure to set up a path to store the resulting dataframe. Also, decomment
-the line of code
+This is a minimal example on how to retrieve data from the DDL with ddlpy.
 """
 
 from ddlpy import ddlpy
