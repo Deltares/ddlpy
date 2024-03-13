@@ -2,12 +2,9 @@
 
 """Console script for ddlpy."""
 import sys
-import io
 import logging
-
 import click
 import pandas as pd
-import dateutil
 import ddlpy
 
 
@@ -25,7 +22,11 @@ def cli(verbose,  args=None):
 # Define a command
 # Each command has options which are read from the console.
 @cli.command()
-@click.argument('output', type=click.STRING )
+@click.option(
+    '--output', 
+    help='output of locations json file',
+    default='locations.json'
+    )
 @click.option(
     '--quantity',
     help='Grootheid code',
@@ -103,13 +104,11 @@ def locations(output,
 
 # Another command to get the measurements from locations
 @cli.command()
-@click.option(
-    '--start-date',
-    help='Start date of the measurements'
+@click.argument(
+    'start-date',
 )
-@click.option(
-    '--end-date',
-    help='End date of the measurements'
+@click.argument(
+    'end-date',
 )
 @click.option(
     '--locations',
@@ -123,14 +122,8 @@ def measurements(locations, start_date, end_date):
     try:
         locations_df = pd.read_json(locations, orient='records')
     except:
-        raise ValueError('location file not existing. Create one or specify its name.')
-
-    # conver strings to dates
-    if start_date:
-        start_date = dateutil.parser.parse(start_date)
-    if end_date:
-        end_date = dateutil.parser.parse(end_date)
-
+        raise ValueError('locations.json file not found. First run "ddlpy locations"')
+        
     for obs in range(locations_df.shape[0]): #goes through rows in table
         selected = locations_df.loc[obs]
 
