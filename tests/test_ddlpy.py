@@ -62,6 +62,12 @@ def test_measurements_amount(location):
     assert data_amount_jaar["Groeperingsperiode"].str.len().iloc[0] == 4
 
 
+def test_measurements_latest(location):
+    """measurements for a location """
+    latest = ddlpy.measurements_latest(location)
+    assert latest.shape[0] > 1
+
+
 def test_measurements_empty(location):
     """measurements for a location """
     start_date = dt.datetime(2153, 1, 1)
@@ -89,12 +95,6 @@ def test_measurements_noindex(location):
     end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location_sel, start_date=start_date, end_date=end_date)
     assert measurements.shape[0] > 1
-
-
-def test_measurements_latest(location):
-    """measurements for a location """
-    latest = ddlpy.measurements_latest(location)
-    assert latest.shape[0] > 1
 
 
 def test_measurements_long(location):
