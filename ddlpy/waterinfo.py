@@ -133,8 +133,5 @@ def waterinfo_read(f, encoding='latin'):
             d['time'].attrs['timezone'] = 'UTC'
             
         ds.append(d)
-        
-    # if len(ds)==1:
-    #     ds = ds[0]
 
     return ds

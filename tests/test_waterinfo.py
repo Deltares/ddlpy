@@ -17,10 +17,11 @@ def test_waterinfo_read():
     g = os.path.join(dir_tests, 'NVT_WATHTE_SCHE_20200507.csv')
     
     dxf_list = waterinfo_read(f)
-    dxg = waterinfo_read(g)
+    dxg_list = waterinfo_read(g)
     
     dxf0 = dxf_list[0]
+    dxg0 = dxg_list[0]
     assert "time" in dxf0.variables
     assert "data" in dxf0.variables
-    assert "time" in dxg.variables
-    assert "data" in dxg.variables
+    assert "time" in dxg0.variables
+    assert "data" in dxg0.variables
