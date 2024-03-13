@@ -25,3 +25,6 @@ def test_waterinfo_read():
     assert "data" in dxf0.variables
     assert "time" in dxg0.variables
     assert "data" in dxg0.variables
+    
+    os.remove(f)
+    os.remove(g)
