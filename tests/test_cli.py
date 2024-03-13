@@ -22,9 +22,15 @@ def test_command_line_interface():
     locations_command = 'locations --grootheid-code WATHTE --station HOEKVHLD'
     locations_result = runner.invoke(cli.cli, locations_command.split())
     assert locations_result.exit_code == 0
-    assert os.path.exists("locations.json")
+    file_locs = "locations.json"
+    assert os.path.exists(file_locs)
     
     measurements_command = 'measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
-    assert os.path.exists("HOEKVHLD_OW_cm_WATHTE_NVT_NAP_NVT.csv")
+    file_meas = "HOEKVHLD_OW_cm_WATHTE_NVT_NAP_NVT.csv"
+    assert os.path.exists(file_meas)
+    
+    # cleanup
+    os.remove(file_locs)
+    os.remove(file_meas)

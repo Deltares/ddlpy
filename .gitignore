@@ -1,6 +1,3 @@
-locations.json
-*.csv
-
 # README.rst is generated from README.md, see Makefile
 README.rst
 
