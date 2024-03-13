@@ -128,6 +128,12 @@ $ git push --tags
 Travis will then deploy to PyPI if tests pass.
 
 
+Generate documentation
+----------------------
+- `cp notebooks/measurements.ipynb docs`
+- `sphinx-build docs _build`
+
+
 Releasing (non-travis)
 ----------------------
 
