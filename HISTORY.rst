@@ -2,6 +2,10 @@
 History
 =======
 
+UNRELEASED
+------------------
+* nothing yet
+
 0.3.0 (2023-03-13)
 ------------------
 * improved nan filtering of measurements in https://github.com/deltares/ddlpy/pull/30
