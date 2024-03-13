@@ -29,26 +29,31 @@ def cli(verbose,  args=None):
 @cli.command()
 @click.option(
     '--output', 
-    help='output of locations json file',
+    help='the locations json filename that will be created',
     default='locations.json'
     )
 @click.option(
-    '--quantity',
+    '--station',
+    help='Station codes, e.g. HOEKVHLD',
+    multiple=True
+)
+@click.option(
+    '--grootheid-code',
     help='Grootheid code, e.g. WATHTE',
     multiple=True
 )
 @click.option(
-    '--group',
+    '--groepering-code',
     help='Groepering code, e.g. NVT',
     multiple=True
 )
 @click.option(
-    '--vertref',
+    '--hoedanigheid-code',
     help='Hoedanigheid code, e.g. NAP',
     multiple=True
 )
 @click.option(
-    '--unit',
+    '--eenheid-code',
     help='Eenheid code, e.g. cm',
     multiple=True
 )
@@ -62,16 +67,12 @@ def cli(verbose,  args=None):
     help='Compartment code, e.g. OW',
     multiple=True
 )
-@click.option(
-    '--station',
-    help='Station codes, e.g. HOEKVHLD',
-    multiple=True
-)
 def locations(output,
               station,
-              quantity,
-              vertref,
-              unit,
+              grootheid_code,
+              groepering_code,
+              hoedanigheid_code,
+              eenheid_code,
               parameter_code,
               compartment_code):
     """
@@ -81,10 +82,10 @@ def locations(output,
     locations_df = ddlpy.locations()
 
     stations = station
-    quantities = {'Grootheid.Code': list(quantity),
-                  'Hoedanigheid.Code': list(vertref),
-                  'Groepering.Code': list(group),
-                  'Eenheid.Code': list(unit),
+    quantities = {'Grootheid.Code': list(grootheid_code),
+                  'Groepering.Code': list(groepering_code),
+                  'Hoedanigheid.Code': list(hoedanigheid_code),
+                  'Eenheid.Code': list(eenheid_code),
                   'Parameter.Code': list(parameter_code),
                   'Compartiment.Code': list(compartment_code)
                   }
@@ -139,11 +140,12 @@ def measurements(locations, start_date, end_date):
             cc = selected['Compartiment.Code']
             ec = selected['Eenheid.Code']
             gc = selected['Grootheid.Code']
+            grc = selected['Groepering.Code']
             hc = selected['Hoedanigheid.Code']
             pc = selected['Parameter.Code']
 
-            measurements.to_csv('%s_%s_%s_%s_%s_%s.csv' %
-                                (station, cc, ec, gc, hc, pc))
+            measurements.to_csv('%s_%s_%s_%s_%s_%s_%s.csv' %
+                                (station, cc, ec, gc, grc, hc, pc))
         else:
             print('No Data of station %s were retrieved from Water Info' %
                   selected['Code'])
