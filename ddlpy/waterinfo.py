@@ -134,7 +134,7 @@ def waterinfo_read(f, encoding='latin'):
             
         ds.append(d)
         
-    if len(ds)==1:
-        ds = ds[0]
+    # if len(ds)==1:
+    #     ds = ds[0]
 
     return ds
