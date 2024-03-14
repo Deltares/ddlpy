@@ -59,7 +59,6 @@ def dataframe_to_xarray(df, keep=[]):
         if colname in df.columns:
             df_simple[colname] = df[colname]
     
-    #TODO: the column names of locations are always the same, so drop these always and maybe keep the rest? Not sure what is useful
     colname_code_list = df_simple.columns[df_simple.columns.str.contains(".Code")]
     colname_list = colname_code_list.str.replace(".Code","")
     colname_oms_list = colname_list+".Omschrijving"
