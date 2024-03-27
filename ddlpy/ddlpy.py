@@ -32,9 +32,7 @@ logger = logging.getLogger(__name__)
 
 def catalog(catalog_filter:list = None):
     endpoint = ENDPOINTS["collect_catalogue"]
-    msg = "{} with {}".format(endpoint["url"], json.dumps(endpoint["request"]))
-    logger.debug("requesting: {}".format(msg))
-
+    
     if catalog_filter is None:
         # use the default request from endpoints.json
         catalog_request = endpoint["request"]
@@ -42,6 +40,9 @@ def catalog(catalog_filter:list = None):
         assert isinstance(catalog_filter, list)
         catalog_request = {"CatalogusFilter": {x:True for x in catalog_filter}}
     
+    msg = "{} with {}".format(endpoint["url"], json.dumps(catalog_request))
+    logger.debug("requesting: {}".format(msg))
+
     resp = requests.post(endpoint["url"], json=catalog_request)
     if not resp.ok:
         raise IOError("Failed to request {}: {}".format(msg, resp.text))
