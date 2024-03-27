@@ -14,6 +14,18 @@ bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE'])
 bool_groepering = locations['Groepering.Code'].isin(['NVT'])
 selected = locations.loc[bool_grootheid & bool_hoedanigheid & bool_groepering & bool_stations]
 
+# TODO: how to get this from a measurements dataframe? Might be more useful to decide on 
+# >> a list of important properties that are kept, but this is case specific
+catalog_filter = ['Compartimenten','Eenheden','Grootheden',
+                  'Hoedanigheden','Groeperingen','MeetApparaten',
+                  'Typeringen','WaardeBepalingsmethoden','Parameters']
+locations_extended = ddlpy.locations(catalog_filter=catalog_filter)
+bool_hoedanigheid = locations_extended['Hoedanigheid.Code'].isin(['NAP'])
+bool_stations = locations_extended.index.isin(['BAALHK'])
+bool_grootheid = locations_extended['Grootheid.Code'].isin(['WATHTE'])
+bool_groepering = locations_extended['Groepering.Code'].isin(['NVT'])
+selected_extended = locations_extended.loc[bool_grootheid & bool_hoedanigheid & bool_groepering & bool_stations]
+
 # VLISSING has different WaardeBepalingsmethode from 1-2-2024
 date_start = "1990-01-15"
 date_end = "1990-05-15"
@@ -24,24 +36,28 @@ print(measurements['WaardeBepalingsmethode.Code'].drop_duplicates())
 simple = ddlpy.simplify_dataframe(measurements)
 # TODO: somehow the column AquoMetadata_MessageID does not have constant values
 
-# on dataframe
-
+# some actions on dataframe
 colname_code_list = measurements.columns[measurements.columns.str.contains(".Code")]
 colname_list = colname_code_list.str.replace(".Code","")
 colname_oms_list = colname_list+".Omschrijving"
 
-# create var_attrs_dict # TODO: later do this from entire extended locations dataset, to include all potential metadata
+# create var_attrs_dict
+# TODO: deside whether to derive attrs from measurements dataframe or from extended locations dataframe
 var_attrs_dict = {}
 for colname in colname_list:
     colname_code = f"{colname}.Code"
     colname_oms = f"{colname}.Omschrijving"
-    meas_twocol = measurements[[colname_code,colname_oms]].drop_duplicates()
+    if 1: # from measurements (=all keys)
+        meas_twocol = measurements[[colname_code,colname_oms]].drop_duplicates()
+    else: # from extended locations (=all values)
+        if colname_code not in selected_extended.columns:
+            continue
+        meas_twocol = selected_extended[[colname_code,colname_oms]].drop_duplicates()
     attr_dict = meas_twocol.set_index(colname_code)[colname_oms].to_dict()
     var_attrs_dict[colname] = attr_dict
 
 
 # to_xarray
-
 ds1 = measurements.to_xarray()
 ds2 = simple.to_xarray()
 
