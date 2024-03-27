@@ -34,7 +34,21 @@ def measurements(location):
 
 
 def test_locations(locations):
+    # the number of columns depend on the catalog filter in endpoints.json
+    assert locations.shape[1] == 18
+    # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
+
+
+def test_locations_extended():
+    catalog_filter = ['Compartimenten','Eenheden','Grootheden',
+                      'Hoedanigheden','Groeperingen','MeetApparaten',
+                      'Typeringen','WaardeBepalingsmethoden','Parameters']
+    locations_extended = ddlpy.locations(catalog_filter=catalog_filter)
+    # the number of columns depend on the provided catalog_filter
+    assert locations_extended.shape[1] == 24
+    # the number of rows is the number of stations, so will change over time
+    assert locations_extended.shape[0] > 1
 
 
 def test_measurements(measurements):
