@@ -216,7 +216,6 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
 def _combine_waarnemingenlijst(result, location):
     assert "WaarnemingenLijst" in result
     
-    # assert len(result['WaarnemingenLijst']) == 1
     # flatten the datastructure
     rows = []
     for waarneming in result["WaarnemingenLijst"]:
