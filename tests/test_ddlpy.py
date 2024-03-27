@@ -33,7 +33,20 @@ def measurements(location):
     return measurements
 
 
+def test_catalog():
+    catalog_filter = ['Compartimenten','Eenheden','Grootheden',
+                      'Hoedanigheden','Groeperingen','MeetApparaten',
+                      'Typeringen','WaardeBepalingsmethoden','Parameters']
+    result = ddlpy.ddlpy.catalog(catalog_filter=catalog_filter)
+    df_metadata = pd.json_normalize(result["AquoMetadataLijst"])
+    # the number of columns depend on the provided catalog_filter
+    assert df_metadata.shape[1] == 20
+
+
 def test_locations(locations):
+    # the number of columns depend on the catalog filter in endpoints.json
+    assert locations.shape[1] == 18
+    # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
 
 
