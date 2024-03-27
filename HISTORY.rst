@@ -4,7 +4,8 @@ History
 
 UNRELEASED
 ------------------
-* nothing yet
+* added `catalog_filter` argument to `ddlpy.locations()` to enabling retrieving the extended catalog in https://github.com/Deltares/ddlpy/pull/87
+
 
 0.3.0 (2023-03-13)
 ------------------

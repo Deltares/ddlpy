@@ -30,24 +30,38 @@ class NoDataException(ValueError):
 logger = logging.getLogger(__name__)
 
 
-def locations():
-    """
-    get station information from DDL (metadata from Catalogue). All metadata regarding stations.
-    The response (result) retrieves more keys
-
-    """
+def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
-    msg = "{} with {}".format(endpoint["url"], json.dumps(endpoint["request"]))
+    
+    if catalog_filter is None:
+        # use the default request from endpoints.json
+        catalog_request = endpoint["request"]
+    else:
+        assert isinstance(catalog_filter, list)
+        catalog_request = {"CatalogusFilter": {x:True for x in catalog_filter}}
+    
+    msg = "{} with {}".format(endpoint["url"], json.dumps(catalog_request))
     logger.debug("requesting: {}".format(msg))
 
-    resp = requests.post(endpoint["url"], json=endpoint["request"])
+    resp = requests.post(endpoint["url"], json=catalog_request)
     if not resp.ok:
         raise IOError("Failed to request {}: {}".format(msg, resp.text))
     result = resp.json()
     if not result["Succesvol"]:
         logger.exception(str(result))
         raise ValueError(result.get("Foutmelding", "No error returned"))
+    return result
 
+
+def locations(catalog_filter=None):
+    """
+    get station information from DDL (metadata from Catalogue). All metadata regarding stations.
+    The response (result) retrieves more keys
+
+    """
+
+    result = catalog(catalog_filter=catalog_filter)
+    
     df_locations = pd.DataFrame(result["LocatieLijst"])
 
     df_metadata = pd.json_normalize(result["AquoMetadataLijst"])
