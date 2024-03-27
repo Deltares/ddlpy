@@ -96,13 +96,12 @@ def _check_convert_dates(start_date, end_date, return_str=True):
 
 
 def _get_request_dicts(location):
-    aquometadata_dict = {
-        "Eenheid": {"Code": location["Eenheid.Code"]},
-        "Grootheid": {"Code": location["Grootheid.Code"]},
-        "Hoedanigheid": {"Code": location["Hoedanigheid.Code"]},
-        "Groepering": {"Code": location["Groepering.Code"]},
-    }
     
+    # generate aquometadata dict from location "*.Code" values
+    key_list = [x.replace(".Code","") for x in location.index if x.endswith(".Code")]
+    aquometadata_dict = {key:{"Code":location[f"{key}.Code"]} for key in key_list}
+    
+    # generate location dict from relevant values
     locatie_dict = {
         "X": location["X"],
         "Y": location["Y"],
@@ -217,7 +216,6 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
 def _combine_waarnemingenlijst(result, location):
     assert "WaarnemingenLijst" in result
     
-    # assert len(result['WaarnemingenLijst']) == 1
     # flatten the datastructure
     rows = []
     for waarneming in result["WaarnemingenLijst"]:
