@@ -30,7 +30,7 @@ class NoDataException(ValueError):
 logger = logging.getLogger(__name__)
 
 
-def catalog(catalog_filter:list = None):
+def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
     
     if catalog_filter is None:
@@ -53,14 +53,14 @@ def catalog(catalog_filter:list = None):
     return result
 
 
-def locations():
+def locations(catalog_filter=None):
     """
     get station information from DDL (metadata from Catalogue). All metadata regarding stations.
     The response (result) retrieves more keys
 
     """
 
-    result = catalog()
+    result = catalog(catalog_filter=catalog_filter)
     
     df_locations = pd.DataFrame(result["LocatieLijst"])
 
