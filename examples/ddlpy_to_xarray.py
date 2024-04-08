@@ -6,6 +6,7 @@ Created on Thu Mar 14 20:28:44 2024
 """
 
 import ddlpy
+import xarray as xr
 
 locations = ddlpy.locations()
 bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP'])
@@ -21,12 +22,12 @@ date_end = "1990-01-19"
 measurements = ddlpy.measurements(selected.iloc[0], date_start, date_end)
 print(measurements['WaardeBepalingsmethode.Code'].drop_duplicates())
 
-simple = ddlpy.simplify_dataframe(measurements)
+# simple = ddlpy.simplify_dataframe(measurements)
 
 # some actions on dataframe
 colname_code_list = measurements.columns[measurements.columns.str.contains(".Code")]
 colname_list = colname_code_list.str.replace(".Code","")
-colname_oms_list = colname_list+".Omschrijving"
+# colname_oms_list = colname_list+".Omschrijving"
 
 # create var_attrs_dict
 var_attrs_dict = {}
@@ -37,10 +38,9 @@ for colname in colname_list:
     attr_dict = meas_twocol.set_index(colname_code)[colname_oms].to_dict()
     var_attrs_dict[colname_code] = attr_dict
 
-
 # to_xarray
 ds1 = measurements.to_xarray()
-ds2 = simple.to_xarray()
+# ds2 = simple.to_xarray()
 
 def dataframe_to_xarray(df, keep=[]):
 
@@ -91,16 +91,23 @@ def dataframe_to_xarray(df, keep=[]):
     return ds
 
 ds3 = dataframe_to_xarray(measurements)
+# ds3["WaardeBepalingsmethode.Omschrijving"] = xr.DataArray(measurements["WaardeBepalingsmethode.Omschrijving"].values, dims='time')
 ds3 = ds3.drop_vars(["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
                      "WaarnemingMetadata.BemonsteringshoogteLijst",
                      ],errors="ignore")
 
+# TODO: convert retrieved meas-types to attrs (since they are always all constant)
+# Compartiment.Code
+# Eenheid.Code
+# Grootheid.Code
+# Hoedanigheid.Code (?)
+# BemonsteringsSoort.Code (?)
+
 ds3.to_netcdf("file_nc.nc")
-import xarray as xr
 ds_file = xr.open_dataset("file_nc.nc")
 
 print(f'full [MB]: {ds1.nbytes/1024**2:.3f}')
-print(f'simple [MB]: {ds2.nbytes/1024**2:.3f}')
+# print(f'simple [MB]: {ds2.nbytes/1024**2:.3f}')
 print(f'filt [MB]: {ds3.nbytes/1024**2:.3f}')
 print(f'file [MB]: {ds_file.nbytes/1024**2:.3f}')
 
