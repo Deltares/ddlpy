@@ -74,6 +74,9 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     - All location columns are dropped and added as ds attributes
     - All drop_if_constant columns are dropped and added as ds attributes (if the values are indeed constant)
     
+    The timestamps are converted to UTC since xarray does not support non-UTC timestamps.
+    These can be converted to different timezones after loading the netcdf and converting 
+    to a pandas dataframe with df.index.tz_convert()
     """
 
     # create list of columns with duplicate info (often not constant), will be dropped
