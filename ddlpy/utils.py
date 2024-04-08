@@ -32,9 +32,8 @@ def date_series(start, end, freq=dateutil.rrule.MONTHLY):
 
 def simplify_dataframe(df: pd.DataFrame):
     """
-    drop columns with constant values from the dataframe
-    and collect them in a dictionary which is 
-    added as attrs of the dataframe
+    Drop columns with constant values from the dataframe and collect them 
+    in a dictionary which is added as attrs of the dataframe.
     """
     
     bool_constant = (df == df.iloc[0]).all()
@@ -65,14 +64,16 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
 
 def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     """
-    converts the measurement dataframe to a xarray dataset,
-    including several cleanups to minimize the size of the netcdf dataset on disk
+    Converts the measurement dataframe to a xarray dataset,
+    including several cleanups to minimize the size of the netcdf dataset on disk:
+    
     - The column 'Parameter_Wat_Omschrijving' is dropped (combination of information in other columns)
-    - The column 'Meetwaarde.Waarde_Alfanumeriek' if 'Meetwaarde.Waarde_Numeriek' is present (contains duplicate values in that case)
-    - All *.Omschrijving columns are dropped and added as attributes to the *.Code variables
-    - All NVT-only *.Code columns are dropped and added as ds attributes
+    - The column 'Meetwaarde.Waarde_Alfanumeriek' is dropped if 'Meetwaarde.Waarde_Numeriek' is present (contains duplicate values in that case)
+    - All Omschrijving columns are dropped and added as attributes to the Code variables
+    - All NVT-only Code columns are dropped and added as ds attributes
     - All location columns are dropped and added as ds attributes
     - All drop_if_constant columns are dropped and added as ds attributes (if the values are indeed constant)
+    
     """
 
     # create list of columns with duplicate info (often not constant), will be dropped
