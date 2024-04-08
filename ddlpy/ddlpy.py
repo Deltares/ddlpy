@@ -416,7 +416,7 @@ def simplify_dataframe(df: pd.DataFrame):
     df_attrs = df.loc[:, bool_constant].iloc[0].to_dict()
     
     # varying columns are kept in output dataframe
-    df_simple = df.loc[:, ~bool_constant]
+    df_simple = df.loc[:, ~bool_constant].copy()
     
     # attach as attrs to dataframe
     df_simple.attrs = df_attrs
