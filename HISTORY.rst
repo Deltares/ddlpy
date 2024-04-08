@@ -6,7 +6,7 @@ History
 ------------------
 * added `catalog_filter` argument to `ddlpy.locations()` to enabling retrieving the extended catalog in https://github.com/Deltares/ddlpy/pull/87
 * pass all Code parameters to measurements request instead of only four in https://github.com/Deltares/ddlpy/pull/88
-* added ddlpy.dataframe_to_xarray()` function in https://github.com/Deltares/ddlpy/pull/86
+* added `ddlpy.dataframe_to_xarray()` function in https://github.com/Deltares/ddlpy/pull/86
 
 0.3.0 (2024-03-13)
 ------------------
