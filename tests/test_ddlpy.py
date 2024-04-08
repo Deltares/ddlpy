@@ -155,14 +155,6 @@ def test_measurements_duplicated(measurements):
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
-def test_simplify_dataframe(measurements):
-    assert len(measurements.columns) == 53
-    meas_simple = ddlpy.simplify_dataframe(measurements)
-    assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 50
-    assert len(meas_simple.columns) == 3
-
-
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
 @pytest.mark.parametrize("datetype", datetype_list)
 def test_check_convert_dates(datetype):
@@ -193,3 +185,43 @@ def test_check_convert_wrongorder():
     with pytest.raises(ValueError):
         start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(end_date, start_date)
 
+
+def test_simplify_dataframe(measurements):
+    assert len(measurements.columns) == 53
+    meas_simple = ddlpy.simplify_dataframe(measurements)
+    assert hasattr(meas_simple, "attrs")
+    assert len(meas_simple.attrs) == 50
+    assert len(meas_simple.columns) == 3
+
+
+def test_dataframe_to_xarray(measurements):
+    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
+                        "WaarnemingMetadata.BemonsteringshoogteLijst",
+                        "WaarnemingMetadata.ReferentievlakLijst",
+                        "AquoMetadata_MessageID", 
+                        "BemonsteringsSoort.Code", 
+                        "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
+                        ]
+    ds_clean = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
+    
+    # check if constant value that was not in drop_if_constant list is indeed not dropped
+    assert "MeetApparaat.Code" in ds_clean.data_vars
+    assert len(ds_clean["MeetApparaat.Code"]) > 0
+    
+    for varname in drop_if_constant:
+        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantieLijst":
+            continue
+        assert varname not in ds_clean.data_vars
+        assert varname in ds_clean.attrs.keys()
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" in ds_clean.data_vars
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" not in ds_clean.attrs.keys()
+    
+    data_vars_list = ['WaarnemingMetadata.StatuswaardeLijst',
+     'WaarnemingMetadata.KwaliteitswaardecodeLijst',
+     'MeetApparaat.Code',
+     'WaardeBepalingsmethode.Code',
+     'Meetwaarde.Waarde_Numeriek']
+    for varname in data_vars_list:
+        assert varname in ds_clean.data_vars
+    
+    assert "X" in ds_clean.attrs.keys()

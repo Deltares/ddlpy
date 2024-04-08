@@ -11,8 +11,9 @@ from ddlpy.ddlpy import (measurements,
                          measurements_latest, 
                          measurements_available, 
                          measurements_amount,
-                         simplify_dataframe,
                          )
+from ddlpy.utils import (simplify_dataframe,
+                         dataframe_to_xarray)
 
 __all__ = ['locations', 
            'measurements',
@@ -20,4 +21,5 @@ __all__ = ['locations',
            'measurements_available', 
            'measurements_amount',
            'simplify_dataframe',
+           'dataframe_to_xarray'
            ]
