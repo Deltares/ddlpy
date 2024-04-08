@@ -401,24 +401,3 @@ def measurements_latest(location):
     if result['Succesvol']:
         df = _combine_waarnemingenlijst(result, location)
         return df
-
-
-def simplify_dataframe(df: pd.DataFrame):
-    """
-    drop columns with constant values from the dataframe
-    and collect them in a dictionary which is 
-    added as attrs of the dataframe
-    """
-    
-    bool_constant = (df == df.iloc[0]).all()
-    
-    # constant columns are flattened and converted to dict of attrs
-    df_attrs = df.loc[:, bool_constant].iloc[0].to_dict()
-    
-    # varying columns are kept in output dataframe
-    df_simple = df.loc[:, ~bool_constant].copy()
-    
-    # attach as attrs to dataframe
-    df_simple.attrs = df_attrs
-    
-    return df_simple
