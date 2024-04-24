@@ -205,11 +205,13 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
                                             df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
             
             # select columns from dataframe and append to list
-            df = df[["Groeperingsperiode","AantalMetingen"]]
+            df = df.set_index("Groeperingsperiode")
+            df = df[["AantalMetingen"]]
             df_list.append(df)
         
-        # concatenate
-        amount_all = pd.concat(df_list).sort_values("Groeperingsperiode").reset_index(drop=True)
+        # concatenate and sum duplicated index
+        amount_all = pd.concat(df_list).sort_index()
+        amount_all = amount_all.groupby(amount_all.index).sum()
         return amount_all
 
 

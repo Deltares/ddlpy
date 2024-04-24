@@ -2,6 +2,10 @@
 History
 =======
 
+UNRELEASED
+----------
+* avoid duplicated periods in dataframe returned by `ddlpy.measurements_amount()` https://github.com/Deltares/ddlpy/pull/93
+
 0.4.0 (2024-04-08)
 ------------------
 * added `catalog_filter` argument to `ddlpy.locations()` to enabling retrieving the extended catalog in https://github.com/Deltares/ddlpy/pull/87
