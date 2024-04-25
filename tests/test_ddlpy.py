@@ -170,6 +170,36 @@ def test_measurements_duplicated(measurements):
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
+def test_nodataerror(location):
+    """
+    Test whether a request that returns no data is indeed properly catched
+    This is important since it is derived from the returned error message "Geen gegevens gevonden!"
+    In case this error message changes in the future, 
+    this test will fail and the ddlpy code needs to be updated accordingly
+    """
+    start_date = dt.datetime(2180, 1, 1)
+    end_date = dt.datetime(2180, 4, 1)
+    with pytest.raises(ddlpy.ddlpy.NoDataError):
+        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
+        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+    with pytest.raises(ddlpy.ddlpy.NoDataError):
+        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
+
+
+# TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
+# def test_unsuccessfulrequesterror(location):
+#     """
+#     deliberately send a request that is too large to get the error message
+#     Foutmelding: 'Het max aantal waarnemingen (157681) is overschreven, beperk uw request.'
+#     which is raised as a UnsuccessfulRequestError
+#     """
+#     start_date = dt.datetime(2015, 1, 1)
+#     end_date = dt.datetime(2020, 1, 1)
+#     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
+#         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
+#         _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+
+
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
 @pytest.mark.parametrize("datetype", datetype_list)
 def test_check_convert_dates(datetype):

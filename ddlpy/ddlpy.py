@@ -21,7 +21,11 @@ with ENDPOINTS_PATH.open() as f:
     ENDPOINTS = json.load(f)
 
 
-class NoDataException(ValueError):
+class NoDataError(ValueError):
+    pass
+
+
+class UnsuccessfulRequestError(ValueError):
     pass
 
 
@@ -30,26 +34,43 @@ class NoDataException(ValueError):
 logger = logging.getLogger(__name__)
 
 
+def _send_post_request(url, request, timeout=None):
+    logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
+    resp = requests.post(url, json=request, timeout=timeout)
+    if not resp.ok:
+        raise IOError("Request failed: {}".format(resp.text))
+    
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Response result is unsuccessful: {}'.format(result))
+        error_message = result.get('Foutmelding', 'No error returned')
+        if "Geen gegevens gevonden" in error_message:
+            # Foutmelding: "Geen gegevens gevonden!"
+            # this is a valid response for periods where there is no data
+            # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+            raise NoDataError(error_message)
+        else:
+            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+            # or any other possible error message
+            # are raised here and not catched elsewhere in the code
+            raise UnsuccessfulRequestError(error_message)
+    
+    # continue if request was successful
+    return result
+
+
 def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
     
     if catalog_filter is None:
         # use the default request from endpoints.json
-        catalog_request = endpoint["request"]
+        request = endpoint["request"]
     else:
         assert isinstance(catalog_filter, list)
-        catalog_request = {"CatalogusFilter": {x:True for x in catalog_filter}}
+        request = {"CatalogusFilter": {x:True for x in catalog_filter}}
     
-    msg = "{} with {}".format(endpoint["url"], json.dumps(catalog_request))
-    logger.debug("requesting: {}".format(msg))
-
-    resp = requests.post(endpoint["url"], json=catalog_request)
-    if not resp.ok:
-        raise IOError("Failed to request {}: {}".format(msg, resp.text))
-    result = resp.json()
-    if not result["Succesvol"]:
-        logger.exception(str(result))
-        raise ValueError(result.get("Foutmelding", "No error returned"))
+    result = _send_post_request(endpoint["url"], request, timeout=None)
+    
     return result
 
 
@@ -135,22 +156,14 @@ def measurements_available(location, start_date, end_date):
         }
     }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request, timeout=5)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
-        logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise e
-
-    if result['Succesvol']:
-        if result['WaarnemingenAanwezig'] == 'true' :
-            return True
-        else:
-            return False  
+    result = _send_post_request(endpoint["url"], request, timeout=5)
+    
+    # continue if request was successful
+    logger.debug('Got response: {}'.format(result))
+    if result['WaarnemingenAanwezig'] == 'true' :
+        return True
+    else:
+        return False  
 
 
 def measurements_amount(location, start_date, end_date, period="Jaar"):
@@ -179,35 +192,26 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
         }
     }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
-        logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise e
+    result = _send_post_request(endpoint["url"], request, timeout=None)
 
-    if result['Succesvol']:
-        df_list = []
-        for one in result['AantalWaarnemingenPerPeriodeLijst']:
-            df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
-            
-            # combine columns to a period string
-            df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
-            if period in ["Maand", "Dag"]:
-                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                            df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
-            if period in ["Dag"]:
-                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                            df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
-            
-            # select columns from dataframe and append to list
-            df = df.set_index("Groeperingsperiode")
-            df = df[["AantalMetingen"]]
-            df_list.append(df)
+    # continue if request was successful
+    df_list = []
+    for one in result['AantalWaarnemingenPerPeriodeLijst']:
+        df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
+        
+        # combine columns to a period string
+        df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
+        if period in ["Maand", "Dag"]:
+            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                        df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
+        if period in ["Dag"]:
+            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                        df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
+        
+        # select columns from dataframe and append to list
+        df = df.set_index("Groeperingsperiode")
+        df = df[["AantalMetingen"]]
+        df_list.append(df)
         
         # concatenate and sum duplicated index
         amount_all = pd.concat(df_list).sort_index()
@@ -298,17 +302,8 @@ def _measurements_slice(location, start_date, end_date):
                     "Einddatumtijd": end_date_str},
     }
 
-    try:
-        logger.debug("requesting:  {}".format(request))
-        resp = requests.post(endpoint["url"], json=request)
-        result = resp.json()
-        if not result["Succesvol"]:
-            logger.debug("Got  invalid response: {}".format(result))
-            raise NoDataException(result.get("Foutmelding", "No error returned"))
-    except NoDataException as e:
-        logger.debug("No data availble for {} {}".format(start_date, end_date))
-        raise e
-    
+    result = _send_post_request(endpoint["url"], request, timeout=None)
+
     df = _combine_waarnemingenlijst(result, location)
     return df
 
@@ -381,7 +376,7 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
                 location, start_date=start_date_i, end_date=end_date_i
             )
             measurements.append(measurement)
-        except NoDataException:
+        except NoDataError:
             continue
 
     if len(measurements) == 0:
@@ -410,17 +405,8 @@ def measurements_latest(location):
                "LocatieLijst":[request_dicts["Locatie"]]
                }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request, timeout=5)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
-        logger.debug('No data availble')
-        raise e
-
-    if result['Succesvol']:
-        df = _combine_waarnemingenlijst(result, location)
-        return df
+    result = _send_post_request(endpoint["url"], request, timeout=5)
+    
+    # continue if request was successful
+    df = _combine_waarnemingenlijst(result, location)
+    return df
