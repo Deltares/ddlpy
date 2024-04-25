@@ -139,22 +139,19 @@ def measurements_available(location, start_date, end_date):
         }
     }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request, timeout=5)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
+    logger.debug('requesting:  {}'.format(request))
+    resp = requests.post(endpoint['url'], json=request, timeout=5)
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Got  invalid response: {}'.format(result))
         logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise e
-
-    if result['Succesvol']:
-        if result['WaarnemingenAanwezig'] == 'true' :
-            return True
-        else:
-            return False  
+        raise NoDataException(result.get('Foutmelding', 'No error returned'))
+    
+    # continue if request was successful
+    if result['WaarnemingenAanwezig'] == 'true' :
+        return True
+    else:
+        return False  
 
 
 def measurements_amount(location, start_date, end_date, period="Jaar"):
@@ -183,35 +180,32 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
         }
     }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
+    logger.debug('requesting:  {}'.format(request))
+    resp = requests.post(endpoint['url'], json=request)
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Got  invalid response: {}'.format(result))
         logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise e
+        raise NoDataException(result.get('Foutmelding', 'No error returned'))
 
-    if result['Succesvol']:
-        df_list = []
-        for one in result['AantalWaarnemingenPerPeriodeLijst']:
-            df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
-            
-            # combine columns to a period string
-            df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
-            if period in ["Maand", "Dag"]:
-                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                            df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
-            if period in ["Dag"]:
-                df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                            df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
-            
-            # select columns from dataframe and append to list
-            df = df.set_index("Groeperingsperiode")
-            df = df[["AantalMetingen"]]
-            df_list.append(df)
+    # continue if request was successful
+    df_list = []
+    for one in result['AantalWaarnemingenPerPeriodeLijst']:
+        df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
+        
+        # combine columns to a period string
+        df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
+        if period in ["Maand", "Dag"]:
+            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                        df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
+        if period in ["Dag"]:
+            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
+                                        df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
+        
+        # select columns from dataframe and append to list
+        df = df.set_index("Groeperingsperiode")
+        df = df[["AantalMetingen"]]
+        df_list.append(df)
         
         # concatenate and sum duplicated index
         amount_all = pd.concat(df_list).sort_index()
@@ -416,17 +410,14 @@ def measurements_latest(location):
                "LocatieLijst":[request_dicts["Locatie"]]
                }
 
-    try:
-        logger.debug('requesting:  {}'.format(request))
-        resp = requests.post(endpoint['url'], json=request, timeout=5)
-        result = resp.json()
-        if not result['Succesvol']:
-            logger.debug('Got  invalid response: {}'.format(result))
-            raise NoDataException(result.get('Foutmelding', 'No error returned'))
-    except NoDataException as e:
+    logger.debug('requesting:  {}'.format(request))
+    resp = requests.post(endpoint['url'], json=request, timeout=5)
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Got  invalid response: {}'.format(result))
         logger.debug('No data availble')
-        raise e
+        raise NoDataException(result.get('Foutmelding', 'No error returned'))
 
-    if result['Succesvol']:
-        df = _combine_waarnemingenlijst(result, location)
-        return df
+    # continue if request was successful
+    df = _combine_waarnemingenlijst(result, location)
+    return df
