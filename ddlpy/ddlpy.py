@@ -143,11 +143,12 @@ def measurements_available(location, start_date, end_date):
     resp = requests.post(endpoint['url'], json=request, timeout=5)
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got  invalid response: {}'.format(result))
+        logger.debug('Got invalid response: {}'.format(result))
         logger.debug('No data availble for {} {}'.format(start_date, end_date))
         raise NoDataException(result.get('Foutmelding', 'No error returned'))
     
     # continue if request was successful
+    logger.debug('Got response: {}'.format(result))
     if result['WaarnemingenAanwezig'] == 'true' :
         return True
     else:
