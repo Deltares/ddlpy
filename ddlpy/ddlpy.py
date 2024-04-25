@@ -345,7 +345,8 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
         Can also be None, in which case the entire dataset will be retrieved at once.
         Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks 
         since the DDL limits the responses to 157681 values and several stations have duplicated timesteps.
-        In that case the query will fail with an error or timeout and the user should fallback to monthly chunks.
+        In that case the query will fail with an error or timeout or just return an empty result (as if there was no data).
+        In that case, the user should fallback to monthly chunks.
         This is significantly slower but it is also much more robust. The default is dateutil.rrule.MONTHLY.
     clean_df : bool, optional
         Whether to sort the dataframe and remove duplicate rows. The default is True.
