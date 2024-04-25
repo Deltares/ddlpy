@@ -52,7 +52,7 @@ def catalog(catalog_filter=None):
         raise IOError("Failed to request {}: {}".format(msg, resp.text))
     result = resp.json()
     if not result["Succesvol"]:
-        logger.exception(str(result))
+        # this probably never happens in case of an ok response
         raise ValueError(result.get("Foutmelding", "No error returned"))
     return result
 
@@ -143,9 +143,7 @@ def measurements_available(location, start_date, end_date):
     resp = requests.post(endpoint['url'], json=request, timeout=5)
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got invalid response: {}'.format(result))
-        logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise NoDataException(result.get('Foutmelding', 'No error returned'))
+        _handle_unsuccessful_result(result)
     
     # continue if request was successful
     logger.debug('Got response: {}'.format(result))
@@ -185,9 +183,7 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
     resp = requests.post(endpoint['url'], json=request)
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got  invalid response: {}'.format(result))
-        logger.debug('No data availble for {} {}'.format(start_date, end_date))
-        raise NoDataException(result.get('Foutmelding', 'No error returned'))
+        _handle_unsuccessful_result(result)
 
     # continue if request was successful
     df_list = []
@@ -280,6 +276,16 @@ def _combine_waarnemingenlijst(result, location):
     return df
 
 
+def _handle_unsuccessful_result(result):
+    logger.debug('Got  invalid response: {}'.format(result))
+    error_message = result.get('Foutmelding', 'No error returned')
+    if "max aantal waarnemingen" in error_message:
+        # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+        raise RequestTooLargeException(error_message)
+    else:
+        raise NoDataException(error_message)
+
+
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
@@ -301,14 +307,7 @@ def _measurements_slice(location, start_date, end_date):
     resp = requests.post(endpoint["url"], json=request)
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got  invalid response: {}'.format(result))
-        error_message = result.get('Foutmelding', 'No error returned')
-        logger.debug('No data returned for {} {}'.format(start_date, end_date))
-        if "max aantal waarnemingen" in error_message:
-            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-            raise RequestTooLargeException(error_message)
-        else:
-            raise NoDataException(error_message)
+        _handle_unsuccessful_result(result)
     
     df = _combine_waarnemingenlijst(result, location)
     return df
@@ -415,9 +414,7 @@ def measurements_latest(location):
     resp = requests.post(endpoint['url'], json=request, timeout=5)
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got  invalid response: {}'.format(result))
-        logger.debug('No data availble')
-        raise NoDataException(result.get('Foutmelding', 'No error returned'))
+        _handle_unsuccessful_result(result)
 
     # continue if request was successful
     df = _combine_waarnemingenlijst(result, location)
