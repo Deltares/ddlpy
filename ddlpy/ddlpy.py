@@ -21,11 +21,11 @@ with ENDPOINTS_PATH.open() as f:
     ENDPOINTS = json.load(f)
 
 
-class NoDataException(ValueError):
+class NoDataError(ValueError):
     pass
 
 
-class RequestTooLargeException(ValueError):
+class UnsuccesfulRequestError(ValueError):
     pass
 
 
@@ -34,26 +34,43 @@ class RequestTooLargeException(ValueError):
 logger = logging.getLogger(__name__)
 
 
+def _send_post_request(url, request, timeout=None):
+    logger.debug("requesting: {} with {}".format(url, json.dumps(request)))
+    resp = requests.post(url, json=request, timeout=timeout)
+    if not resp.ok:
+        raise IOError("Request failed: {}".format(resp.text))
+    
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Got  invalid response: {}'.format(result))
+        error_message = result.get('Foutmelding', 'No error returned')
+        if "Geen gegevens gevonden" in error_message:
+            # Foutmelding: "Geen gegevens gevonden!"
+            # this is a valid response for periods where there is no data
+            # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+            raise NoDataError(error_message)
+        else:
+            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+            # or any other possible error message
+            # are raised here and not catched elsewhere in the code
+            raise UnsuccesfulRequestError(error_message)
+    
+    # continue if request was successful
+    return result
+
+
 def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
     
     if catalog_filter is None:
         # use the default request from endpoints.json
-        catalog_request = endpoint["request"]
+        request = endpoint["request"]
     else:
         assert isinstance(catalog_filter, list)
-        catalog_request = {"CatalogusFilter": {x:True for x in catalog_filter}}
+        request = {"CatalogusFilter": {x:True for x in catalog_filter}}
     
-    msg = "{} with {}".format(endpoint["url"], json.dumps(catalog_request))
-    logger.debug("requesting: {}".format(msg))
-
-    resp = requests.post(endpoint["url"], json=catalog_request)
-    if not resp.ok:
-        raise IOError("Failed to request {}: {}".format(msg, resp.text))
-    result = resp.json()
-    if not result["Succesvol"]:
-        # this probably never happens in case of an ok response
-        raise ValueError(result.get("Foutmelding", "No error returned"))
+    result = _send_post_request(endpoint["url"], request, timeout=None)
+    
     return result
 
 
@@ -139,11 +156,7 @@ def measurements_available(location, start_date, end_date):
         }
     }
 
-    logger.debug('requesting:  {}'.format(request))
-    resp = requests.post(endpoint['url'], json=request, timeout=5)
-    result = resp.json()
-    if not result['Succesvol']:
-        _handle_unsuccessful_result(result)
+    result = _send_post_request(endpoint["url"], request, timeout=5)
     
     # continue if request was successful
     logger.debug('Got response: {}'.format(result))
@@ -179,11 +192,7 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
         }
     }
 
-    logger.debug('requesting:  {}'.format(request))
-    resp = requests.post(endpoint['url'], json=request)
-    result = resp.json()
-    if not result['Succesvol']:
-        _handle_unsuccessful_result(result)
+    result = _send_post_request(endpoint["url"], request, timeout=None)
 
     # continue if request was successful
     df_list = []
@@ -276,16 +285,6 @@ def _combine_waarnemingenlijst(result, location):
     return df
 
 
-def _handle_unsuccessful_result(result):
-    logger.debug('Got  invalid response: {}'.format(result))
-    error_message = result.get('Foutmelding', 'No error returned')
-    if "max aantal waarnemingen" in error_message:
-        # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-        raise RequestTooLargeException(error_message)
-    else:
-        raise NoDataException(error_message)
-
-
 def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
@@ -303,12 +302,8 @@ def _measurements_slice(location, start_date, end_date):
                     "Einddatumtijd": end_date_str},
     }
 
-    logger.debug("requesting:  {}".format(request))
-    resp = requests.post(endpoint["url"], json=request)
-    result = resp.json()
-    if not result['Succesvol']:
-        _handle_unsuccessful_result(result)
-    
+    result = _send_post_request(endpoint["url"], request, timeout=None)
+
     df = _combine_waarnemingenlijst(result, location)
     return df
 
@@ -381,7 +376,7 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
                 location, start_date=start_date_i, end_date=end_date_i
             )
             measurements.append(measurement)
-        except NoDataException:
+        except NoDataError:
             continue
 
     if len(measurements) == 0:
@@ -410,12 +405,8 @@ def measurements_latest(location):
                "LocatieLijst":[request_dicts["Locatie"]]
                }
 
-    logger.debug('requesting:  {}'.format(request))
-    resp = requests.post(endpoint['url'], json=request, timeout=5)
-    result = resp.json()
-    if not result['Succesvol']:
-        _handle_unsuccessful_result(result)
-
+    result = _send_post_request(endpoint["url"], request, timeout=5)
+    
     # continue if request was successful
     df = _combine_waarnemingenlijst(result, location)
     return df
