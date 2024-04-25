@@ -171,6 +171,12 @@ def test_measurements_duplicated(measurements):
 
 
 def test_nodataerror(location):
+    """
+    Test whether a request that returns no data is indeed properly catched
+    This is important since it is derived from the returned error message "Geen gegevens gevonden!"
+    In case this error message changes in the future, 
+    this test will fail and the ddlpy code needs to be updated accordingly
+    """
     start_date = dt.datetime(2180, 1, 1)
     end_date = dt.datetime(2180, 4, 1)
     with pytest.raises(ddlpy.ddlpy.NoDataError):
@@ -180,8 +186,8 @@ def test_nodataerror(location):
         _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
 
 
+# TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
 # def test_unsuccessfulrequesterror(location):
-#     """this testcase is ultra slow, enable it when the ddl is faster"""
 #     start_date = dt.datetime(2015, 1, 1)
 #     end_date = dt.datetime(2020, 1, 1)
 #     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
