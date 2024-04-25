@@ -35,14 +35,14 @@ logger = logging.getLogger(__name__)
 
 
 def _send_post_request(url, request, timeout=None):
-    logger.debug("requesting at {} with request: {}".format(url, json.dumps(request)))
+    logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
     if not resp.ok:
         raise IOError("Request failed: {}".format(resp.text))
     
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Response result was unsuccessful: {}'.format(result))
+        logger.debug('Response result is unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
         if "Geen gegevens gevonden" in error_message:
             # Foutmelding: "Geen gegevens gevonden!"
