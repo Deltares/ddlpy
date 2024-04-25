@@ -25,6 +25,10 @@ class NoDataException(ValueError):
     pass
 
 
+class RequestTooLargeException(ValueError):
+    pass
+
+
 # Web Feature Service
 # Web Mapping Service
 logger = logging.getLogger(__name__)
@@ -298,16 +302,18 @@ def _measurements_slice(location, start_date, end_date):
                     "Einddatumtijd": end_date_str},
     }
 
-    try:
-        logger.debug("requesting:  {}".format(request))
-        resp = requests.post(endpoint["url"], json=request)
-        result = resp.json()
-        if not result["Succesvol"]:
-            logger.debug("Got  invalid response: {}".format(result))
-            raise NoDataException(result.get("Foutmelding", "No error returned"))
-    except NoDataException as e:
-        logger.debug("No data availble for {} {}".format(start_date, end_date))
-        raise e
+    logger.debug("requesting:  {}".format(request))
+    resp = requests.post(endpoint["url"], json=request)
+    result = resp.json()
+    if not result['Succesvol']:
+        logger.debug('Got  invalid response: {}'.format(result))
+        error_message = result.get('Foutmelding', 'No error returned')
+        logger.debug('No data returned for {} {}'.format(start_date, end_date))
+        if "max aantal waarnemingen" in error_message:
+            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+            raise RequestTooLargeException(error_message)
+        else:
+            raise NoDataException(error_message)
     
     df = _combine_waarnemingenlijst(result, location)
     return df
