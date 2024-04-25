@@ -170,6 +170,25 @@ def test_measurements_duplicated(measurements):
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
+def test_nodataerror(location):
+    start_date = dt.datetime(2180, 1, 1)
+    end_date = dt.datetime(2180, 4, 1)
+    with pytest.raises(ddlpy.ddlpy.NoDataError):
+        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
+        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+    with pytest.raises(ddlpy.ddlpy.NoDataError):
+        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
+
+
+# def test_unsuccessfulrequesterror(location):
+#     """this testcase is ultra slow, enable it when the ddl is faster"""
+#     start_date = dt.datetime(2015, 1, 1)
+#     end_date = dt.datetime(2020, 1, 1)
+#     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
+#         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
+#         _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+
+
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
 @pytest.mark.parametrize("datetype", datetype_list)
 def test_check_convert_dates(datetype):

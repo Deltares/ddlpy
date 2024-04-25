@@ -25,7 +25,7 @@ class NoDataError(ValueError):
     pass
 
 
-class UnsuccesfulRequestError(ValueError):
+class UnsuccessfulRequestError(ValueError):
     pass
 
 
@@ -42,7 +42,7 @@ def _send_post_request(url, request, timeout=None):
     
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got  invalid response: {}'.format(result))
+        logger.debug('Got invalid response: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
         if "Geen gegevens gevonden" in error_message:
             # Foutmelding: "Geen gegevens gevonden!"
@@ -53,7 +53,7 @@ def _send_post_request(url, request, timeout=None):
             # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
             # or any other possible error message
             # are raised here and not catched elsewhere in the code
-            raise UnsuccesfulRequestError(error_message)
+            raise UnsuccessfulRequestError(error_message)
     
     # continue if request was successful
     return result
