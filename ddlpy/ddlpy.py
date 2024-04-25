@@ -318,7 +318,7 @@ def _clean_dataframe(measurements):
     # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
     measurements = measurements.drop_duplicates()
     
-    # remove Tijdstap column, has to be done after drop_duplicates to avoid too much to be dropped
+    # remove Tijdstip column, has to be done after drop_duplicates to avoid too much to be dropped
     measurements = measurements.drop("Tijdstip", axis=1, errors='ignore')
     
     # sort dataframe on time, ddl returns non-sorted data
@@ -328,8 +328,30 @@ def _clean_dataframe(measurements):
     return measurements
 
 
-def measurements(location, start_date, end_date, clean_df=True):
-    """return measurements for the given location and time window (start_date, end_date)"""
+def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, clean_df=True):
+    """
+    Return measurements for the given location and time window (start_date, end_date)
+
+    Parameters
+    ----------
+    location : pd.Series
+        Single row of the `ddlpy.locations()` DataFrame.
+    start_date : str, dt.datetime, pd.Timestamp
+        Start of the retrieval period.
+    end_date : str, dt.datetime, pd.Timestamp
+        End of the retrieval period.
+    freq : None, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
+        The frequency in which to divide the requested period (e.g. yearly or monthly).
+        Can also be None, in which case the entire dataset will be retrieved at once.
+        Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks 
+        since the DDL limits the responses to 157681 values and several stations have duplicated timesteps.
+        In that case the query will fail with an error or timeout or just return an empty result (as if there was no data).
+        In that case, the user should fallback to monthly chunks.
+        This is significantly slower but it is also much more robust. The default is dateutil.rrule.MONTHLY.
+    clean_df : bool, optional
+        Whether to sort the dataframe and remove duplicate rows. The default is True.
+    
+    """
     
     if isinstance(location, pd.DataFrame):
         raise TypeError("The provided location is a pandas.DataFrame, but should be a pandas.Series, "
@@ -346,15 +368,14 @@ def measurements(location, start_date, end_date, clean_df=True):
     #     logger.debug("no data found for this station and time extent")
     #     return
     
-    for (start_date_i, end_date_i) in tqdm.tqdm(
-        date_series(start_date, end_date, freq=dateutil.rrule.MONTHLY)
-    ):
-        """return measurements for station given by locations record \"location\", from start_date through end_date
-        IMPORTANT: measurements made every 10 minutes will not be downoladed if freq= YEAR.
-        For instance if many duplicate timesteps are present, it will fail or timeout.
-        Therefore, Please DO NOT CHANGE THE FREQUENCY TO YEAR. KEEP IT MONTHLY NO MATTER HOW SLOW THE CODE CAN BE!
-        """
-
+    if freq is None:
+        date_series_iterator = tqdm.tqdm([(start_date, end_date)])
+    else:
+        date_series_iterator = tqdm.tqdm(
+            date_series(start_date, end_date, freq=freq)
+        )
+    
+    for (start_date_i, end_date_i) in date_series_iterator:
         try:
             measurement = _measurements_slice(
                 location, start_date=start_date_i, end_date=end_date_i
