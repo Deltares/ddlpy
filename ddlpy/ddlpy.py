@@ -340,9 +340,10 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
         Start of the retrieval period.
     end_date : str, dt.datetime, pd.Timestamp
         End of the retrieval period.
-    freq : dateutil.rrule.MONTHLY or dateutil.rrule.YEARLY etc., optional
+    freq : None, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
         The frequency in which to divide the requested period (e.g. yearly or monthly).
-        Please note that 10-minute measurements can often not be downloaded in yearly chunks 
+        Can also be None, in which case the entire dataset will be retrieved at once.
+        Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks 
         since the DDL limits the responses to 157681 values and several stations have duplicated timesteps.
         In that case the query will fail with an error or timeout and the user should fallback to monthly chunks.
         This is significantly slower but it is also much more robust. The default is dateutil.rrule.MONTHLY.
@@ -366,9 +367,14 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
     #     logger.debug("no data found for this station and time extent")
     #     return
     
-    for (start_date_i, end_date_i) in tqdm.tqdm(
-        date_series(start_date, end_date, freq=freq)
-    ):
+    if freq is None:
+        date_range_list = tqdm.tqdm([(start_date, end_date)])
+    else:
+        date_range_list = tqdm.tqdm(
+            date_series(start_date, end_date, freq=freq)
+        )
+    
+    for (start_date_i, end_date_i) in date_range_list:
         try:
             measurement = _measurements_slice(
                 location, start_date=start_date_i, end_date=end_date_i

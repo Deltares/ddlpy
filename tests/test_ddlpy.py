@@ -56,10 +56,17 @@ def test_measurements(measurements):
     assert measurements.shape[0] > 1
 
 
-def test_measurements_yearly(location, measurements):
+def test_measurements_freq_yearly(location, measurements):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
     measurements_yearly = ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=dateutil.rrule.YEARLY)
+    assert measurements.shape == measurements_yearly.shape
+
+
+def test_measurements_freq_none(location, measurements):
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 1)
+    measurements_yearly = ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
     assert measurements.shape == measurements_yearly.shape
 
 
