@@ -42,7 +42,7 @@ def _send_post_request(url, request, timeout=None):
     
     result = resp.json()
     if not result['Succesvol']:
-        logger.debug('Got invalid response: {}'.format(result))
+        logger.debug('Response result was unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
         if "Geen gegevens gevonden" in error_message:
             # Foutmelding: "Geen gegevens gevonden!"

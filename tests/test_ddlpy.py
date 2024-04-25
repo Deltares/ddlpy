@@ -188,6 +188,11 @@ def test_nodataerror(location):
 
 # TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
 # def test_unsuccessfulrequesterror(location):
+#     """
+#     deliberately send a request that is too large to get the error message
+#     Foutmelding: 'Het max aantal waarnemingen (157681) is overschreven, beperk uw request.'
+#     which is raised as a UnsuccessfulRequestError
+#     """
 #     start_date = dt.datetime(2015, 1, 1)
 #     end_date = dt.datetime(2020, 1, 1)
 #     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
