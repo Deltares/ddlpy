@@ -368,13 +368,13 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
     #     return
     
     if freq is None:
-        date_range_list = tqdm.tqdm([(start_date, end_date)])
+        date_series_iterator = tqdm.tqdm([(start_date, end_date)])
     else:
-        date_range_list = tqdm.tqdm(
+        date_series_iterator = tqdm.tqdm(
             date_series(start_date, end_date, freq=freq)
         )
     
-    for (start_date_i, end_date_i) in date_range_list:
+    for (start_date_i, end_date_i) in date_series_iterator:
         try:
             measurement = _measurements_slice(
                 location, start_date=start_date_i, end_date=end_date_i

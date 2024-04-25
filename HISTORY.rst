@@ -4,6 +4,7 @@ History
 
 UNRELEASED
 ----------
+* allow for different retrieval frequencies (including None) in `ddlpy.measurements()` https://github.com/Deltares/ddlpy/pull/95
 * avoid duplicated periods in dataframe returned by `ddlpy.measurements_amount()` https://github.com/Deltares/ddlpy/pull/93
 
 0.4.0 (2024-04-08)
