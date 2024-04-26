@@ -105,12 +105,21 @@ def _check_convert_dates(start_date, end_date, return_str=True):
     start_date = pd.Timestamp(start_date)
     end_date = pd.Timestamp(end_date)
     
+    # check if timezones are the same
+    assert start_date.tz == end_date.tz
+    
+    # set UTC timezone if tz is None
+    if start_date.tz is None:
+        start_date = pytz.UTC.localize(start_date)
+    if end_date.tz is None:
+        end_date = pytz.UTC.localize(end_date)
+    
     if start_date > end_date:
-        raise ValueError("start_date is larger than end_date")
+        raise ValueError(f"start_date {start_date} is larger than end_date {end_date}")
     
     if return_str:
-        start_date_str = pytz.UTC.localize(start_date).isoformat(timespec='milliseconds')
-        end_date_str = pytz.UTC.localize(end_date).isoformat(timespec='milliseconds')
+        start_date_str = start_date.isoformat(timespec='milliseconds')
+        end_date_str = end_date.isoformat(timespec='milliseconds')
         return start_date_str, end_date_str
     else:
         return start_date, end_date
@@ -388,7 +397,7 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
 
     if clean_df:
         measurements = _clean_dataframe(measurements)
-
+    
     return measurements
 
 

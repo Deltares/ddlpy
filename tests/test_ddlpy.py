@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 import ddlpy
 import dateutil
+import numpy as np
 
 
 @pytest.fixture
@@ -168,6 +169,31 @@ def test_measurements_duplicated(measurements):
     # check wheter indexes are DatetimeIndex
     assert isinstance(meas_duplicated.index, pd.DatetimeIndex)
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
+
+
+def test_measurements_timezone_behaviour(location):
+    start_date = "2015-01-01 00:00:00 +01:00"
+    end_date = "2015-01-03 00:00:00 +01:00"
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    assert str(measurements.index[0].tz) == 'UTC+01:00'
+    assert measurements.index[0] == pd.Timestamp(start_date)
+    assert measurements.index[-1] == pd.Timestamp(end_date)
+    
+    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    # when retrieving with tzone +01:00 we expect 1 value on 2015-01-03
+    assert np.allclose(data_amount_dag["AantalMetingen"].values, [144,144,1])
+    
+    
+    start_date = "2015-01-01"
+    end_date = "2015-01-03"
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    assert str(measurements.index[0].tz) == 'UTC+01:00'
+    assert measurements.index[0] == pd.Timestamp(start_date).tz_localize("UTC").tz_convert('UTC+01:00')
+    assert measurements.index[-1] == pd.Timestamp(end_date).tz_localize("UTC").tz_convert('UTC+01:00')
+    
+    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    # when retrieving with tzone +00:00 we expect 7 values on 2015-01-03
+    assert np.allclose(data_amount_dag["AantalMetingen"].values, [138,144,7])
 
 
 def test_nodataerror(location):
