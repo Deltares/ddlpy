@@ -2,11 +2,11 @@
 History
 =======
 
-UNRELEASED
+0.5.0 (2024-04-26)
 ----------
 * avoid duplicated periods in dataframe returned by `ddlpy.measurements_amount()` in https://github.com/Deltares/ddlpy/pull/93
 * allow for different retrieval frequencies (including None) in `ddlpy.measurements()` in https://github.com/Deltares/ddlpy/pull/95
-* only catch "Geen waarnemingen aanwezig!" error message and raise all others (for instance for a too large request) in https://github.com/Deltares/ddlpy/pull/97
+* only catch "Geen gegevens gevonden!" error message and raise all others (for instance for a too large request) in https://github.com/Deltares/ddlpy/pull/97
 * support for timezones in start_date/end_date in https://github.com/Deltares/ddlpy/pull/98
 
 0.4.0 (2024-04-08)

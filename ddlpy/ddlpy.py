@@ -44,15 +44,14 @@ def _send_post_request(url, request, timeout=None):
     if not result['Succesvol']:
         logger.debug('Response result is unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
-        if "Geen gegevens gevonden" in error_message:
+        if error_message == "Geen gegevens gevonden!":
             # Foutmelding: "Geen gegevens gevonden!"
             # this is a valid response for periods where there is no data
             # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
             raise NoDataError(error_message)
         else:
             # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-            # or any other possible error message
-            # are raised here and not catched elsewhere in the code
+            # or any other possible error message are raised here
             raise UnsuccessfulRequestError(error_message)
     
     # continue if request was successful
