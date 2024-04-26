@@ -41,4 +41,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -m "not requireslocaldata" --cov=ddlpy --cov-report xml --cov-report term
-    - uses: codecov/codecov-action@v4
+    - uses: codecov/codecov-action@v1
+      env:
+        CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
