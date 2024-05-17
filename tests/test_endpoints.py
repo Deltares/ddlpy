@@ -13,7 +13,7 @@ def endpoints():
     """
     Get the endpoints from the api
     """
-    return ddlpy.ENDPOINTS
+    return ddlpy.ddlpy.ENDPOINTS
 
 
 @pytest.fixture
