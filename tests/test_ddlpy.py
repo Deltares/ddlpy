@@ -10,14 +10,14 @@ import dateutil
 import numpy as np
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def locations():
     """return all locations"""
     locations = ddlpy.locations()
     return locations
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
@@ -26,7 +26,7 @@ def location(locations):
     return location
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)
