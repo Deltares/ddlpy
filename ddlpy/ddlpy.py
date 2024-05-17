@@ -272,7 +272,6 @@ def _combine_waarnemingenlijst(result, location):
         "Naam",
         "X",
         "Y",
-        "Parameter_Wat_Omschrijving",
     ]:
         df[name] = location[name]
 

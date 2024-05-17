@@ -3,17 +3,17 @@
 
 """Tests for `utils` package."""
 
-from ddlpy import utils
+from ddlpy.utils import date_series
 import datetime
 
 
-def test_content():
+def test_date_series():
     """Sample pytest test function with the pytest fixture as an argument."""
     # from bs4 import BeautifulSoup
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
     start = datetime.datetime(2018, 1, 1)
     end = datetime.datetime(2018, 3, 1)
-    result = utils.date_series(start, end)
+    result = date_series(start, end)
     expected = [
         (datetime.datetime(2018, 1, 1, 0, 0), datetime.datetime(2018, 2, 1, 0, 0)),
         (datetime.datetime(2018, 2, 1, 0, 0), datetime.datetime(2018, 3, 1, 0, 0))
@@ -22,7 +22,7 @@ def test_content():
 
     start = datetime.datetime(2017, 11, 15)
     end = datetime.datetime(2018, 3, 5)
-    result = utils.date_series(start, end)
+    result = date_series(start, end)
     expected = [
         (datetime.datetime(2017, 11, 15, 0, 0), datetime.datetime(2017, 12, 15, 0, 0)),
         (datetime.datetime(2017, 12, 15, 0, 0), datetime.datetime(2018, 1, 15, 0, 0)),

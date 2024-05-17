@@ -10,14 +10,14 @@ import dateutil
 import numpy as np
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def locations():
     """return all locations"""
     locations = ddlpy.locations()
     return locations
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
@@ -26,7 +26,7 @@ def location(locations):
     return location
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)
@@ -40,6 +40,13 @@ def test_locations(locations):
     assert locations.shape[1] == 18
     # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
+    
+    # check presence of columns
+    assert "Coordinatenstelsel" in locations.columns
+    assert "Naam" in locations.columns
+    assert "X" in locations.columns
+    assert "Y" in locations.columns
+    assert "Parameter_Wat_Omschrijving" in locations.columns
 
 
 def test_locations_extended():
@@ -55,6 +62,14 @@ def test_locations_extended():
 
 def test_measurements(measurements):
     assert measurements.shape[0] > 1
+    
+    # check presence of columns
+    assert "Coordinatenstelsel" in measurements.columns
+    assert "Naam" in measurements.columns
+    assert "X" in measurements.columns
+    assert "Y" in measurements.columns
+    assert "Parameter_Wat_Omschrijving" in measurements.columns
+    assert "Code" in measurements.columns
 
 
 def test_measurements_freq_yearly(location, measurements):
@@ -67,8 +82,8 @@ def test_measurements_freq_yearly(location, measurements):
 def test_measurements_freq_none(location, measurements):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
-    measurements_yearly = ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-    assert measurements.shape == measurements_yearly.shape
+    measurements_monthly = ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
+    assert measurements.shape == measurements_monthly.shape
 
 
 def test_measurements_available(location):
