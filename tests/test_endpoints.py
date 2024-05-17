@@ -4,18 +4,17 @@
 """Tests for `ddlpy` package."""
 
 import pytest
-
 import requests
+import ddlpy
 
-from ddlpy import ddlpy
 
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def endpoints():
     """
     Get the endpoints from the api
     """
     return ddlpy.ENDPOINTS
+
 
 @pytest.fixture
 def collect_catalogue_resp(endpoints):
@@ -56,6 +55,7 @@ def check_observations_available_resp(endpoints):
 def test_check_observations_available(check_observations_available_resp):
     assert check_observations_available_resp.status_code == 200
 
+
 @pytest.fixture
 def collect_number_of_observations_resp(endpoints):
     endpoint = endpoints['collect_number_of_observations']
@@ -64,6 +64,7 @@ def collect_number_of_observations_resp(endpoints):
 
 def test_collect_number_of_observations(collect_number_of_observations_resp):
     assert collect_number_of_observations_resp.status_code == 200
+
 
 @pytest.fixture
 def request_bulk_observations_resp(endpoints):
