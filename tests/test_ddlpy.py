@@ -280,7 +280,7 @@ def test_simplify_dataframe(measurements):
     assert len(meas_simple.columns) == 3
 
 
-def test_dataframe_to_xarray(measurements):
+def test_dataframe_to_xarray(measurements, tmp_dir):
     drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
                         "WaarnemingMetadata.BemonsteringshoogteLijst",
                         "WaarnemingMetadata.ReferentievlakLijst",
@@ -313,5 +313,14 @@ def test_dataframe_to_xarray(measurements):
     assert "X" in ds_clean.attrs.keys()
     
     # check if times and timezone are correct
+    refdate = str(measurements.index[0])
     assert measurements.tz_localize(None).index[0] == ds_clean.time.to_pandas().iloc[0]
     assert ds_clean.time.encoding['units'].endswith("+01:00")
+    assert ds_clean.time.encoding['units'] == f"minutes since {refdate}"
+    
+    #TODO: add assertions with netcdf file times and timezone (if it makes sense)
+    import os
+    import xarray as xr
+    file_nc = os.path.join(tmp_dir, "meas_with_timezone.nc")
+    ds_clean.to_netcdf(file_nc)
+    ds_fromfile = xr.open_dataset(file_nc, decode_times=False)
