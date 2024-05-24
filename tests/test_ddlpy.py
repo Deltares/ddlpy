@@ -311,3 +311,7 @@ def test_dataframe_to_xarray(measurements):
         assert varname in ds_clean.data_vars
     
     assert "X" in ds_clean.attrs.keys()
+    
+    # check if times and timezone are correct
+    assert measurements.tz_localize(None).index[0] == ds_clean.time.to_pandas().iloc[0]
+    assert ds_clean.time.encoding['units'].endswith("+01:00")
