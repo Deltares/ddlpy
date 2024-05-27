@@ -8,6 +8,8 @@ import pytest
 import ddlpy
 import dateutil
 import numpy as np
+import os
+import xarray as xr
 
 
 @pytest.fixture(scope="session")
@@ -313,14 +315,11 @@ def test_dataframe_to_xarray(measurements, tmp_dir):
     assert "X" in ds_clean.attrs.keys()
     
     # check if times and timezone are correct
-    refdate = str(measurements.index[0])
-    assert measurements.tz_localize(None).index[0] == ds_clean.time.to_pandas().iloc[0]
-    assert ds_clean.time.encoding['units'].endswith("+01:00")
-    assert ds_clean.time.encoding['units'] == f"minutes since {refdate}"
+    refdate_utc = measurements.tz_convert(None).index[0]
+    assert refdate_utc == ds_clean.time.to_pandas().iloc[0]
     
-    #TODO: add assertions with netcdf file times and timezone (if it makes sense)
-    import os
-    import xarray as xr
+    # assertions with netcdf file times and timezone
     file_nc = os.path.join(tmp_dir, "meas_with_timezone.nc")
     ds_clean.to_netcdf(file_nc)
-    ds_fromfile = xr.open_dataset(file_nc, decode_times=False)
+    ds_fromfile = xr.open_dataset(file_nc)
+    assert ds_fromfile.time.encoding['units'] == f"hours since {refdate_utc}"

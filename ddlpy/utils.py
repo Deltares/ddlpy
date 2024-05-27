@@ -114,14 +114,12 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
                     cols_onlynvt_code + cols_omschrijving)
     df_simple = df.drop(drop_columns, axis=1, errors='ignore')
     
-    # get refdate (including timezone) from df, convert to UTC to please xarray (and prevent integer timestamps)
-    refdate = str(df_simple.index[0])
+    # convert to UTC to please xarray (otherwise we get invalid timestamps)
     if df_simple.index.tz is not None:
         df_simple.index = df_simple.index.tz_convert(None)
     
     # convert to xarray dataset, add refdate (including timezone) and add ds_attrs
     ds = df_simple.to_xarray()
-    ds.time.encoding['units'] = f"minutes since {refdate}"
     ds = ds.assign_attrs(ds_attrs)
 
     # assign attrs with code+omschrijving to each *.Code variable
