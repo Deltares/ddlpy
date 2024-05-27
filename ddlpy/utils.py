@@ -118,7 +118,7 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     if df_simple.index.tz is not None:
         df_simple.index = df_simple.index.tz_convert(None)
     
-    # convert to xarray dataset, add refdate (including timezone) and add ds_attrs
+    # convert to xarray dataset and add ds_attrs
     ds = df_simple.to_xarray()
     ds = ds.assign_attrs(ds_attrs)
 
