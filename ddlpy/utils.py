@@ -114,7 +114,8 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
                     cols_onlynvt_code + cols_omschrijving)
     df_simple = df.drop(drop_columns, axis=1, errors='ignore')
     
-    # convert to UTC to please xarray (otherwise we get invalid timestamps)
+    # convert to UTC to please xarray/netcdf4 (otherwise we get invalid timestamps)
+    # adding a refdate with tzinfo is also possible but adds confusion and timestamps still have to be stored as UTC
     if df_simple.index.tz is not None:
         df_simple.index = df_simple.index.tz_convert(None)
     
