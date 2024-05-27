@@ -314,4 +314,6 @@ def test_dataframe_to_xarray(measurements):
     
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]
-    assert refdate_utc == ds_clean.time.to_pandas().iloc[0]
+    ds_firsttime = ds_clean.time.to_pandas().iloc[0]
+    assert refdate_utc == ds_firsttime
+    assert ds_firsttime.tz is None
