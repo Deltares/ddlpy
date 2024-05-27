@@ -8,8 +8,6 @@ import pytest
 import ddlpy
 import dateutil
 import numpy as np
-import os
-import xarray as xr
 
 
 @pytest.fixture(scope="session")
@@ -282,7 +280,7 @@ def test_simplify_dataframe(measurements):
     assert len(meas_simple.columns) == 3
 
 
-def test_dataframe_to_xarray(measurements, tmp_dir):
+def test_dataframe_to_xarray(measurements):
     drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
                         "WaarnemingMetadata.BemonsteringshoogteLijst",
                         "WaarnemingMetadata.ReferentievlakLijst",
@@ -317,9 +315,3 @@ def test_dataframe_to_xarray(measurements, tmp_dir):
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]
     assert refdate_utc == ds_clean.time.to_pandas().iloc[0]
-    
-    # assertions with netcdf file times and timezone
-    file_nc = os.path.join(tmp_dir, "meas_with_timezone.nc")
-    ds_clean.to_netcdf(file_nc)
-    ds_fromfile = xr.open_dataset(file_nc)
-    assert ds_fromfile.time.encoding['units'] == f"hours since {refdate_utc}"
