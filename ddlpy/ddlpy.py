@@ -73,10 +73,20 @@ def catalog(catalog_filter=None):
     return result
 
 
-def locations(catalog_filter=None):
+def locations(catalog_filter:list = None) -> pd.DataFrame:
     """
-    get station information from DDL (metadata from Catalogue). All metadata regarding stations.
-    The response (result) retrieves more keys
+    Get station information from DDL (metadata from Catalogue). All metadata regarding stations.
+
+    Parameters
+    ----------
+    catalog_filter : list, optional
+        list of catalogs to pass on to OphalenCatalogus CatalogusFilter, 
+        if None the list form endpoints.json is retrieved. The default is None.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with a combination of available locations and measurements.
 
     """
 
@@ -144,10 +154,24 @@ def _get_request_dicts(location):
     return request_dicts
 
 
-def measurements_available(location, start_date, end_date):
-    """checks if there are measurements for location, for the period start_date, end_date
-    gives None if check was unsuccesfull
-    gives True/False if there are / are no measurement available
+def measurements_available(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp)) -> bool:
+    """
+    Checks if there are measurements available for a location in the requested period.
+    
+    Parameters
+    ----------
+    location : pd.Series
+        Single row of the `ddlpy.locations()` DataFrame.
+    start_date : (str,pd.Timestamp)
+        The start date of the requested period.
+    end_date : (str,pd.Timestamp)
+        The end date of the requested period.
+
+    Returns
+    -------
+    bool
+        Whether there are measurements available or not.
+
     """
     endpoint = ENDPOINTS['check_observations_available']
 
@@ -174,10 +198,27 @@ def measurements_available(location, start_date, end_date):
         return False  
 
 
-def measurements_amount(location, start_date, end_date, period="Jaar"):
-    """checks how much measurements are available for a location, for the period start_date, end_date
-    returns a DataFrame with columns Groeperingsperiode and AantalMetingen
-    possible for Jaar/Maand/Dag
+def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp), 
+                        period:str = "Jaar") -> pd.DataFrame:
+    """
+    Retrieves the amount of measurements available for a location for the requested period.
+
+    Parameters
+    ----------
+    location : pd.Series
+        Single row of the `ddlpy.locations()` DataFrame.
+    start_date : (str,pd.Timestamp)
+        The start date of the requested period.
+    end_date : (str,pd.Timestamp)
+        The end date of the requested period.
+    period : str, optional
+        "Jaar", "Maand" or "Dag". The default is "Jaar".
+
+    Returns
+    -------
+    df_amount : pd.DataFrame
+        A DataFrame with the number of mesurements (AantalMetingen) per period (Groeperingsperiode).
+
     """
     # TODO: there are probably more Groeperingsperiodes accepted by ddl, but not supported by ddlpy yet
     accepted_period = ["Jaar","Maand","Dag"]
@@ -222,9 +263,9 @@ def measurements_amount(location, start_date, end_date, period="Jaar"):
         df_list.append(df)
         
         # concatenate and sum duplicated index
-        amount_all = pd.concat(df_list).sort_index()
-        amount_all = amount_all.groupby(amount_all.index).sum()
-        return amount_all
+        df_amount = pd.concat(df_list).sort_index()
+        df_amount = df_amount.groupby(df_amount.index).sum()
+        return df_amount
 
 
 def _combine_waarnemingenlijst(result, location):
@@ -330,19 +371,20 @@ def _clean_dataframe(measurements):
     return measurements
 
 
-def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, clean_df=True):
+def measurements(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp), 
+                 freq:int = dateutil.rrule.MONTHLY, clean_df:bool = True):
     """
-    Return measurements for the given location and time window (start_date, end_date)
+    Returns measurements for the given location and requested period.
 
     Parameters
     ----------
     location : pd.Series
         Single row of the `ddlpy.locations()` DataFrame.
-    start_date : str, dt.datetime, pd.Timestamp
+    start_date : str, pd.Timestamp
         Start of the retrieval period.
-    end_date : str, dt.datetime, pd.Timestamp
+    end_date : str, pd.Timestamp
         End of the retrieval period.
-    freq : None, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
+    freq : int, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
         The frequency in which to divide the requested period (e.g. yearly or monthly).
         Can also be None, in which case the entire dataset will be retrieved at once.
         Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks 
@@ -353,6 +395,10 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
     clean_df : bool, optional
         Whether to sort the dataframe and remove duplicate rows. The default is True.
     
+    Returns
+    -------
+    measurements : pd.DataFrame
+        DataFrame with measurements.
     """
     
     if isinstance(location, pd.DataFrame):
@@ -399,10 +445,20 @@ def measurements(location, start_date, end_date, freq=dateutil.rrule.MONTHLY, cl
     return measurements
 
 
-def measurements_latest(location):
-    """checks if there are measurements for location, for the period start_date, end_date
-    gives None if check was unsuccesfull
-    gives True/False if there are / are no measurement available
+def measurements_latest(location:pd.Series) -> pd.DataFrame:
+    """
+    Returns the latest available measurement for the given location.
+
+    Parameters
+    ----------
+    location : pd.Series
+        Single row of the `ddlpy.locations()` DataFrame.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        DataFrame with measurements.
+
     """
     endpoint = ENDPOINTS['collect_latest_observations']
 

@@ -2,6 +2,11 @@
 History
 =======
 
+UNRELEASED
+------------------
+* avoid timezone conversion if tz-naive `ddlpy.dataframe_to_xarray` in https://github.com/Deltares/ddlpy/pull/106
+* added some missing dependencies in https://github.com/Deltares/ddlpy/pull/108
+
 0.5.0 (2024-04-26)
 ------------------
 * avoid duplicated periods in dataframe returned by `ddlpy.measurements_amount()` in https://github.com/Deltares/ddlpy/pull/93
