@@ -1,8 +1,11 @@
 Usage
 ===========
 
-.. literalinclude:: ../examples/minimal_example.py
-   :language: python
-   :linenos:
-    
-    
+.. toctree::
+   :titlesonly:
+   :hidden:
+   :maxdepth: 2
+
+   notebooks/measurements.ipynb
+   notebooks/waterinfo.ipynb
+   minimal_example.rst

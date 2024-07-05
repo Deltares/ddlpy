@@ -22,13 +22,13 @@ Documentation: <https://deltares.github.io/ddlpy>
 
 In the examples/notebooks folders you will find the following examples to get you started:
 
-* [minimal_example.py](https://github.com/Deltares/ddlpy/blob/main/examples/minimal_example.py) -> minimal code to retrieve data.
+* [minimal_example.py](https://github.com/Deltares/ddlpy/blob/main/docs/examples/minimal_example.py) -> minimal code to retrieve data.
 
-* [retrieve_parallel_to_netcdf.py](https://github.com/Deltares/ddlpy/blob/main/examples/retrieve_parallel_to_netcdf.py) -> Code to retrieve a bulk of observations and write to netcdf files for each station.
+* [retrieve_parallel_to_netcdf.py](https://github.com/Deltares/ddlpy/blob/main/docs/examples/retrieve_parallel_to_netcdf.py) -> Code to retrieve a bulk of observations and write to netcdf files for each station.
 
-* [measurements.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/measurements.ipynb) -> interactive notebook to subset/inspect locations and download/plot measurements
+* [measurements.ipynb](https://github.com/Deltares/ddlpy/blob/main/docs/notebooks/measurements.ipynb) -> interactive notebook to subset/inspect locations and download/plot measurements
 
-* [waterinfo.ipynb](https://github.com/Deltares/ddlpy/blob/main/notebooks/waterinfo.ipynb) -> interactive notebook to read csv's obained from waterinfo.rws.nl
+* [waterinfo.ipynb](https://github.com/Deltares/ddlpy/blob/main/docs/notebooks/waterinfo.ipynb) -> interactive notebook to read csv's obained from waterinfo.rws.nl
 
 
 # Run ddlpy from console
