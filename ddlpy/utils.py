@@ -76,7 +76,11 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     
     The timestamps are converted to UTC since xarray does not support non-UTC timestamps.
     These can be converted to different timezones after loading the netcdf and converting 
-    to a pandas dataframe with df.index.tz_convert()
+    to a pandas dataframe with df.index.tz_convert().
+
+    When writing the dataset to disk with ds.to_netcdf() it is recommended to use
+    `format="NETCDF3_CLASSIC"` or `format="NETCDF4_CLASSIC"` since this automatically
+    converts variables of dtype <U to |S which saves a lot of disk space for DDL data.
     """
 
     # create list of columns with duplicate info (often not constant), will be dropped
