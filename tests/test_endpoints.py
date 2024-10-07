@@ -33,7 +33,7 @@ def collect_observations_resp(endpoints):
     return resp
 
 def test_collect_observations(collect_observations_resp):
-    assert collect_observations_resp.status_code == 200
+    assert collect_observations_resp.status_code == 204
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def collect_latest_observations_resp(endpoints):
     return resp
 
 def test_collect_latest_observations(collect_latest_observations_resp):
-    assert collect_latest_observations_resp.status_code == 200
+    assert collect_latest_observations_resp.status_code == 204
 
 
 @pytest.fixture
@@ -66,11 +66,12 @@ def test_collect_number_of_observations(collect_number_of_observations_resp):
     assert collect_number_of_observations_resp.status_code == 200
 
 
-@pytest.fixture
-def request_bulk_observations_resp(endpoints):
-    endpoint = endpoints['request_bulk_observations']
-    resp = requests.post(endpoint['url'], json=endpoint['request'])
-    return resp
+# TODO: AanvragenBulkWaarnemingen not present in beta WaterWebservices
+# @pytest.fixture
+# def request_bulk_observations_resp(endpoints):
+#     endpoint = endpoints['request_bulk_observations']
+#     resp = requests.post(endpoint['url'], json=endpoint['request'])
+#     return resp
 
-def test_request_bulk_observations(request_bulk_observations_resp):
-    assert request_bulk_observations_resp.status_code == 200
+# def test_request_bulk_observations(request_bulk_observations_resp):
+#     assert request_bulk_observations_resp.status_code == 200

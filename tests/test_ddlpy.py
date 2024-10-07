@@ -21,8 +21,8 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_groepering = locations['Groepering.Code'] == 'NVT'
-    location = locations[bool_grootheid & bool_groepering].loc['DENHDR']
+    bool_groepering = locations['Groepering.Code'] == ''
+    location = locations[bool_grootheid & bool_groepering].loc['denhelder.marsdiep']
     return location
 
 
@@ -37,15 +37,15 @@ def measurements(location):
 
 def test_locations(locations):
     # the number of columns depend on the catalog filter in endpoints.json
-    assert locations.shape[1] == 18
+    assert locations.shape[1] == 20
     # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
     
     # check presence of columns
     assert "Coordinatenstelsel" in locations.columns
     assert "Naam" in locations.columns
-    assert "X" in locations.columns
-    assert "Y" in locations.columns
+    assert "Lon" in locations.columns
+    assert "Lat" in locations.columns
     assert "Parameter_Wat_Omschrijving" in locations.columns
 
 
@@ -55,7 +55,7 @@ def test_locations_extended():
                       'Typeringen','WaardeBepalingsmethoden','Parameters']
     locations_extended = ddlpy.locations(catalog_filter=catalog_filter)
     # the number of columns depend on the provided catalog_filter
-    assert locations_extended.shape[1] == 24
+    assert locations_extended.shape[1] == 25
     # the number of rows is the number of stations, so will change over time
     assert locations_extended.shape[0] > 1
 
@@ -66,8 +66,8 @@ def test_measurements(measurements):
     # check presence of columns
     assert "Coordinatenstelsel" in measurements.columns
     assert "Naam" in measurements.columns
-    assert "X" in measurements.columns
-    assert "Y" in measurements.columns
+    assert "Lon" in measurements.columns
+    assert "Lat" in measurements.columns
     assert "Parameter_Wat_Omschrijving" in measurements.columns
     assert "Code" in measurements.columns
 
@@ -94,13 +94,14 @@ def test_measurements_available(location):
 
 
 def test_measurements_amount(location):
+    # TODO: revert expected values when database is extended
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 5)
     data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
-    assert data_amount_dag.shape[0] > 50
+    assert data_amount_dag.shape[0] > 10
     assert data_amount_dag.index.str.len()[0] == 10
     data_amount_maand = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Maand")
-    assert data_amount_maand.shape[0] == 4
+    assert data_amount_maand.shape[0] == 2
     assert data_amount_maand.index.str.len()[0] == 7
     data_amount_jaar = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Jaar")
     assert data_amount_jaar.shape[0] == 1

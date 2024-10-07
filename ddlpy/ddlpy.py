@@ -40,19 +40,17 @@ def _send_post_request(url, request, timeout=None):
     if not resp.ok:
         raise IOError("Request failed: {}".format(resp.text))
     
+    if resp.status_code==204:
+        # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+        raise NoDataError(resp.reason)
+    
     result = resp.json()
     if not result['Succesvol']:
         logger.debug('Response result is unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
-        if error_message == "Geen gegevens gevonden!":
-            # Foutmelding: "Geen gegevens gevonden!"
-            # this is a valid response for periods where there is no data
-            # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
-            raise NoDataError(error_message)
-        else:
-            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-            # or any other possible error message are raised here
-            raise UnsuccessfulRequestError(error_message)
+        # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+        # or any other possible error message are raised here
+        raise UnsuccessfulRequestError(error_message)
     
     # continue if request was successful
     return result
@@ -142,8 +140,8 @@ def _get_request_dicts(location):
     
     # generate location dict from relevant values
     locatie_dict = {
-        "X": location["X"],
-        "Y": location["Y"],
+        # "X": location["X"],
+        # "Y": location["Y"],
         # assert code is used as index
         # TODO: use  a numpy  compatible json encoder in requests
         "Code": location.get("Code", location.name),
@@ -311,8 +309,8 @@ def _combine_waarnemingenlijst(result, location):
     for name in [
         "Coordinatenstelsel",
         "Naam",
-        "X",
-        "Y",
+        "Lon",
+        "Lat",
     ]:
         df[name] = location[name]
 
