@@ -51,7 +51,9 @@ def _send_post_request(url, request, timeout=None):
         # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
         # or any other possible error message are raised here
         raise UnsuccessfulRequestError(error_message)
-    
+    else:
+        raise ValueError(result)
+        
     # continue if request was successful
     return result
 

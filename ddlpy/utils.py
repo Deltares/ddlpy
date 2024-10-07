@@ -98,7 +98,7 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     cols_onlynvt_code = [x for x in cols_onlynvt_code if x.endswith(".Code")]
     
     # create list of location columns, will be dropped (added as ds.attrs)
-    cols_location = ['Code', 'Naam', 'Coordinatenstelsel', 'X', 'Y']
+    cols_location = ['Code', 'Naam', 'Coordinatenstelsel', 'Lon', 'Lat']
     
     # add drop_if_constant colums to list if values are indeed constant, will be dropped (added as ds.attrs)
     cols_constant = []

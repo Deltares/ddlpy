@@ -111,7 +111,7 @@ def test_measurements_amount(location):
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
-    assert latest.shape[0] > 1
+    assert latest.shape[0] == 1
 
 
 def test_measurements_empty(location):
@@ -274,11 +274,11 @@ def test_check_convert_wrongorder():
 
 
 def test_simplify_dataframe(measurements):
-    assert len(measurements.columns) == 53
+    assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 50
-    assert len(meas_simple.columns) == 3
+    assert len(meas_simple.attrs) == 46
+    assert len(meas_simple.columns) == 2
 
 
 def test_dataframe_to_xarray(measurements):
@@ -311,7 +311,7 @@ def test_dataframe_to_xarray(measurements):
     for varname in data_vars_list:
         assert varname in ds_clean.data_vars
     
-    assert "X" in ds_clean.attrs.keys()
+    assert "Lon" in ds_clean.attrs.keys()
     
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]
