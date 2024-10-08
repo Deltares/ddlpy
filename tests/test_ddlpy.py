@@ -108,6 +108,21 @@ def test_measurements_amount(location):
     assert data_amount_jaar.index.str.len()[0] == 4
 
 
+def test_measurements_amount_multipleblocks(location):
+    # in 1993 the WaardeBepalingsmethode changes from
+    # other:F001 (Rekenkundig gemiddelde waarde over vorige 10 minuten) to 
+    # other:F007 (Rekenkundig gemiddelde waarde over vorige 5 en volgende 5 minuten)
+    date_min = "1990-01-01"
+    date_max = "1995-01-01"
+    # if we pass one row to the measurements function you can get all the measurements
+    df_amount = ddlpy.measurements_amount(location, date_min, date_max)
+    
+    index_expected = np.array(['1990', '1991', '1992', '1993', '1994', '1995'])
+    values_expected = np.array([52554, 52560, 52704, 52560, 52560,     7])
+    assert (df_amount.index == index_expected).all()
+    assert (df_amount["AantalMetingen"].values == values_expected).all()
+
+
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
