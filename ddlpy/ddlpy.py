@@ -262,10 +262,10 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
         df = df[["AantalMetingen"]]
         df_list.append(df)
         
-        # concatenate and sum duplicated index
-        df_amount = pd.concat(df_list).sort_index()
-        df_amount = df_amount.groupby(df_amount.index).sum()
-        return df_amount
+    # concatenate and sum duplicated index
+    df_amount = pd.concat(df_list).sort_index()
+    df_amount = df_amount.groupby(df_amount.index).sum()
+    return df_amount
 
 
 def _combine_waarnemingenlijst(result, location):
