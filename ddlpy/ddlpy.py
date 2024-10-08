@@ -259,7 +259,10 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
         df = df.set_index("Groeperingsperiode")
         df = df[["AantalMetingen"]]
         df_list.append(df)
-        
+    
+    if len(df_list) == 0:
+        raise NoDataError("no measurements available returned")
+    
     # concatenate and sum duplicated index
     df_amount = pd.concat(df_list).sort_index()
     df_amount = df_amount.groupby(df_amount.index).sum()
