@@ -142,7 +142,7 @@ Releasing (non-travis)
 - run testbank
 - local check with: ``python -m build`` and ``twine check dist/*``
 - push+merge all changes
-- create a new release at https://github.com/Deltares/dfm_tools/releases/new
+- create a new release at https://github.com/Deltares/ddlpy/releases/new
 - click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag on publish``
 - set the release title to the tagname (e.g. ``v0.3.0``)
 - click `Generate release notes`
