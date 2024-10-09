@@ -22,9 +22,7 @@
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
       "Locatie": {
-        "X": 761899.770959577,
-        "Y": 5915790.48491405,
-        "Code": "DELFZL"
+        "Code": "delfzijl"
       },
       "AquoPlusWaarnemingMetadata": {
         "AquoMetadata": {
@@ -68,9 +66,7 @@
       ],
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ]
     }
@@ -93,9 +89,7 @@
       ],
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ],
       "Periode": {
@@ -118,9 +112,7 @@
       "Groeperingsperiode": "Week",
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ],
       "Periode": {
@@ -173,19 +165,13 @@
         ],
         "LocatieLijst": [
           {
-            "X": 742469.913149676,
-            "Y": 5940708.14824459,
-            "Code": "HUIBGOT"
+            "Code": "huibertgat.oost"
           },
           {
-            "X": 595875.376191307,
-            "Y": 5790952.82210343,
-            "Code": "NOORDWK2"
+            "Code": "noordwijk.2kmuitdekust.flachsee"
           },
           {
-            "X": 571670.054611366,
-            "Y": 5822651.05560318,
-            "Code": "IJMDMNTSPS"
+            "Code": "ijmuiden.munitiestort.1"
           }
         ],
         "Periode": {

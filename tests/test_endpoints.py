@@ -13,7 +13,8 @@ def endpoints():
     """
     Get the endpoints from the api
     """
-    return ddlpy.ddlpy.ENDPOINTS
+    endpoints = ddlpy.ddlpy.ENDPOINTS
+    return endpoints
 
 
 @pytest.fixture
@@ -33,7 +34,7 @@ def collect_observations_resp(endpoints):
     return resp
 
 def test_collect_observations(collect_observations_resp):
-    assert collect_observations_resp.status_code == 204
+    assert collect_observations_resp.status_code == 200
 
 
 @pytest.fixture
@@ -43,7 +44,7 @@ def collect_latest_observations_resp(endpoints):
     return resp
 
 def test_collect_latest_observations(collect_latest_observations_resp):
-    assert collect_latest_observations_resp.status_code == 204
+    assert collect_latest_observations_resp.status_code == 200
 
 
 @pytest.fixture
