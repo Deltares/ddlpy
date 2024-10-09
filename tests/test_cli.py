@@ -31,7 +31,8 @@ def test_command_line_interface():
     file_meas = "hoekvanholland_OW_cm_WATHTE_GETETBRKD2_NAP_NVT.csv"
     assert os.path.exists(file_meas)
     # TODO: resulting file does not contain normal waterlevels, only extremes
-    # it seems to be not possible to use `--groepering-code ""`
+    # subsetting `--groepering-code ""` results in an empty locations.json
+    # but this might be because there are no measurements available for this period?
     
     # cleanup
     os.remove(file_locs)
