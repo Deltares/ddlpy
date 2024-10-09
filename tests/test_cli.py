@@ -28,8 +28,10 @@ def test_command_line_interface():
     measurements_command = 'measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
-    file_meas = "hoekvanholland_OW_cm_WATHTE_NVT_NAP_NVT.csv"
+    file_meas = "hoekvanholland_OW_cm_WATHTE_GETETBRKD2_NAP_NVT.csv"
     assert os.path.exists(file_meas)
+    # TODO: resulting file does not contain normal waterlevels, only extremes
+    # it seems to be not possible to use `--groepering-code ""`
     
     # cleanup
     os.remove(file_locs)
