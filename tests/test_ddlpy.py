@@ -297,10 +297,9 @@ def test_simplify_dataframe(measurements):
 
 
 def test_dataframe_to_xarray(measurements):
-    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
-                        "WaarnemingMetadata.BemonsteringshoogteLijst",
-                        "WaarnemingMetadata.ReferentievlakLijst",
-                        "AquoMetadata_MessageID", 
+    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantie",
+                        "WaarnemingMetadata.Bemonsteringshoogte",
+                        "WaarnemingMetadata.Referentievlak",
                         "BemonsteringsSoort.Code", 
                         "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
                         ]
@@ -310,18 +309,22 @@ def test_dataframe_to_xarray(measurements):
     assert "MeetApparaat.Code" in ds_clean.data_vars
     assert len(ds_clean["MeetApparaat.Code"]) > 0
     
+    # TODO: temporary commenting OpdrachtgevendeInstantie checks, since this was not constant before
+    # and thus not dropped. With this very limited dataset it is constant, so it is dropped.
+    # could be also with complete dataset, but in that case pick another non-constant variable 
+    # to test that only constant variables are dropped.
     for varname in drop_if_constant:
-        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantieLijst":
-            continue
+        # if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
+        #     continue
         assert varname not in ds_clean.data_vars
         assert varname in ds_clean.attrs.keys()
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" in ds_clean.data_vars
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" not in ds_clean.attrs.keys()
+    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
+    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
     
-    data_vars_list = ['WaarnemingMetadata.StatuswaardeLijst',
-     'WaarnemingMetadata.KwaliteitswaardecodeLijst',
+    data_vars_list = ['WaarnemingMetadata.Statuswaarde',
+     'WaarnemingMetadata.Kwaliteitswaardecode',
      'MeetApparaat.Code',
-     'WaardeBepalingsmethode.Code',
+     'WaardeBepalingsMethode.Code',
      'Meetwaarde.Waarde_Numeriek']
     for varname in data_vars_list:
         assert varname in ds_clean.data_vars
