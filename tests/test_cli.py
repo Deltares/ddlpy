@@ -32,7 +32,7 @@ def test_command_line_interface():
     assert os.path.exists(file_meas)
     # TODO: resulting file does not contain normal waterlevels, only extremes
     # subsetting `--groepering-code ""` results in an empty locations.json
-    # but this might be because there are no measurements available for this period?
+    # but this might be because there are no measurements available for this period in the beta-waterwebservices?
     
     # cleanup
     os.remove(file_locs)
