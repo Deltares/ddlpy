@@ -365,7 +365,7 @@ def _clean_dataframe(measurements):
     measurements = measurements.drop_duplicates()
     
     # remove Tijdstip column, has to be done after drop_duplicates to avoid too much to be dropped
-    measurements = measurements.drop("Tijdstip", axis=1, errors='ignore')
+    measurements = measurements.drop("Tijdstip", axis=1)
     
     # sort dataframe on time, ddl returns non-sorted data
     measurements = measurements.sort_index()

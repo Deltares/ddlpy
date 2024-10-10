@@ -239,6 +239,9 @@ def test_measurements_long(location):
 def test_measurements_sorted(measurements):
     """https://github.com/deltares/ddlpy/issues/27"""
     
+    # restore Tijdstip column to avoid error on removal
+    measurements = measurements.copy()
+    measurements["Tijdstip"] = measurements.index
     # sort dataframe on values so it will not be sorted on time
     meas_wrongorder = measurements.sort_values("Meetwaarde.Waarde_Numeriek")
     assert meas_wrongorder.index.is_monotonic_increasing == False
@@ -255,17 +258,19 @@ def test_measurements_duplicated(measurements):
     """
     WALSODN 2010 contains all values three times, ddlpy drops duplicates
     https://github.com/deltares/ddlpy/issues/24
-    if the data is cleaned in ddl, this test will fail and can be removed or adjusted
     
-    length assertion of meas_clean is important, to prevent issue 
-    https://github.com/deltares/ddlpy/issues/53
+    Tijdstip column and length assertion of meas_clean are important
+    to prevent too much duplicates removal https://github.com/deltares/ddlpy/issues/53
     """
+    # restore Tijdstip column to avoid too much duplicates removal
+    measurements = measurements.copy()
+    measurements["Tijdstip"] = measurements.index
     
     # deliberately duplicate values in a measurements dataframe
     meas_duplicated = pd.concat([measurements, measurements, measurements], axis=0)
     meas_clean = ddlpy.ddlpy._clean_dataframe(meas_duplicated)
     assert len(meas_duplicated) == 3024
-    assert len(meas_clean) == 392
+    assert len(meas_clean) == len(measurements) == 1008
     
     # check wheter indexes are DatetimeIndex
     assert isinstance(meas_duplicated.index, pd.DatetimeIndex)
