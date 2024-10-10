@@ -19,7 +19,7 @@ def test_command_line_interface():
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output
 
-    locations_command = 'locations --grootheid-code WATHTE --procestype meting --station ameland.nes'
+    locations_command = 'locations --grootheid-code WATHTE --station hoekvanholland'
     locations_result = runner.invoke(cli.cli, locations_command.split())
     assert locations_result.exit_code == 0
     file_locs = "locations.json"
