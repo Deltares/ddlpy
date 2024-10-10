@@ -21,7 +21,7 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_procestype = locations['Procestype.Code'] == 'WATHTE'
+    bool_procestype = locations['ProcesType'] == 'meting'
     bool_groepering = locations['Groepering.Code'] == ''
     location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['denhelder.marsdiep']
     return location
@@ -252,8 +252,9 @@ def test_toolargerequest(locations):
     # TODO: we commented this testcase since the old WaterWebservices was very slow in checking this.
     # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_procestype = locations['ProcesType'] == 'meting'
     bool_groepering = locations['Groepering.Code'] == ''
-    location = locations[bool_grootheid & bool_groepering].loc['ameland.nes'].iloc[0]
+    location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
     
     start_date = dt.datetime(2015, 1, 1)
     end_date = dt.datetime(2020, 1, 1)

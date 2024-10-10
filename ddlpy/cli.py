@@ -38,6 +38,11 @@ def cli(verbose,  args=None):
     multiple=True
 )
 @click.option(
+    '--procestype',
+    help='Procestype, e.g. meting, astronomisch, verwachting',
+    multiple=True
+)
+@click.option(
     '--grootheid-code',
     help='Grootheid code, e.g. WATHTE',
     multiple=True
@@ -69,6 +74,7 @@ def cli(verbose,  args=None):
 )
 def locations(output,
               station,
+              procestype,
               grootheid_code,
               groepering_code,
               hoedanigheid_code,
@@ -82,7 +88,8 @@ def locations(output,
     locations_df = ddlpy.locations()
 
     stations = station
-    quantities = {'Grootheid.Code': list(grootheid_code),
+    quantities = {'ProcesType':list(procestype),
+                  'Grootheid.Code': list(grootheid_code),
                   'Groepering.Code': list(groepering_code),
                   'Hoedanigheid.Code': list(hoedanigheid_code),
                   'Eenheid.Code': list(eenheid_code),
