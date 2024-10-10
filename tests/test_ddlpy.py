@@ -10,6 +10,14 @@ import dateutil
 import numpy as np
 
 
+DTYPES_NONSTRING = {
+    'Locatie_MessageID': np.int64,
+    'AquoMetadata_MessageID': np.int64,
+    'Meetwaarde.Waarde_Numeriek': np.float64,
+    'Lon': np.float64,
+    'Lat': np.float64}
+
+
 @pytest.fixture(scope="session")
 def locations():
     """return all locations"""
@@ -37,17 +45,44 @@ def measurements(location):
 
 
 def test_locations(locations):
+    # check if index is station code
+    assert locations.index.name == "Code"
+    assert isinstance(locations.index, pd.Index)
+    assert isinstance(locations.index[0], str)
+
+    # check presence of columns
+    expected_columns = [
+        'Locatie_MessageID', 'Lat', 'Lon', 'Coordinatenstelsel', 'Naam',
+        'Omschrijving', # TODO: omschrijving is often the same as Naam, but not always
+        'Parameter_Wat_Omschrijving', 
+        'ProcesType',
+        'Compartiment.Code', 'Compartiment.Omschrijving',
+        'Grootheid.Code', 'Grootheid.Omschrijving', 
+        'Eenheid.Code', 'Eenheid.Omschrijving',
+        'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving',
+        'Parameter.Code', 'Parameter.Omschrijving',
+        'Groepering.Code', 'Groepering.Omschrijving',
+        ]
+    for colname in expected_columns:
+        assert colname in locations.columns
+
     # the number of columns depend on the catalog filter in endpoints.json
-    assert locations.shape[1] == 20
+    assert locations.shape[1] == len(expected_columns)
     # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
-    
-    # check presence of columns
-    assert "Coordinatenstelsel" in locations.columns
-    assert "Naam" in locations.columns
-    assert "Lon" in locations.columns
-    assert "Lat" in locations.columns
-    assert "Parameter_Wat_Omschrijving" in locations.columns
+
+    # check whether first values of all columns have the expected dtype
+    for colname in locations.columns:
+        if colname in DTYPES_NONSTRING.keys():
+            expected_dtype = DTYPES_NONSTRING[colname]
+        else:
+            expected_dtype = str
+        assert isinstance(locations[colname].iloc[0], expected_dtype)
+
+    # check whether all dtypes are the same for entire column
+    for colname in locations.columns:
+        column_unique_dtypes = locations[colname].apply(type).drop_duplicates()
+        assert len(column_unique_dtypes) == 1
 
 
 def test_locations_extended():
@@ -62,15 +97,49 @@ def test_locations_extended():
 
 
 def test_measurements(measurements):
+    # check if index is time and check dtype
+    assert measurements.index.name == "time"
+    assert isinstance(measurements.index, pd.DatetimeIndex)
+    assert isinstance(measurements.index[0], pd.Timestamp)
+
+    # check presence of columns, skipping all but one *.Omschrijving and *.Code columns
+    expected_columns = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Bemonsteringshoogte',
+        'WaarnemingMetadata.Referentievlak',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Parameter_Wat_Omschrijving',
+        'ProcesType',
+        'Meetwaarde.Waarde_Alfanumeriek',
+        'Meetwaarde.Waarde_Numeriek',
+        'Code',
+        'Coordinatenstelsel',
+        'Naam',
+        'Lon',
+        'Lat',
+        'Grootheid.Code',
+        'Grootheid.Omschrijving',
+        ]
+    for colname in expected_columns:
+        assert colname in measurements.columns
+
+    # check the shape of the dataframe
+    assert measurements.shape[1] == len(expected_columns) + 32
     assert measurements.shape[0] > 1
-    
-    # check presence of columns
-    assert "Coordinatenstelsel" in measurements.columns
-    assert "Naam" in measurements.columns
-    assert "Lon" in measurements.columns
-    assert "Lat" in measurements.columns
-    assert "Parameter_Wat_Omschrijving" in measurements.columns
-    assert "Code" in measurements.columns
+
+    # check whether first values of all columns have the expected dtype
+    for colname in measurements.columns:
+        if colname in DTYPES_NONSTRING.keys():
+            expected_dtype = DTYPES_NONSTRING[colname]
+        else:
+            expected_dtype = str
+        assert isinstance(measurements[colname].iloc[0], expected_dtype)
+
+    # check whether all dtypes are the same for entire column
+    for colname in measurements.columns:
+        column_unique_dtypes = measurements[colname].apply(type).drop_duplicates()
+        assert len(column_unique_dtypes) == 1
 
 
 def test_measurements_freq_yearly(location, measurements):
