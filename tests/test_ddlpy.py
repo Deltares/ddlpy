@@ -47,6 +47,12 @@ def test_locations(locations):
     # the number of rows is the number of stations, so will change over time
     assert locations.shape[0] > 1
 
+    # check if index is station code
+    assert locations.index.name == "Code"
+    assert isinstance(locations.index, pd.Index)
+    assert isinstance(locations.index[0], str)
+
+    # check presence of columns
     expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
                         'Parameter_Wat_Omschrijving', 
                         'Compartiment.Code', 'Compartiment.Omschrijving', 
@@ -55,11 +61,6 @@ def test_locations(locations):
                         'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving', 
                         'Parameter.Code', 'Parameter.Omschrijving', 
                         'Groepering.Code', 'Groepering.Omschrijving']
-    
-    # check if index is station code
-    assert locations.index.name == "Code"
-    
-    # check presence of columns
     for colname in expected_columns:
         assert colname in locations.columns
     
@@ -92,8 +93,10 @@ def test_locations_extended():
 def test_measurements(measurements):
     assert measurements.shape[0] > 1
     
-    # check if index is station code
+    # check if index is time and check dtype
     assert measurements.index.name == "time"
+    assert isinstance(measurements.index, pd.DatetimeIndex)
+    assert isinstance(measurements.index[0], pd.Timestamp)
     
     # check if columns are present that are transfered from the locations dataframe
     expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
