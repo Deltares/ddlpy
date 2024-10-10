@@ -135,15 +135,14 @@ def measurements(locations, start_date, end_date):
     except:
         raise ValueError('locations.json file not found. First run "ddlpy locations"')
         
-    for obs in range(locations_df.shape[0]): #goes through rows in table
-        selected = locations_df.loc[obs]
-
+    for irow, selected in locations_df.iterrows(): #goes through rows in table
         measurements = ddlpy.measurements(
             selected, start_date=start_date, end_date=end_date)
 
-        if (len(measurements) > 0):
+        if len(measurements) > 0:
             print('Measurements of %s were obtained' % selected['Code'])
             station = selected['Code']
+            pt = selected['ProcesType']
             cc = selected['Compartiment.Code']
             ec = selected['Eenheid.Code']
             gc = selected['Grootheid.Code']
@@ -151,8 +150,8 @@ def measurements(locations, start_date, end_date):
             hc = selected['Hoedanigheid.Code']
             pc = selected['Parameter.Code']
 
-            measurements.to_csv('%s_%s_%s_%s_%s_%s_%s.csv' %
-                                (station, cc, ec, gc, grc, hc, pc))
+            measurements.to_csv('%s_%s_%s_%s_%s_%s_%s_%s.csv' %
+                                (station, pt ,cc, ec, gc, grc, hc, pc))
         else:
             print('No Data of station %s were retrieved from Water Info' %
                   selected['Code'])
