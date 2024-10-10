@@ -36,6 +36,16 @@ def location(locations):
 
 
 @pytest.fixture(scope="session")
+def location_nes(locations):
+    # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_procestype = locations['ProcesType'] == 'meting'
+    bool_groepering = locations['Groepering.Code'] == ''
+    location_nes = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
+    return location_nes
+
+    
+@pytest.fixture(scope="session")
 def measurements(location):
     """measurements for a location """
     start_date = dt.datetime(1953, 1, 1)
@@ -178,14 +188,14 @@ def test_measurements_amount(location):
     assert data_amount_jaar.index.str.len()[0] == 4
 
 
-def test_measurements_amount_multipleblocks(location):
+def test_measurements_amount_multipleblocks(location_nes):
     # in 1993 the WaardeBepalingsmethode changes from
     # other:F001 (Rekenkundig gemiddelde waarde over vorige 10 minuten) to 
     # other:F007 (Rekenkundig gemiddelde waarde over vorige 5 en volgende 5 minuten)
     date_min = "1990-01-01"
     date_max = "1995-01-01"
     # if we pass one row to the measurements function you can get all the measurements
-    df_amount = ddlpy.measurements_amount(location, date_min, date_max)
+    df_amount = ddlpy.measurements_amount(location_nes, date_min, date_max)
     
     index_expected = np.array(['1990', '1991', '1992', '1993', '1994', '1995'])
     values_expected = np.array([52554, 52560, 52704, 52560, 52560,     7])
@@ -269,35 +279,36 @@ def test_measurements_duplicated(measurements):
     # deliberately duplicate values in a measurements dataframe
     meas_duplicated = pd.concat([measurements, measurements, measurements], axis=0)
     meas_clean = ddlpy.ddlpy._clean_dataframe(meas_duplicated)
-    assert len(meas_duplicated) == 3024
-    assert len(meas_clean) == len(measurements) == 1008
+    # TODO: probably need to restore the expected values once the WaterWebservices database is filled
+    assert len(meas_duplicated) == 864
+    assert len(meas_clean) == len(measurements) == 288
     
     # check wheter indexes are DatetimeIndex
     assert isinstance(meas_duplicated.index, pd.DatetimeIndex)
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
-def test_measurements_timezone_behaviour(location):
+def test_measurements_timezone_behaviour(location_nes):
     start_date = "2015-01-01 00:00:00 +01:00"
     end_date = "2015-01-03 00:00:00 +01:00"
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    measurements = ddlpy.measurements(location_nes, start_date=start_date, end_date=end_date)
     assert str(measurements.index[0].tz) == 'UTC+01:00'
     assert measurements.index[0] == pd.Timestamp(start_date)
     assert measurements.index[-1] == pd.Timestamp(end_date)
     
-    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    data_amount_dag = ddlpy.measurements_amount(location_nes, start_date=start_date, end_date=end_date, period="Dag")
     # when retrieving with tzone +01:00 we expect 1 value on 2015-01-03
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [144,144,1])
     
     
     start_date = "2015-01-01"
     end_date = "2015-01-03"
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    measurements = ddlpy.measurements(location_nes, start_date=start_date, end_date=end_date)
     assert str(measurements.index[0].tz) == 'UTC+01:00'
     assert measurements.index[0] == pd.Timestamp(start_date).tz_localize("UTC").tz_convert('UTC+01:00')
     assert measurements.index[-1] == pd.Timestamp(end_date).tz_localize("UTC").tz_convert('UTC+01:00')
     
-    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    data_amount_dag = ddlpy.measurements_amount(location_nes, start_date=start_date, end_date=end_date, period="Dag")
     # when retrieving with tzone +00:00 we expect 7 values on 2015-01-03
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [138,144,7])
 
@@ -318,23 +329,18 @@ def test_nodataerror(location):
         _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
 
 
-def test_toolargerequest(locations):
+def test_toolargerequest(location_nes):
     """
     deliberately send a request that is too large to get the error message
     Foutmelding: 'Het maximaal aantal waarnemingen (160000) is overschreven. Beperk uw request.'
     """
     # TODO: we commented this testcase since the old WaterWebservices was very slow in checking this.
-    # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
-    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_procestype = locations['ProcesType'] == 'meting'
-    bool_groepering = locations['Groepering.Code'] == ''
-    location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
-    
+
     start_date = dt.datetime(2015, 1, 1)
     end_date = dt.datetime(2020, 1, 1)
     with pytest.raises(IOError) as e:
         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+        _ = ddlpy.ddlpy._measurements_slice(location_nes, start_date=start_date, end_date=end_date)
     assert "Het maximaal aantal waarnemingen (160000) is overschreden." in str(e.value)
 
 
