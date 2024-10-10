@@ -21,8 +21,9 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_procestype = locations['Procestype.Code'] == 'WATHTE'
     bool_groepering = locations['Groepering.Code'] == ''
-    location = locations[bool_grootheid & bool_groepering].loc['denhelder.marsdiep']
+    location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['denhelder.marsdiep']
     return location
 
 

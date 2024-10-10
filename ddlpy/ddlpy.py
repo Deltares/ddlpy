@@ -145,10 +145,7 @@ def _get_request_dicts(location):
     
     # generate location dict from relevant values
     locatie_dict = {
-        # "X": location["X"],
-        # "Y": location["Y"],
         # assert code is used as index
-        # TODO: use  a numpy  compatible json encoder in requests
         "Code": location.get("Code", location.name),
     }
     
