@@ -37,18 +37,23 @@ logger = logging.getLogger(__name__)
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
-    if not resp.ok:
-        raise IOError("Request failed: {}".format(resp.text))
     
     if resp.status_code==204:
         # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
         raise NoDataError(resp.reason)
     
     result = resp.json()
-    if not result['Succesvol']:
+    if not resp.ok:
+        # bijv Foutmelding: "Het max aantal waarnemingen (160000) is overschreven. Beperk uw request."
         logger.debug('Response result is unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
-        # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
+        raise IOError("Request failed: {}".format(error_message))
+    
+    if not result['Succesvol']:
+        # TODO: this is probably never reached anymore. Ask whether Succesvol can be removed from the response
+        # if not it can be false if resp.ok=True, add a testcase
+        logger.debug('Response result is unsuccessful: {}'.format(result))
+        error_message = result.get('Foutmelding', 'No error returned')
         # or any other possible error message are raised here
         raise UnsuccessfulRequestError(error_message)
         

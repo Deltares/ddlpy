@@ -243,18 +243,23 @@ def test_nodataerror(location):
         _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
 
 
-# TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
-# def test_unsuccessfulrequesterror(location):
-#     """
-#     deliberately send a request that is too large to get the error message
-#     Foutmelding: 'Het max aantal waarnemingen (157681) is overschreven, beperk uw request.'
-#     which is raised as a UnsuccessfulRequestError
-#     """
-#     start_date = dt.datetime(2015, 1, 1)
-#     end_date = dt.datetime(2020, 1, 1)
-#     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
-#         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-#         _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+def test_toolargerequest(locations):
+    """
+    deliberately send a request that is too large to get the error message
+    Foutmelding: 'Het maximaal aantal waarnemingen (160000) is overschreven. Beperk uw request.'
+    """
+    # TODO: we commented this testcase since the old WaterWebservices was very slow in checking this.
+    # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_groepering = locations['Groepering.Code'] == ''
+    location = locations[bool_grootheid & bool_groepering].loc['ameland.nes'].iloc[0]
+    
+    start_date = dt.datetime(2015, 1, 1)
+    end_date = dt.datetime(2020, 1, 1)
+    with pytest.raises(IOError) as e:
+        #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
+        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+    assert "Het maximaal aantal waarnemingen (160000) is overschreden." in str(e.value)
 
 
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
