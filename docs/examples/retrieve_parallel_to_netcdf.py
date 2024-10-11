@@ -13,7 +13,6 @@ import glob
 
 
 def get_data(location, start_date, end_date, dir_output, overwrite=True):
-    
     station_id = location.name
     station_messageid = location["Locatie_MessageID"]
     filename = os.path.join(dir_output, f"{station_id}-{station_messageid}.nc")
@@ -44,19 +43,18 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
     ds.to_netcdf(filename, format="NETCDF4_CLASSIC")
 
 
-if ( __name__ == "__main__" ):
-    
+if __name__ == "__main__":
     dir_output = './ddl_retrieved_data'
     os.makedirs(dir_output, exist_ok=True)
     
     # get locations
     locations = ddlpy.locations()
-    bool_stations = locations.index.isin(['IJMDBTHVN', 'DANTZGZD', 'HOEKVHLD', 'VLISSGN', 'HOEK', 'VLIS', "OLST"])
-    bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE']) # measured (WATHTE) versus computed/astro
-    bool_groepering = locations['Groepering.Code'].isin(['NVT']) # timeseries (NVT) versus extremes
+    bool_stations = locations.index.isin(['ijmuiden.buitenhaven', 'dantziggat.zuid', 'hoekvanholland', 'ameland.nes', 'vlissingen', 'olst'])
+    bool_procestype = locations['ProcesType'].isin(['meting']) # meting/astronomisch/verwachting
+    bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE']) # waterlevel (WATHTE)
+    bool_groepering = locations['Groepering.Code'].isin(['']) # timeseries (NVT) versus extremes
     bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP']) # vertical reference (NAP/MSL)
-    selected = locations.loc[bool_stations & bool_grootheid & bool_groepering & bool_hoedanigheid]
-    
+    selected = locations.loc[bool_stations & bool_procestype & bool_grootheid & bool_groepering & bool_hoedanigheid]
     
     start_date = dt.datetime(2022, 1, 1)
     end_date = dt.datetime(2022, 3, 1)
@@ -70,7 +68,6 @@ if ( __name__ == "__main__" ):
         for station_code, location in selected.iterrows():
             executor.submit(get_data, location, start_date, end_date, dir_output)
 
-    
     file_list = glob.glob(os.path.join(dir_output, "*.nc"))
     fig, ax = plt.subplots()
     for file_nc in file_list:
