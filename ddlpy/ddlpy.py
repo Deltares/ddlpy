@@ -69,6 +69,8 @@ def catalog(catalog_filter=None):
         request = endpoint["request"]
     else:
         assert isinstance(catalog_filter, list)
+        # TODO: incorrect filter keys results in empty catalog instead of proper error
+        # https://github.com/Rijkswaterstaat/wm-ws-dl/issues/44
         request = {"CatalogusFilter": {x:True for x in catalog_filter}}
     
     result = _send_post_request(endpoint["url"], request, timeout=None)
