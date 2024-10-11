@@ -37,23 +37,26 @@ logger = logging.getLogger(__name__)
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
-    if not resp.ok:
-        raise IOError("Request failed: {}".format(resp.text))
+    
+    if resp.status_code==204:
+        # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+        raise NoDataError(resp.reason)
     
     result = resp.json()
-    if not result['Succesvol']:
+    if not resp.ok:
+        # bijv Foutmelding: "Het max aantal waarnemingen (160000) is overschreven. Beperk uw request."
         logger.debug('Response result is unsuccessful: {}'.format(result))
         error_message = result.get('Foutmelding', 'No error returned')
-        if error_message == "Geen gegevens gevonden!":
-            # Foutmelding: "Geen gegevens gevonden!"
-            # this is a valid response for periods where there is no data
-            # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
-            raise NoDataError(error_message)
-        else:
-            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-            # or any other possible error message are raised here
-            raise UnsuccessfulRequestError(error_message)
+        raise IOError("Request failed: {}".format(error_message))
     
+    if not result['Succesvol']:
+        # TODO: this is probably never reached anymore. Ask whether Succesvol can be removed from the response
+        # if not it can be false if resp.ok=True, add a testcase
+        logger.debug('Response result is unsuccessful: {}'.format(result))
+        error_message = result.get('Foutmelding', 'No error returned')
+        # or any other possible error message are raised here
+        raise UnsuccessfulRequestError(error_message)
+        
     # continue if request was successful
     return result
 
@@ -66,6 +69,8 @@ def catalog(catalog_filter=None):
         request = endpoint["request"]
     else:
         assert isinstance(catalog_filter, list)
+        # TODO: incorrect filter keys results in empty catalog instead of proper error
+        # https://github.com/Rijkswaterstaat/wm-ws-dl/issues/44
         request = {"CatalogusFilter": {x:True for x in catalog_filter}}
     
     result = _send_post_request(endpoint["url"], request, timeout=None)
@@ -142,10 +147,7 @@ def _get_request_dicts(location):
     
     # generate location dict from relevant values
     locatie_dict = {
-        "X": location["X"],
-        "Y": location["Y"],
         # assert code is used as index
-        # TODO: use  a numpy  compatible json encoder in requests
         "Code": location.get("Code", location.name),
     }
     
@@ -261,7 +263,10 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
         df = df.set_index("Groeperingsperiode")
         df = df[["AantalMetingen"]]
         df_list.append(df)
-        
+    
+    if len(df_list) == 0:
+        raise NoDataError("no measurements available returned")
+    
     # concatenate and sum duplicated index
     df_amount = pd.concat(df_list).sort_index()
     df_amount = df_amount.groupby(df_amount.index).sum()
@@ -311,8 +316,8 @@ def _combine_waarnemingenlijst(result, location):
     for name in [
         "Coordinatenstelsel",
         "Naam",
-        "X",
-        "Y",
+        "Lon",
+        "Lat",
     ]:
         df[name] = location[name]
 
