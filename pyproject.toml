@@ -71,7 +71,8 @@ examples = [
 	"matplotlib",
 ]
 netcdf = [
-	"xarray[io]",
+	"xarray",
+	"h5netcdf",
 ]
 
 [project.scripts]
