@@ -16,7 +16,7 @@ jobs:
       matrix:
         # we assume it also works for inbetween versions
         python-version: ["3.8", "3.12", "3.13"]
-        os: [ubuntu-latest] #, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] #, macos-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
