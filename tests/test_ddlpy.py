@@ -9,12 +9,14 @@ import ddlpy
 import dateutil
 import numpy as np
 
+
 DTYPES_NONSTRING = {
     'Locatie_MessageID': np.int64,
     'AquoMetadata_MessageID': np.int64,
     'Meetwaarde.Waarde_Numeriek': np.float64,
-    'X': np.float64,
-    'Y': np.float64}
+    'Lon': np.float64,
+    'Lat': np.float64}
+
 
 @pytest.fixture(scope="session")
 def locations():
@@ -27,11 +29,22 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_groepering = locations['Groepering.Code'] == 'NVT'
-    location = locations[bool_grootheid & bool_groepering].loc['DENHDR']
+    bool_procestype = locations['ProcesType'] == 'meting'
+    bool_groepering = locations['Groepering.Code'] == ''
+    location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['denhelder.marsdiep']
     return location
 
 
+@pytest.fixture(scope="session")
+def location_nes(locations):
+    # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_procestype = locations['ProcesType'] == 'meting'
+    bool_groepering = locations['Groepering.Code'] == ''
+    location_nes = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
+    return location_nes
+
+    
 @pytest.fixture(scope="session")
 def measurements(location):
     """measurements for a location """
@@ -42,28 +55,32 @@ def measurements(location):
 
 
 def test_locations(locations):
-    # the number of columns depend on the catalog filter in endpoints.json
-    assert locations.shape[1] == 18
-    # the number of rows is the number of stations, so will change over time
-    assert locations.shape[0] > 1
-
     # check if index is station code
     assert locations.index.name == "Code"
     assert isinstance(locations.index, pd.Index)
     assert isinstance(locations.index[0], str)
 
     # check presence of columns
-    expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
-                        'Parameter_Wat_Omschrijving', 
-                        'Compartiment.Code', 'Compartiment.Omschrijving', 
-                        'Eenheid.Code', 'Eenheid.Omschrijving', 
-                        'Grootheid.Code', 'Grootheid.Omschrijving', 
-                        'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving', 
-                        'Parameter.Code', 'Parameter.Omschrijving', 
-                        'Groepering.Code', 'Groepering.Omschrijving']
+    expected_columns = [
+        'Locatie_MessageID', 'Lat', 'Lon', 'Coordinatenstelsel', 'Naam',
+        'Omschrijving', # TODO: omschrijving is often the same as Naam, but not always
+        'Parameter_Wat_Omschrijving', 
+        'ProcesType',
+        'Compartiment.Code', 'Compartiment.Omschrijving',
+        'Grootheid.Code', 'Grootheid.Omschrijving', 
+        'Eenheid.Code', 'Eenheid.Omschrijving',
+        'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving',
+        'Parameter.Code', 'Parameter.Omschrijving',
+        'Groepering.Code', 'Groepering.Omschrijving',
+        ]
     for colname in expected_columns:
         assert colname in locations.columns
-    
+
+    # the number of columns depend on the catalog filter in endpoints.json
+    assert locations.shape[1] == len(expected_columns)
+    # the number of rows is the number of stations, so will change over time
+    assert locations.shape[0] > 1
+
     # check whether first values of all columns have the expected dtype
     for colname in locations.columns:
         if colname in DTYPES_NONSTRING.keys():
@@ -71,12 +88,11 @@ def test_locations(locations):
         else:
             expected_dtype = str
         assert isinstance(locations[colname].iloc[0], expected_dtype)
-    
+
     # check whether all dtypes are the same for entire column
     for colname in locations.columns:
         column_unique_dtypes = locations[colname].apply(type).drop_duplicates()
         assert len(column_unique_dtypes) == 1
-
 
 
 def test_locations_extended():
@@ -85,25 +101,42 @@ def test_locations_extended():
                       'Typeringen','WaardeBepalingsmethoden','Parameters']
     locations_extended = ddlpy.locations(catalog_filter=catalog_filter)
     # the number of columns depend on the provided catalog_filter
-    assert locations_extended.shape[1] == 24
+    assert locations_extended.shape[1] == 25
     # the number of rows is the number of stations, so will change over time
     assert locations_extended.shape[0] > 1
 
 
 def test_measurements(measurements):
-    assert measurements.shape[0] > 1
-    
     # check if index is time and check dtype
     assert measurements.index.name == "time"
     assert isinstance(measurements.index, pd.DatetimeIndex)
     assert isinstance(measurements.index[0], pd.Timestamp)
-    
-    # check if columns are present that are transfered from the locations dataframe
-    expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
-                        "Parameter_Wat_Omschrijving", "Code"
-                        ]
+
+    # check presence of columns, skipping all but one *.Omschrijving and *.Code columns
+    expected_columns = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Bemonsteringshoogte',
+        'WaarnemingMetadata.Referentievlak',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Parameter_Wat_Omschrijving',
+        'ProcesType',
+        'Meetwaarde.Waarde_Alfanumeriek',
+        'Meetwaarde.Waarde_Numeriek',
+        'Code',
+        'Coordinatenstelsel',
+        'Naam',
+        'Lon',
+        'Lat',
+        'Grootheid.Code',
+        'Grootheid.Omschrijving',
+        ]
     for colname in expected_columns:
         assert colname in measurements.columns
+
+    # check the shape of the dataframe
+    assert measurements.shape[1] == len(expected_columns) + 32
+    assert measurements.shape[0] > 1
 
     # check whether first values of all columns have the expected dtype
     for colname in measurements.columns:
@@ -112,7 +145,7 @@ def test_measurements(measurements):
         else:
             expected_dtype = str
         assert isinstance(measurements[colname].iloc[0], expected_dtype)
-    
+
     # check whether all dtypes are the same for entire column
     for colname in measurements.columns:
         column_unique_dtypes = measurements[colname].apply(type).drop_duplicates()
@@ -141,27 +174,28 @@ def test_measurements_available(location):
 
 
 def test_measurements_amount(location):
+    # TODO: revert expected values when database is extended
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 5)
     data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
-    assert data_amount_dag.shape[0] > 50
+    assert data_amount_dag.shape[0] > 10
     assert data_amount_dag.index.str.len()[0] == 10
     data_amount_maand = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Maand")
-    assert data_amount_maand.shape[0] == 4
+    assert data_amount_maand.shape[0] == 2
     assert data_amount_maand.index.str.len()[0] == 7
     data_amount_jaar = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Jaar")
     assert data_amount_jaar.shape[0] == 1
     assert data_amount_jaar.index.str.len()[0] == 4
 
 
-def test_measurements_amount_multipleblocks(location):
+def test_measurements_amount_multipleblocks(location_nes):
     # in 1993 the WaardeBepalingsmethode changes from
     # other:F001 (Rekenkundig gemiddelde waarde over vorige 10 minuten) to 
     # other:F007 (Rekenkundig gemiddelde waarde over vorige 5 en volgende 5 minuten)
     date_min = "1990-01-01"
     date_max = "1995-01-01"
     # if we pass one row to the measurements function you can get all the measurements
-    df_amount = ddlpy.measurements_amount(location, date_min, date_max)
+    df_amount = ddlpy.measurements_amount(location_nes, date_min, date_max)
     
     index_expected = np.array(['1990', '1991', '1992', '1993', '1994', '1995'])
     values_expected = np.array([52554, 52560, 52704, 52560, 52560,     7])
@@ -172,7 +206,7 @@ def test_measurements_amount_multipleblocks(location):
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
-    assert latest.shape[0] > 1
+    assert latest.shape[0] == 1
 
 
 def test_measurements_empty(location):
@@ -245,35 +279,36 @@ def test_measurements_duplicated(measurements):
     # deliberately duplicate values in a measurements dataframe
     meas_duplicated = pd.concat([measurements, measurements, measurements], axis=0)
     meas_clean = ddlpy.ddlpy._clean_dataframe(meas_duplicated)
-    assert len(meas_duplicated) == 3024
-    assert len(meas_clean) == len(measurements) == 1008
+    # TODO: probably need to restore the expected values once the WaterWebservices database is filled
+    assert len(meas_duplicated) == 864
+    assert len(meas_clean) == len(measurements) == 288
     
     # check wheter indexes are DatetimeIndex
     assert isinstance(meas_duplicated.index, pd.DatetimeIndex)
     assert isinstance(meas_clean.index, pd.DatetimeIndex)
 
 
-def test_measurements_timezone_behaviour(location):
+def test_measurements_timezone_behaviour(location_nes):
     start_date = "2015-01-01 00:00:00 +01:00"
     end_date = "2015-01-03 00:00:00 +01:00"
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    measurements = ddlpy.measurements(location_nes, start_date=start_date, end_date=end_date)
     assert str(measurements.index[0].tz) == 'UTC+01:00'
     assert measurements.index[0] == pd.Timestamp(start_date)
     assert measurements.index[-1] == pd.Timestamp(end_date)
     
-    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    data_amount_dag = ddlpy.measurements_amount(location_nes, start_date=start_date, end_date=end_date, period="Dag")
     # when retrieving with tzone +01:00 we expect 1 value on 2015-01-03
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [144,144,1])
     
     
     start_date = "2015-01-01"
     end_date = "2015-01-03"
-    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    measurements = ddlpy.measurements(location_nes, start_date=start_date, end_date=end_date)
     assert str(measurements.index[0].tz) == 'UTC+01:00'
     assert measurements.index[0] == pd.Timestamp(start_date).tz_localize("UTC").tz_convert('UTC+01:00')
     assert measurements.index[-1] == pd.Timestamp(end_date).tz_localize("UTC").tz_convert('UTC+01:00')
     
-    data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
+    data_amount_dag = ddlpy.measurements_amount(location_nes, start_date=start_date, end_date=end_date, period="Dag")
     # when retrieving with tzone +00:00 we expect 7 values on 2015-01-03
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [138,144,7])
 
@@ -294,18 +329,19 @@ def test_nodataerror(location):
         _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
 
 
-# TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
-# def test_unsuccessfulrequesterror(location):
-#     """
-#     deliberately send a request that is too large to get the error message
-#     Foutmelding: 'Het max aantal waarnemingen (157681) is overschreven, beperk uw request.'
-#     which is raised as a UnsuccessfulRequestError
-#     """
-#     start_date = dt.datetime(2015, 1, 1)
-#     end_date = dt.datetime(2020, 1, 1)
-#     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
-#         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-#         _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+def test_toolargerequest(location_nes):
+    """
+    deliberately send a request that is too large to get the error message
+    Foutmelding: 'Het maximaal aantal waarnemingen (160000) is overschreven. Beperk uw request.'
+    """
+    # TODO: we commented this testcase since the old WaterWebservices was very slow in checking this.
+
+    start_date = dt.datetime(2015, 1, 1)
+    end_date = dt.datetime(2020, 1, 1)
+    with pytest.raises(IOError) as e:
+        #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
+        _ = ddlpy.ddlpy._measurements_slice(location_nes, start_date=start_date, end_date=end_date)
+    assert "Het maximaal aantal waarnemingen (160000) is overschreden." in str(e.value)
 
 
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
@@ -340,18 +376,17 @@ def test_check_convert_wrongorder():
 
 
 def test_simplify_dataframe(measurements):
-    assert len(measurements.columns) == 53
+    assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 50
-    assert len(meas_simple.columns) == 3
+    assert len(meas_simple.attrs) == 46
+    assert len(meas_simple.columns) == 2
 
 
 def test_dataframe_to_xarray(measurements):
-    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
-                        "WaarnemingMetadata.BemonsteringshoogteLijst",
-                        "WaarnemingMetadata.ReferentievlakLijst",
-                        "AquoMetadata_MessageID", 
+    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantie",
+                        "WaarnemingMetadata.Bemonsteringshoogte",
+                        "WaarnemingMetadata.Referentievlak",
                         "BemonsteringsSoort.Code", 
                         "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
                         ]
@@ -361,23 +396,27 @@ def test_dataframe_to_xarray(measurements):
     assert "MeetApparaat.Code" in ds_clean.data_vars
     assert len(ds_clean["MeetApparaat.Code"]) > 0
     
+    # TODO: temporary commenting OpdrachtgevendeInstantie checks, since this was not constant before
+    # and thus not dropped. With this very limited dataset it is constant, so it is dropped.
+    # could be also with complete dataset, but in that case pick another non-constant variable 
+    # to test that only constant variables are dropped.
     for varname in drop_if_constant:
-        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantieLijst":
-            continue
+        # if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
+        #     continue
         assert varname not in ds_clean.data_vars
         assert varname in ds_clean.attrs.keys()
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" in ds_clean.data_vars
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" not in ds_clean.attrs.keys()
+    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
+    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
     
-    data_vars_list = ['WaarnemingMetadata.StatuswaardeLijst',
-     'WaarnemingMetadata.KwaliteitswaardecodeLijst',
+    data_vars_list = ['WaarnemingMetadata.Statuswaarde',
+     'WaarnemingMetadata.Kwaliteitswaardecode',
      'MeetApparaat.Code',
-     'WaardeBepalingsmethode.Code',
+     'WaardeBepalingsMethode.Code',
      'Meetwaarde.Waarde_Numeriek']
     for varname in data_vars_list:
         assert varname in ds_clean.data_vars
     
-    assert "X" in ds_clean.attrs.keys()
+    assert "Lon" in ds_clean.attrs.keys()
     
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]
