@@ -84,6 +84,9 @@ packages = ["ddlpy"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--durations=0"
+filterwarnings = [
+	"error",
+	]
 
 [tool.flake8]
 exclude = "docs"
