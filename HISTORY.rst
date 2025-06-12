@@ -2,8 +2,8 @@
 History
 =======
 
-UNRELEASED
-----------
+0.7.0 (2025-06-12)
+------------------
 * resolved datetime parsing warning by providing datetime format in https://github.com/Deltares/ddlpy/pull/131
 
 0.6.0 (2024-10-08)
