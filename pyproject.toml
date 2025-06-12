@@ -12,7 +12,7 @@ maintainers = [
 description = "Service from Rijkswaterstaat for distributing water quantity data."
 readme = "README.md"
 keywords = ["ddlpy"]
-license = "GPL-3.0"
+license = { text = "GPLv3" }
 requires-python = ">=3.8"
 dependencies = [
 	#numpy 1.21 is EOL since june 2023
@@ -29,7 +29,7 @@ classifiers = [
 	"Intended Audience :: Developers",
 	"Intended Audience :: Science/Research",
 	"Operating System :: OS Independent",
-	"License-Expression: GPL-3.0",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
