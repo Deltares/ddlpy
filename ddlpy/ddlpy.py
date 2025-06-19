@@ -284,8 +284,7 @@ def _combine_waarnemingenlijst(result, location):
             new_row = {}
             for key, value in row["WaarnemingMetadata"].items():
                 new_key = "WaarnemingMetadata." + key
-                new_val = value[0] if len(value) == 1 else value
-                new_row[new_key] = new_val
+                new_row[new_key] = value
 
             # add remaining data
             for key, val in row.items():
