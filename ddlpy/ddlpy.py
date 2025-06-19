@@ -293,7 +293,7 @@ def _combine_waarnemingenlijst(result, location):
                 new_row[key] = val
 
             # add metadata
-            for key, val in list(waarneming["AquoMetadata"].items()):
+            for key, val in waarneming["AquoMetadata"].items():
                 if isinstance(val, dict) and "Code" in val and "Omschrijving" in val:
                     # some values have a code/omschrijving pair, flatten them
                     new_key = key + ".Code"
