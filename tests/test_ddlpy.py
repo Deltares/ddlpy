@@ -52,7 +52,7 @@ def test_locations(locations):
     # check presence of columns
     expected_columns = [
         'Locatie_MessageID', 'Lat', 'Lon', 'Coordinatenstelsel', 'Naam',
-        'Omschrijving', # TODO: omschrijving is often the same as Naam, but not always
+        'Omschrijving', # TODO: Omschrijving is often the same as Naam, but not always. Speed up catalog retrieval by removing Omschrijving
         'Parameter_Wat_Omschrijving', 
         'ProcesType',
         'Compartiment.Code', 'Compartiment.Omschrijving',
@@ -270,8 +270,6 @@ def test_measurements_duplicated(measurements):
     # deliberately duplicate values in a measurements dataframe
     meas_duplicated = pd.concat([measurements, measurements, measurements], axis=0)
     meas_clean = ddlpy.ddlpy._clean_dataframe(meas_duplicated)
-    # TODO: probably need to restore the expected values once the WaterWebservices database is filled
-    # restored, but currently there are more values present, check if this is valid
     assert len(meas_duplicated) == 3024
     assert len(meas_clean) == len(measurements) == 1008
     
@@ -325,9 +323,9 @@ def test_toolargerequest(location):
     """
     deliberately send a request that is too large to get the error message
     Foutmelding: 'Het maximaal aantal waarnemingen (160000) is overschreven. Beperk uw request.'
+    This was very slow in the old WaterWebservices (and was therefore disabled),
+    but runs quickly in the new WaterWebservices so we can enable this.
     """
-    # TODO: we commented this testcase since the old WaterWebservices was very slow in checking this.
-
     start_date = dt.datetime(2015, 1, 1)
     end_date = dt.datetime(2020, 1, 1)
     with pytest.raises(IOError) as e:
