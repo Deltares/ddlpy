@@ -174,14 +174,13 @@ def test_measurements_available(location):
 
 
 def test_measurements_amount(location):
-    # TODO: revert expected values when database is extended
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 5)
     data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
-    assert data_amount_dag.shape[0] > 10
+    assert data_amount_dag.shape[0] > 50
     assert data_amount_dag.index.str.len()[0] == 10
     data_amount_maand = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Maand")
-    assert data_amount_maand.shape[0] == 2
+    assert data_amount_maand.shape[0] == 4
     assert data_amount_maand.index.str.len()[0] == 7
     data_amount_jaar = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Jaar")
     assert data_amount_jaar.shape[0] == 1
