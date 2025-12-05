@@ -30,9 +30,7 @@ def test_collect_catalogue(collect_catalogue_resp):
 @pytest.fixture
 def collect_observations_resp(endpoints):
     endpoint = endpoints['collect_observations']
-    # TODO: temporary overwrite of request because of limited testdataset
     request = endpoint['request']
-    request['Locatie']['Code'] = "ameland.nes"
     resp = requests.post(endpoint['url'], json=request)
     return resp
 
@@ -43,10 +41,7 @@ def test_collect_observations(collect_observations_resp):
 @pytest.fixture
 def collect_latest_observations_resp(endpoints):
     endpoint = endpoints['collect_latest_observations']
-    # TODO: temporary overwrite of request because of limited testdataset
     request = endpoint['request']
-    request['LocatieLijst'][0]['Code'] = "ameland.nes"
-    request['AquoPlusWaarnemingMetadataLijst'][0]['AquoMetadata']['Grootheid'] = "WATHTE"
     resp = requests.post(endpoint['url'], json=request)
     return resp
 
