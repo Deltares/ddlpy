@@ -1,7 +1,7 @@
 {
   "collect_catalogue": {
     "name": "OphalenCatalogus",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/METADATASERVICES/OphalenCatalogus",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/METADATASERVICES/OphalenCatalogus",
     "type": "POST",
     "request": {
       "CatalogusFilter": {
@@ -17,7 +17,7 @@
   },
   "collect_observations": {
     "name": "OphalenWaarnemingen",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
@@ -45,7 +45,7 @@
   },
   "collect_latest_observations": {
     "name": "OphalenLaatsteWaarnemingen",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/ONLINEWAARNEMINGENSERVICES/OphalenLaatsteWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenLaatsteWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals.",
     "request": {
@@ -73,7 +73,7 @@
   },
   "check_observations_available": {
     "name": "CheckWaarnemingenAanwezig",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/ONLINEWAARNEMINGENSERVICES/CheckWaarnemingenAanwezig",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/CheckWaarnemingenAanwezig",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
@@ -100,7 +100,7 @@
   },
   "collect_number_of_observations": {
     "name": "OphalenAantalWaarnemingen",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/ONLINEWAARNEMINGENSERVICES/OphalenAantalWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenAantalWaarnemingen",
     "type": "POST",
     "request": {
       "AquoMetadataLijst": [
@@ -123,7 +123,7 @@
   },
   "request_bulk_observations": {
     "name": "AanvragenBulkWaarnemingen",
-    "url": "https://waterwebservices.beta.rijkswaterstaat.nl/test/BULKWAARNEMINGSERVICES/AanvragenBulkWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/BULKWAARNEMINGSERVICES/AanvragenBulkWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
