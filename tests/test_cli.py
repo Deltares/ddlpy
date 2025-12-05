@@ -38,9 +38,10 @@ def test_command_line_interface(tmp_path):
     measurements_command = 'measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
-    file_meas = "hoekvanholland_astronomisch_OW_cm_WATHTE_GETETBRKD2_NAP_NVT.csv"
+    file_meas = "hoekvanholland_astronomisch_OW_cm_WATHTE__NAP_NVT.csv"
     assert os.path.exists(file_meas)
+    file_ext = "hoekvanholland_astronomisch_OW_cm_WATHTE_GETETBRKD2_NAP_NVT.csv"
+    assert os.path.exists(file_ext)
     
-    # TODO: resulting file does not contain normal waterlevels, only extremes. Probably fixed when database is being filled
-    # TODO: maybe assert for multiple files being downloaded, or do more subsetting
-    # TODO: subsetting `--groepering-code ""` results in an empty locations.json, this is because it is being parsed as '""', which is not present in the columns
+    # TODO: this currently retrieves two files, one for measurement timeseries, one for extremes.
+    # TODO: subsetting `--groepering-code ""` (measurement timeseries) results in an empty locations.json, this is because it is being parsed as '""', which is not present in the columns
