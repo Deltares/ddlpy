@@ -9,7 +9,6 @@ import ddlpy
 import dateutil
 import numpy as np
 
-
 DTYPES_NONSTRING = {
     'Locatie_MessageID': np.int64,
     'AquoMetadata_MessageID': np.int64,
@@ -29,12 +28,12 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_procestype = locations['ProcesType'] == 'meting'
     bool_groepering = locations['Groepering.Code'] == ''
-    location = locations[bool_grootheid & bool_procestype & bool_groepering].loc['denhelder.marsdiep']
+    bool_procestype = locations['ProcesType'] == 'meting'
+    location = locations[bool_grootheid & bool_groepering & bool_procestype].loc['denhelder.marsdiep']
     return location
 
-    
+
 @pytest.fixture(scope="session")
 def measurements(location):
     """measurements for a location """
@@ -142,7 +141,6 @@ def test_measurements(measurements):
         assert len(column_unique_dtypes) == 1
     
     # check whether the filtering was passed properly
-    # TODO: this is not the case since "astronomisch" is also included
     assert set(measurements["ProcesType"].unique()) == {'meting'}
 
 
@@ -373,8 +371,11 @@ def test_simplify_dataframe(measurements):
     assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 46
-    assert len(meas_simple.columns) == 2
+    # TODO: the below should be 46 and 2, but there are still RIKZ_WAT instances in
+    # OpdrachtgevendeInstantie column, which is different from RIKZMON_WAT
+    # this also probably partly causes the 96 duplicated timestamps
+    assert len(meas_simple.attrs) == 45
+    assert len(meas_simple.columns) == 3
 
 
 def test_dataframe_to_xarray(measurements):
@@ -383,6 +384,7 @@ def test_dataframe_to_xarray(measurements):
                         "WaarnemingMetadata.Referentievlak",
                         "BemonsteringsSoort.Code", 
                         "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
+                        'Meetwaarde.Waarde_Numeriek',
                         ]
     ds_clean = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
     
@@ -390,17 +392,19 @@ def test_dataframe_to_xarray(measurements):
     assert "MeetApparaat.Code" in ds_clean.data_vars
     assert len(ds_clean["MeetApparaat.Code"]) > 0
     
-    # TODO: temporary commenting OpdrachtgevendeInstantie checks, since this was not constant before
-    # and thus not dropped. With this very limited dataset it is constant, so it is dropped.
-    # could be also with complete dataset, but in that case pick another non-constant variable 
-    # to test that only constant variables are dropped.
     for varname in drop_if_constant:
-        # if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
-        #     continue
+        # OpdrachtgevendeInstantie is not constant (contains RIKZMON_WAT vs RIKZ_WAT)
+        # remove this when the dataset is cleaned and therefore only contains RIKZMON_WAT
+        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
+            continue
+        # Meetwaarde.Waarde_Numeriek will never be constant so can be used to check if
+        # indeed only constant variables are dropped
+        if varname == "Meetwaarde.Waarde_Numeriek":
+            continue
         assert varname not in ds_clean.data_vars
         assert varname in ds_clean.attrs.keys()
-    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
-    # assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
     
     data_vars_list = ['WaarnemingMetadata.Statuswaarde',
      'WaarnemingMetadata.Kwaliteitswaardecode',
