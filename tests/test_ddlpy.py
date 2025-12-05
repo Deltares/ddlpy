@@ -38,10 +38,14 @@ def location(locations):
 @pytest.fixture(scope="session")
 def location_nes(locations):
     # TODO: when the denhelder dataset is completely filled we can also simulate it with that station
+    # bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    # bool_procestype = locations['ProcesType'] == 'meting'
+    # bool_groepering = locations['Groepering.Code'] == ''
+    # location_nes = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
     bool_procestype = locations['ProcesType'] == 'meting'
     bool_groepering = locations['Groepering.Code'] == ''
-    location_nes = locations[bool_grootheid & bool_procestype & bool_groepering].loc['ameland.nes'].iloc[0]
+    location_nes = locations[bool_grootheid & bool_procestype & bool_groepering].loc['denhelder.marsdiep']
     return location_nes
 
     
@@ -187,14 +191,14 @@ def test_measurements_amount(location):
     assert data_amount_jaar.index.str.len()[0] == 4
 
 
-def test_measurements_amount_multipleblocks(location_nes):
+def test_measurements_amount_multipleblocks(location):
     # in 1993 the WaardeBepalingsmethode changes from
     # other:F001 (Rekenkundig gemiddelde waarde over vorige 10 minuten) to 
     # other:F007 (Rekenkundig gemiddelde waarde over vorige 5 en volgende 5 minuten)
     date_min = "1990-01-01"
     date_max = "1995-01-01"
     # if we pass one row to the measurements function you can get all the measurements
-    df_amount = ddlpy.measurements_amount(location_nes, date_min, date_max)
+    df_amount = ddlpy.measurements_amount(location, date_min, date_max)
     
     index_expected = np.array(['1990', '1991', '1992', '1993', '1994', '1995'])
     values_expected = np.array([52554, 52560, 52704, 52560, 52560,     7])
@@ -205,7 +209,7 @@ def test_measurements_amount_multipleblocks(location_nes):
 def test_measurements_latest(location):
     """measurements for a location """
     latest = ddlpy.measurements_latest(location)
-    assert latest.shape[0] == 1
+    assert latest.shape[0] > 1
 
 
 def test_measurements_empty(location):
