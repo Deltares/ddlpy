@@ -4,6 +4,7 @@ History
 
 UNRELEASED
 ----------
+* more robust catching of HTTP errors in https://github.com/Deltares/ddlpy/pull/144
 
 0.7.0 (2025-06-12)
 ------------------
