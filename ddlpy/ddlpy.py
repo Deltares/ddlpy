@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
+    # Raise HTTPError if one occurred, for instance 500 internal server error
+    resp.raise_for_status()
     
     if resp.status_code==204:
         # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
