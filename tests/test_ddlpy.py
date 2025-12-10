@@ -373,6 +373,7 @@ def test_simplify_dataframe(measurements):
     # TODO: the below should be 46 and 2, but there are still RIKZ_WAT instances in
     # OpdrachtgevendeInstantie column, which is different from RIKZMON_WAT
     # this also probably partly causes the 96 duplicated timestamps
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/16
     assert len(meas_simple.attrs) == 45
     assert len(meas_simple.columns) == 3
 
