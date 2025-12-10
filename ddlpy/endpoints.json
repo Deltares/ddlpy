@@ -1,7 +1,7 @@
 {
   "collect_catalogue": {
     "name": "OphalenCatalogus",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/METADATASERVICES_DBO/OphalenCatalogus",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/METADATASERVICES/OphalenCatalogus",
     "type": "POST",
     "request": {
       "CatalogusFilter": {
@@ -10,20 +10,19 @@
         "Hoedanigheden": true,
         "Groeperingen": true,
         "Parameters": true,
+        "ProcesTypes": true,
         "Compartimenten": true
       }
     }
   },
   "collect_observations": {
     "name": "OphalenWaarnemingen",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
       "Locatie": {
-        "X": 761899.770959577,
-        "Y": 5915790.48491405,
-        "Code": "DELFZL"
+        "Code": "delfzijl"
       },
       "AquoPlusWaarnemingMetadata": {
         "AquoMetadata": {
@@ -46,7 +45,7 @@
   },
   "collect_latest_observations": {
     "name": "OphalenLaatsteWaarnemingen",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenLaatsteWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenLaatsteWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals.",
     "request": {
@@ -67,16 +66,14 @@
       ],
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ]
     }
   },
   "check_observations_available": {
     "name": "CheckWaarnemingenAanwezig",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/CheckWaarnemingenAanwezig",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/CheckWaarnemingenAanwezig",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
@@ -92,9 +89,7 @@
       ],
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ],
       "Periode": {
@@ -105,7 +100,7 @@
   },
   "collect_number_of_observations": {
     "name": "OphalenAantalWaarnemingen",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenAantalWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenAantalWaarnemingen",
     "type": "POST",
     "request": {
       "AquoMetadataLijst": [
@@ -117,9 +112,7 @@
       "Groeperingsperiode": "Week",
       "LocatieLijst": [
         {
-          "X": 518882.333320247,
-          "Y": 5760829.11729589,
-          "Code": "EURPFM"
+          "Code": "europlatform"
         }
       ],
       "Periode": {
@@ -130,7 +123,7 @@
   },
   "request_bulk_observations": {
     "name": "AanvragenBulkWaarnemingen",
-    "url": "https://waterwebservices.rijkswaterstaat.nl/BULKWAARNEMINGSERVICES_DBO/AanvragenBulkWaarnemingen",
+    "url": "https://ddapi20-waterwebservices.rijkswaterstaat.nl/BULKWAARNEMINGSERVICES/AanvragenBulkWaarnemingen",
     "type": "POST",
     "_comment": "Make sure you specify the request location to the exact number of decimals and the time in the exact format (samen number of zeros).",
     "request": {
@@ -172,19 +165,13 @@
         ],
         "LocatieLijst": [
           {
-            "X": 742469.913149676,
-            "Y": 5940708.14824459,
-            "Code": "HUIBGOT"
+            "Code": "huibertgat.oost"
           },
           {
-            "X": 595875.376191307,
-            "Y": 5790952.82210343,
-            "Code": "NOORDWK2"
+            "Code": "noordwijk.2kmuitdekust.flachsee"
           },
           {
-            "X": 571670.054611366,
-            "Y": 5822651.05560318,
-            "Code": "IJMDMNTSPS"
+            "Code": "ijmuiden.munitiestort.1"
           }
         ],
         "Periode": {

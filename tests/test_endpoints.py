@@ -13,7 +13,8 @@ def endpoints():
     """
     Get the endpoints from the api
     """
-    return ddlpy.ddlpy.ENDPOINTS
+    endpoints = ddlpy.ddlpy.ENDPOINTS
+    return endpoints
 
 
 @pytest.fixture
@@ -29,7 +30,8 @@ def test_collect_catalogue(collect_catalogue_resp):
 @pytest.fixture
 def collect_observations_resp(endpoints):
     endpoint = endpoints['collect_observations']
-    resp = requests.post(endpoint['url'], json=endpoint['request'])
+    request = endpoint['request']
+    resp = requests.post(endpoint['url'], json=request)
     return resp
 
 def test_collect_observations(collect_observations_resp):
@@ -39,7 +41,8 @@ def test_collect_observations(collect_observations_resp):
 @pytest.fixture
 def collect_latest_observations_resp(endpoints):
     endpoint = endpoints['collect_latest_observations']
-    resp = requests.post(endpoint['url'], json=endpoint['request'])
+    request = endpoint['request']
+    resp = requests.post(endpoint['url'], json=request)
     return resp
 
 def test_collect_latest_observations(collect_latest_observations_resp):
@@ -66,11 +69,14 @@ def test_collect_number_of_observations(collect_number_of_observations_resp):
     assert collect_number_of_observations_resp.status_code == 200
 
 
-@pytest.fixture
-def request_bulk_observations_resp(endpoints):
-    endpoint = endpoints['request_bulk_observations']
-    resp = requests.post(endpoint['url'], json=endpoint['request'])
-    return resp
+# TODO: AanvragenBulkWaarnemingen not present in new WaterWebservices
+# https://github.com/Deltares/ddlpy/issues/145
+# https://github.com/Rijkswaterstaat/WaterWebservices/issues/15
+# @pytest.fixture
+# def request_bulk_observations_resp(endpoints):
+#     endpoint = endpoints['request_bulk_observations']
+#     resp = requests.post(endpoint['url'], json=endpoint['request'])
+#     return resp
 
-def test_request_bulk_observations(request_bulk_observations_resp):
-    assert request_bulk_observations_resp.status_code == 200
+# def test_request_bulk_observations(request_bulk_observations_resp):
+#     assert request_bulk_observations_resp.status_code == 200

@@ -8,13 +8,24 @@ import pytest
 import ddlpy
 import dateutil
 import numpy as np
+from ddlpy.ddlpy import _send_post_request, NoDataError
 
 DTYPES_NONSTRING = {
     'Locatie_MessageID': np.int64,
     'AquoMetadata_MessageID': np.int64,
     'Meetwaarde.Waarde_Numeriek': np.float64,
-    'X': np.float64,
-    'Y': np.float64}
+    'Lon': np.float64,
+    'Lat': np.float64}
+
+
+@pytest.fixture(scope="session")
+def endpoints():
+    """
+    Get the endpoints from the api
+    """
+    endpoints = ddlpy.ddlpy.ENDPOINTS
+    return endpoints
+
 
 @pytest.fixture(scope="session")
 def locations():
@@ -27,8 +38,9 @@ def locations():
 def location(locations):
     """return sample location"""
     bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
-    bool_groepering = locations['Groepering.Code'] == 'NVT'
-    location = locations[bool_grootheid & bool_groepering].loc['DENHDR']
+    bool_groepering = locations['Groepering.Code'] == ''
+    bool_procestype = locations['ProcesType'] == 'meting'
+    location = locations[bool_grootheid & bool_groepering & bool_procestype].loc['denhelder.marsdiep']
     return location
 
 
@@ -41,29 +53,166 @@ def measurements(location):
     return measurements
 
 
-def test_locations(locations):
-    # the number of columns depend on the catalog filter in endpoints.json
-    assert locations.shape[1] == 18
-    # the number of rows is the number of stations, so will change over time
-    assert locations.shape[0] > 1
+def test_send_post_request_errors_wrongapi():
+    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenCatalogus"
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=None)
+    assert "404 Not Found" in str(e.value)
+    assert "No endpoint POST /ONLINEWAARNEMINGENSERVICES/OphalenCatalogus." in str(e.value)
 
+
+def test_send_post_request_errors_ophalencatalogus(endpoints):
+    endpoint = endpoints['collect_catalogue']
+    url = endpoint['url']
+
+    request_empty = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty)
+    assert '400 Bad Request' in str(e.value)
+    assert "Het ophalen van de catalogus is mislukt, geen catalogusFilter opgegeven" in str(e.value)
+
+    # TODO: this should result in an error by ddapi
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/18
+    request_incorrectkeys = {'CatalogusFilter': {
+        # 'Eenheden': True, 'Grootheden': True, 'Hoedanigheden': True,
+        # 'Groeperingen': True, 'Parameters': True, 'Compartimenten': True,
+        'ProcesTypes': True, 'BioTaxonType': True,
+        'ProcesType': True, 'BioTaxonTypes': True, # both incorrect in new ddapi
+        }}
+    result = _send_post_request(url, request=request_incorrectkeys)
+    assert result['Succesvol']
+    assert result['AquoMetadataLijst'] == []
+    assert result['AquoMetadataLocatieLijst'] == []
+    assert result['LocatieLijst'] == []
+    assert result['StatuswaardeLijst'] == ['Ongecontroleerd', 'Gecontroleerd', 'Definitief']
+
+
+def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
+    endpoint = endpoints['collect_observations']
+    url = endpoint['url']
+    request_valid = endpoint["request"]
+
+    request_empty = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty)
+    assert '400 Bad Request' in str(e.value)
+    assert "Er moet een periode worden meegegeven als: Periode" in str(e.value)
+    assert "Er moet een locatie worden meegegeven als: Locatie" in str(e.value)
+    assert "Er moet een AquoPlusObservationMetadata worden meegegeven onder: AquoPlusWaarnemingMetadata" in str(e.value)
+
+    request_empty_aquoplus = dict(request_valid)
+    request_empty_aquoplus["AquoPlusWaarnemingMetadata"] = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty_aquoplus)
+    assert '400 Bad Request: {"aquoPlusObservationMetadata.aquoMetadata":' in str(e.value)
+    
+    request_invalid_locatie = dict(request_valid)
+    request_invalid_locatie["Locatie"] = {"Code": "nonexistent"}
+    with pytest.raises(NoDataError) as e:
+        _send_post_request(url, request=request_invalid_locatie)
+    assert '204 No Content:' in str(e.value)
+
+    request_invalid_periode_order = dict(request_valid)
+    request_invalid_periode_order["Periode"] = {
+        "Begindatumtijd": "2020-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_order)
+    assert '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn onder: Periode."}' in str(e.value)
+
+    # TODO: this error is not properly handled by ddapi20
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/19
+    request_invalid_periode_format = dict(request_valid)
+    request_invalid_periode_format["Periode"] = {
+        "Begindatumtijd": "2015-01-01T00:00:00.000",
+        "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_format)
+    assert '500 Internal Server Error: Onverwachte fout opgetreden' in str(e.value)
+
+    request_invalid_periode_wrongkeys = dict(request_valid)
+    request_invalid_periode_wrongkeys["Periode"] = {
+        "Begindatum": "2015-01-01T00:00:00.000+00:00",
+        "Einddatum": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_wrongkeys)
+    assert '400 Bad Request: {"period.endDateTime":' in str(e.value)
+
+    # TODO: succesful=false is duplicate of resp.ok=False
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/14
+    request_toolarge = dict(request_valid)
+    request_toolarge["Periode"] = {
+        "Begindatumtijd": "2015-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2020-01-01T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_toolarge)
+    assert '400 Bad Request:' in str(e.value)
+    assert '"Succesvol":false' in str(e.value)
+    assert '"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request."' in str(e.value)
+    assert '"WaarnemingenLijst":[]' in str(e.value)
+
+    request_nodata = dict(request_valid)
+    request_nodata["Periode"] = {
+        "Begindatumtijd": "2180-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2180-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(NoDataError) as e:
+        _send_post_request(url, request=request_nodata)
+    assert '204 No Content:' in str(e.value)
+
+
+def test_nodataerror(location):
+    """
+    Test whether a request that returns no data is indeed properly catched also when not
+    calling _send_post_request() directly. The response for measurements_slice() is
+    identical. The response for measurements_amount() is different because resp.ok=True
+    and returns an empty list that is later catched in measurements_amount().
+    """
+    start_date = dt.datetime(2180, 1, 1)
+    end_date = dt.datetime(2180, 4, 1)
+    # same response as testing _send_post_request
+    with pytest.raises(NoDataError) as e:
+        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
+        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+    assert "204 No Content: " in str(e.value)
+    # different response than testing _send_post_request, since empty result will also raise NoDataError
+    with pytest.raises(NoDataError) as e:
+        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
+    assert "no measurements available returned" in str(e.value)
+
+
+def test_locations(locations):
     # check if index is station code
     assert locations.index.name == "Code"
     assert isinstance(locations.index, pd.Index)
     assert isinstance(locations.index[0], str)
 
     # check presence of columns
-    expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
-                        'Parameter_Wat_Omschrijving', 
-                        'Compartiment.Code', 'Compartiment.Omschrijving', 
-                        'Eenheid.Code', 'Eenheid.Omschrijving', 
-                        'Grootheid.Code', 'Grootheid.Omschrijving', 
-                        'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving', 
-                        'Parameter.Code', 'Parameter.Omschrijving', 
-                        'Groepering.Code', 'Groepering.Omschrijving']
+    expected_columns = [
+        'Locatie_MessageID',
+        'Lat', 'Lon', 'Coordinatenstelsel',
+        'Naam', 'Omschrijving',
+        'Parameter_Wat_Omschrijving',
+        'ProcesType',
+        'Compartiment.Code', 'Compartiment.Omschrijving',
+        'Grootheid.Code', 'Grootheid.Omschrijving', 
+        'Eenheid.Code', 'Eenheid.Omschrijving',
+        'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving',
+        'Parameter.Code', 'Parameter.Omschrijving',
+        'Groepering.Code', 'Groepering.Omschrijving',
+        ]
     for colname in expected_columns:
         assert colname in locations.columns
-    
+
+    # the number of columns depend on the catalog filter in endpoints.json
+    assert locations.shape[1] == len(expected_columns)
+    # the number of rows is the number of stations, so will change over time
+    assert locations.shape[0] > 1
+
     # check whether first values of all columns have the expected dtype
     for colname in locations.columns:
         if colname in DTYPES_NONSTRING.keys():
@@ -71,12 +220,11 @@ def test_locations(locations):
         else:
             expected_dtype = str
         assert isinstance(locations[colname].iloc[0], expected_dtype)
-    
+
     # check whether all dtypes are the same for entire column
     for colname in locations.columns:
         column_unique_dtypes = locations[colname].apply(type).drop_duplicates()
         assert len(column_unique_dtypes) == 1
-
 
 
 def test_locations_extended():
@@ -85,25 +233,42 @@ def test_locations_extended():
                       'Typeringen','WaardeBepalingsmethoden','Parameters']
     locations_extended = ddlpy.locations(catalog_filter=catalog_filter)
     # the number of columns depend on the provided catalog_filter
-    assert locations_extended.shape[1] == 24
+    assert locations_extended.shape[1] == 25
     # the number of rows is the number of stations, so will change over time
     assert locations_extended.shape[0] > 1
 
 
 def test_measurements(measurements):
-    assert measurements.shape[0] > 1
-    
     # check if index is time and check dtype
     assert measurements.index.name == "time"
     assert isinstance(measurements.index, pd.DatetimeIndex)
     assert isinstance(measurements.index[0], pd.Timestamp)
-    
-    # check if columns are present that are transfered from the locations dataframe
-    expected_columns = ['Coordinatenstelsel', 'X', 'Y', 'Naam', 
-                        "Parameter_Wat_Omschrijving", "Code"
-                        ]
+
+    # check presence of columns, skipping all but one *.Omschrijving and *.Code columns
+    expected_columns = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Bemonsteringshoogte',
+        'WaarnemingMetadata.Referentievlak',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Parameter_Wat_Omschrijving',
+        'ProcesType',
+        'Meetwaarde.Waarde_Alfanumeriek',
+        'Meetwaarde.Waarde_Numeriek',
+        'Code',
+        'Coordinatenstelsel',
+        'Naam',
+        'Lon',
+        'Lat',
+        'Grootheid.Code',
+        'Grootheid.Omschrijving',
+        ]
     for colname in expected_columns:
         assert colname in measurements.columns
+
+    # check the shape of the dataframe
+    assert measurements.shape[1] == len(expected_columns) + 32
+    assert measurements.shape[0] > 1
 
     # check whether first values of all columns have the expected dtype
     for colname in measurements.columns:
@@ -112,11 +277,14 @@ def test_measurements(measurements):
         else:
             expected_dtype = str
         assert isinstance(measurements[colname].iloc[0], expected_dtype)
-    
+
     # check whether all dtypes are the same for entire column
     for colname in measurements.columns:
         column_unique_dtypes = measurements[colname].apply(type).drop_duplicates()
         assert len(column_unique_dtypes) == 1
+    
+    # check whether the filtering was passed properly
+    assert set(measurements["ProcesType"].unique()) == {'meting'}
 
 
 def test_measurements_freq_yearly(location, measurements):
@@ -186,8 +354,9 @@ def test_measurements_empty(location):
 def test_measurements_typerror(locations):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as e:
         _ = ddlpy.measurements(locations, start_date=start_date, end_date=end_date)
+    assert "The provided location is a pandas.DataFrame, but should be a pandas.Series" in str(e.value)
 
 
 def test_measurements_noindex(location):
@@ -278,36 +447,6 @@ def test_measurements_timezone_behaviour(location):
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [138,144,7])
 
 
-def test_nodataerror(location):
-    """
-    Test whether a request that returns no data is indeed properly catched
-    This is important since it is derived from the returned error message "Geen gegevens gevonden!"
-    In case this error message changes in the future, 
-    this test will fail and the ddlpy code needs to be updated accordingly
-    """
-    start_date = dt.datetime(2180, 1, 1)
-    end_date = dt.datetime(2180, 4, 1)
-    with pytest.raises(ddlpy.ddlpy.NoDataError):
-        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
-        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
-    with pytest.raises(ddlpy.ddlpy.NoDataError):
-        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
-
-
-# TODO: this testcase is very slow and does not add much value, uncomment it when the ddl is faster
-# def test_unsuccessfulrequesterror(location):
-#     """
-#     deliberately send a request that is too large to get the error message
-#     Foutmelding: 'Het max aantal waarnemingen (157681) is overschreven, beperk uw request.'
-#     which is raised as a UnsuccessfulRequestError
-#     """
-#     start_date = dt.datetime(2015, 1, 1)
-#     end_date = dt.datetime(2020, 1, 1)
-#     with pytest.raises(ddlpy.ddlpy.UnsuccessfulRequestError):
-#         #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-#         _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
-
-
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]
 @pytest.mark.parametrize("datetype", datetype_list)
 def test_check_convert_dates(datetype):
@@ -340,20 +479,24 @@ def test_check_convert_wrongorder():
 
 
 def test_simplify_dataframe(measurements):
-    assert len(measurements.columns) == 53
+    assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    assert len(meas_simple.attrs) == 50
+    # TODO: the below should be 46 and 2, but there are still RIKZ_WAT instances in
+    # OpdrachtgevendeInstantie column, which is different from RIKZMON_WAT
+    # this also probably partly causes the 96 duplicated timestamps
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/16
+    assert len(meas_simple.attrs) == 45
     assert len(meas_simple.columns) == 3
 
 
 def test_dataframe_to_xarray(measurements):
-    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantieLijst",
-                        "WaarnemingMetadata.BemonsteringshoogteLijst",
-                        "WaarnemingMetadata.ReferentievlakLijst",
-                        "AquoMetadata_MessageID", 
+    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantie",
+                        "WaarnemingMetadata.Bemonsteringshoogte",
+                        "WaarnemingMetadata.Referentievlak",
                         "BemonsteringsSoort.Code", 
                         "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
+                        'Meetwaarde.Waarde_Numeriek',
                         ]
     ds_clean = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
     
@@ -362,22 +505,28 @@ def test_dataframe_to_xarray(measurements):
     assert len(ds_clean["MeetApparaat.Code"]) > 0
     
     for varname in drop_if_constant:
-        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantieLijst":
+        # OpdrachtgevendeInstantie is not constant (contains RIKZMON_WAT vs RIKZ_WAT)
+        # remove this when the dataset is cleaned and therefore only contains RIKZMON_WAT
+        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
+            continue
+        # Meetwaarde.Waarde_Numeriek will never be constant so can be used to check if
+        # indeed only constant variables are dropped
+        if varname == "Meetwaarde.Waarde_Numeriek":
             continue
         assert varname not in ds_clean.data_vars
         assert varname in ds_clean.attrs.keys()
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" in ds_clean.data_vars
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantieLijst" not in ds_clean.attrs.keys()
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
+    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
     
-    data_vars_list = ['WaarnemingMetadata.StatuswaardeLijst',
-     'WaarnemingMetadata.KwaliteitswaardecodeLijst',
+    data_vars_list = ['WaarnemingMetadata.Statuswaarde',
+     'WaarnemingMetadata.Kwaliteitswaardecode',
      'MeetApparaat.Code',
-     'WaardeBepalingsmethode.Code',
+     'WaardeBepalingsMethode.Code',
      'Meetwaarde.Waarde_Numeriek']
     for varname in data_vars_list:
         assert varname in ds_clean.data_vars
     
-    assert "X" in ds_clean.attrs.keys()
+    assert "Lon" in ds_clean.attrs.keys()
     
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]

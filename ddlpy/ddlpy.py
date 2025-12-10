@@ -16,6 +16,7 @@ from .utils import date_series
 
 BASE_URL = "https://waterwebservices.rijkswaterstaat.nl/"
 ENDPOINTS_PATH = pathlib.Path(__file__).with_name("endpoints.json")
+logger = logging.getLogger(__name__)
 
 with ENDPOINTS_PATH.open() as f:
     ENDPOINTS = json.load(f)
@@ -25,36 +26,21 @@ class NoDataError(ValueError):
     pass
 
 
-class UnsuccessfulRequestError(ValueError):
-    pass
-
-
-# Web Feature Service
-# Web Mapping Service
-logger = logging.getLogger(__name__)
-
-
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
+    
     if not resp.ok:
-        raise IOError("Request failed: {}".format(resp.text))
+        # in case of for instance
+        # resp.status_code: 400, resp.reason: Bad Request, resp.text: {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
+        # resp.status_code: 500, resp.reason: Internal Server Error
+        raise IOError(f"{resp.status_code} {resp.reason}: {resp.text}")
+    
+    if resp.status_code==204:
+        # "204 No Content" is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+        raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
     
     result = resp.json()
-    if not result['Succesvol']:
-        logger.debug('Response result is unsuccessful: {}'.format(result))
-        error_message = result.get('Foutmelding', 'No error returned')
-        if error_message == "Geen gegevens gevonden!":
-            # Foutmelding: "Geen gegevens gevonden!"
-            # this is a valid response for periods where there is no data
-            # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
-            raise NoDataError(error_message)
-        else:
-            # Foutmelding: "Het max aantal waarnemingen (157681) is overschreven, beperk uw request."
-            # or any other possible error message are raised here
-            raise UnsuccessfulRequestError(error_message)
-    
-    # continue if request was successful
     return result
 
 
@@ -139,13 +125,14 @@ def _get_request_dicts(location):
     # generate aquometadata dict from location "*.Code" values
     key_list = [x.replace(".Code","") for x in location.index if x.endswith(".Code")]
     aquometadata_dict = {key:{"Code":location[f"{key}.Code"]} for key in key_list}
+    # additional code required for ProcesType since this does not adhere to the
+    # Code/Omschrijving convention.
+    if "ProcesType" in location.index:
+        aquometadata_dict["ProcesType"] = location["ProcesType"]
     
     # generate location dict from relevant values
     locatie_dict = {
-        "X": location["X"],
-        "Y": location["Y"],
         # assert code is used as index
-        # TODO: use  a numpy  compatible json encoder in requests
         "Code": location.get("Code", location.name),
     }
     
@@ -261,7 +248,10 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
         df = df.set_index("Groeperingsperiode")
         df = df[["AantalMetingen"]]
         df_list.append(df)
-        
+    
+    if len(df_list) == 0:
+        raise NoDataError("no measurements available returned")
+    
     # concatenate and sum duplicated index
     df_amount = pd.concat(df_list).sort_index()
     df_amount = df_amount.groupby(df_amount.index).sum()
@@ -279,8 +269,7 @@ def _combine_waarnemingenlijst(result, location):
             new_row = {}
             for key, value in row["WaarnemingMetadata"].items():
                 new_key = "WaarnemingMetadata." + key
-                new_val = value[0] if len(value) == 1 else value
-                new_row[new_key] = new_val
+                new_row[new_key] = value
 
             # add remaining data
             for key, val in row.items():
@@ -289,7 +278,7 @@ def _combine_waarnemingenlijst(result, location):
                 new_row[key] = val
 
             # add metadata
-            for key, val in list(waarneming["AquoMetadata"].items()):
+            for key, val in waarneming["AquoMetadata"].items():
                 if isinstance(val, dict) and "Code" in val and "Omschrijving" in val:
                     # some values have a code/omschrijving pair, flatten them
                     new_key = key + ".Code"
@@ -311,8 +300,8 @@ def _combine_waarnemingenlijst(result, location):
     for name in [
         "Coordinatenstelsel",
         "Naam",
-        "X",
-        "Y",
+        "Lon",
+        "Lat",
     ]:
         df[name] = location[name]
 
