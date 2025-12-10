@@ -42,7 +42,12 @@ def _send_post_request(url, request, timeout=None):
         # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
         raise NoDataError(resp.reason)
     
-    result = resp.json()
+    try:
+        result = resp.json()
+    except requests.JSONDecodeError:
+        # decoding fails for instance in case of a status_code 500 (internal server error)
+        resp.raise_for_status()
+    
     if not resp.ok:
         # bijv Foutmelding: "Het max aantal waarnemingen (160000) is overschreven. Beperk uw request."
         logger.debug('Response result is unsuccessful: {}'.format(result))
