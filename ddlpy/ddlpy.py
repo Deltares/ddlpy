@@ -45,7 +45,7 @@ def _send_post_request(url, request, timeout=None):
     try:
         result = resp.json()
     except requests.JSONDecodeError:
-        # decoding fails for instance in case of a status_code 500 (internal server error)
+        # decoding fails for instance in case of a status_code 500 (Internal Server Error)
         resp.raise_for_status()
     
     if not resp.ok:
