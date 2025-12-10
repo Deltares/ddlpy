@@ -37,9 +37,6 @@ logger = logging.getLogger(__name__)
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
-    # Raise HTTPError if one occurred, for instance 500 internal server error
-    resp.raise_for_status()
-    
     if not resp.ok:
         raise IOError("Request failed: {}".format(resp.text))
     
