@@ -45,4 +45,4 @@ def test_command_line_interface(tmp_path):
     
     # TODO: this currently retrieves two files, one for measurement timeseries, one for extremes.
     # TODO: subsetting `--groepering-code ""` (measurement timeseries) results in an empty locations.json, this is because it is being parsed as '""', which is not present in the columns
-    # https://github.com/Rijkswaterstaat/wm-ws-dl/issues/44
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/13 and https://github.com/Deltares/ddlpy/issues/146
