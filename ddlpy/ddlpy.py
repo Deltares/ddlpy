@@ -39,7 +39,7 @@ def _send_post_request(url, request, timeout=None):
     resp = requests.post(url, json=request, timeout=timeout)
 
     if resp.status_code==204:
-        # this error is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+        # "204 No Content" is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
         raise NoDataError(resp.reason)
     
     try:
