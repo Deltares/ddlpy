@@ -19,6 +19,15 @@ DTYPES_NONSTRING = {
 
 
 @pytest.fixture(scope="session")
+def endpoints():
+    """
+    Get the endpoints from the api
+    """
+    endpoints = ddlpy.ddlpy.ENDPOINTS
+    return endpoints
+
+
+@pytest.fixture(scope="session")
 def locations():
     """return all locations"""
     locations = ddlpy.locations()
@@ -52,15 +61,36 @@ def test_send_post_request_errors_wrongapi():
     assert "No endpoint POST /ONLINEWAARNEMINGENSERVICES/OphalenCatalogus." in str(e.value)
 
 
-def test_send_post_request_errors_ophalenwaarnemingen():
-    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen"
-    request_valid = {"AquoPlusWaarnemingMetadata": {
-        "AquoMetadata": {
-            "Compartiment": {"Code": "OW"}, "Grootheid": {"Code": "WATHTE"}, "Eenheid": {"Code": "cm"}, "Hoedanigheid": {"Code": "NAP"}, "Parameter": {"Code": "NVT"}, "Groepering": {"Code": ""}, "ProcesType": "meting"}
-        }, 
-        "Locatie": {"Code": "denhelder.marsdiep"}, 
-        "Periode": {"Begindatumtijd": "2015-01-01T00:00:00.000+00:00", "Einddatumtijd": "2015-01-02T00:00:00.000+00:00"},
-        }
+def test_send_post_request_errors_ophalencatalogus(endpoints):
+    endpoint = endpoints['collect_catalogue']
+    url = endpoint['url']
+
+    request_empty = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty)
+    assert '400 Bad Request' in str(e.value)
+    assert "Het ophalen van de catalogus is mislukt, geen catalogusFilter opgegeven" in str(e.value)
+
+    # TODO: this should result in an error by ddapi
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/18
+    request_incorrectkeys = {'CatalogusFilter': {
+        # 'Eenheden': True, 'Grootheden': True, 'Hoedanigheden': True,
+        # 'Groeperingen': True, 'Parameters': True, 'Compartimenten': True,
+        'ProcesTypes': True, 'BioTaxonType': True,
+        'ProcesType': True, 'BioTaxonTypes': True, # both incorrect in new ddapi
+        }}
+    result = _send_post_request(url, request=request_incorrectkeys)
+    assert result['Succesvol']
+    assert result['AquoMetadataLijst'] == []
+    assert result['AquoMetadataLocatieLijst'] == []
+    assert result['LocatieLijst'] == []
+    assert result['StatuswaardeLijst'] == ['Ongecontroleerd', 'Gecontroleerd', 'Definitief']
+
+
+def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
+    endpoint = endpoints['collect_observations']
+    url = endpoint['url']
+    request_valid = endpoint["request"]
 
     request_empty = {}
     with pytest.raises(IOError) as e:
@@ -110,29 +140,48 @@ def test_send_post_request_errors_ophalenwaarnemingen():
         _send_post_request(url, request=request_invalid_periode_wrongkeys)
     assert '400 Bad Request: {"period.endDateTime":' in str(e.value)
 
-
-def test_send_post_request_errors_ophalencatalogus():
-    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/METADATASERVICES/OphalenCatalogus"
-
-    request_empty = {}
+    # TODO: succesful=false is duplicate of resp.ok=False
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/14
+    request_toolarge = {k:v for k,v in request_valid.items()}
+    request_toolarge["Periode"] = {
+        "Begindatumtijd": "2015-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2020-01-01T00:00:00.000+00:00",
+        }
     with pytest.raises(IOError) as e:
-        _send_post_request(url, request=request_empty)
-    assert '400 Bad Request' in str(e.value)
-    assert "Het ophalen van de catalogus is mislukt, geen catalogusFilter opgegeven" in str(e.value)
+        _send_post_request(url, request=request_toolarge)
+    assert '400 Bad Request:' in str(e.value)
+    assert '"Succesvol":false' in str(e.value)
+    assert '"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request."' in str(e.value)
+    assert '"WaarnemingenLijst":[]' in str(e.value)
 
-    # TODO: this should result in an error by ddapi
-    request_incorrectkeys = {'CatalogusFilter': {
-        # 'Eenheden': True, 'Grootheden': True, 'Hoedanigheden': True,
-        # 'Groeperingen': True, 'Parameters': True, 'Compartimenten': True,
-        'ProcesTypes': True, 'BioTaxonType': True,
-        'ProcesType': True, 'BioTaxonTypes': True, # both incorrect in new ddapi
-        }}
-    result = _send_post_request(url, request=request_incorrectkeys)
-    assert result['Succesvol']
-    assert result['AquoMetadataLijst'] == []
-    assert result['AquoMetadataLocatieLijst'] == []
-    assert result['LocatieLijst'] == []
-    assert result['StatuswaardeLijst'] == ['Ongecontroleerd', 'Gecontroleerd', 'Definitief']
+    request_nodata = {k:v for k,v in request_valid.items()}
+    request_nodata["Periode"] = {
+        "Begindatumtijd": "2180-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2180-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(NoDataError) as e:
+        _send_post_request(url, request=request_nodata)
+    assert '204 No Content:' in str(e.value)
+
+
+def test_nodataerror(location):
+    """
+    Test whether a request that returns no data is indeed properly catched also when not
+    calling _send_post_request() directly. The response for measurements_slice() is
+    identical. The response for measurements_amount() is different because resp.ok=True
+    and returns an empty list that is later catched in measurements_amount().
+    """
+    start_date = dt.datetime(2180, 1, 1)
+    end_date = dt.datetime(2180, 4, 1)
+    # same response as testing _send_post_request
+    with pytest.raises(NoDataError) as e:
+        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
+        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
+    assert "204 No Content: " in str(e.value)
+    # different response than testing _send_post_request, since empty result will also raise NoDataError
+    with pytest.raises(NoDataError) as e:
+        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
+    assert "no measurements available returned" in str(e.value)
 
 
 def test_locations(locations):
@@ -304,8 +353,9 @@ def test_measurements_empty(location):
 def test_measurements_typerror(locations):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as e:
         _ = ddlpy.measurements(locations, start_date=start_date, end_date=end_date)
+    assert "The provided location is a pandas.DataFrame, but should be a pandas.Series" in str(e.value)
 
 
 def test_measurements_noindex(location):
@@ -394,37 +444,6 @@ def test_measurements_timezone_behaviour(location):
     data_amount_dag = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Dag")
     # when retrieving with tzone +00:00 we expect 7 values on 2015-01-03
     assert np.allclose(data_amount_dag["AantalMetingen"].values, [138,144,7])
-
-
-def test_nodataerror(location):
-    """
-    Test whether a request that returns no data is indeed properly catched
-    This is important since it is derived from the returned error message "Geen gegevens gevonden!"
-    In case this error message changes in the future, 
-    this test will fail and the ddlpy code needs to be updated accordingly
-    """
-    start_date = dt.datetime(2180, 1, 1)
-    end_date = dt.datetime(2180, 4, 1)
-    with pytest.raises(ddlpy.ddlpy.NoDataError):
-        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
-        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
-    with pytest.raises(ddlpy.ddlpy.NoDataError):
-        _ = ddlpy.ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date)
-
-
-def test_toolargerequest(location):
-    """
-    deliberately send a request that is too large to get the error message
-    Foutmelding: 'Het maximaal aantal waarnemingen (160000) is overschreven. Beperk uw request.'
-    This was very slow in the old WaterWebservices (and was therefore disabled),
-    but runs quickly in the new WaterWebservices so we can enable this.
-    """
-    start_date = dt.datetime(2015, 1, 1)
-    end_date = dt.datetime(2020, 1, 1)
-    with pytest.raises(IOError) as e:
-        #this is the same as ddlpy.measurements(location, start_date=start_date, end_date=end_date, freq=None)
-        _ = ddlpy.ddlpy._measurements_slice(location, start_date=start_date, end_date=end_date)
-    assert "Het maximaal aantal waarnemingen (160000) is overschreden." in str(e.value)
 
 
 datetype_list = ["string", "pd.Timestamp", "dt.datetime", "mixed"]

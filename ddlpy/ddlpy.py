@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
-
+    
     if not resp.ok:
         # in case of for instance
         # resp.status_code: 400, resp.reason: Bad Request, resp.text: {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
@@ -49,12 +49,6 @@ def _send_post_request(url, request, timeout=None):
         raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
     
     result = resp.json()
-    
-    if not resp.ok:
-        # bijv Foutmelding: "Het max aantal waarnemingen (160000) is overschreven. Beperk uw request."
-        logger.debug('Response result is unsuccessful: {}'.format(result))
-        error_message = result.get('Foutmelding', 'No error returned')
-        raise IOError("Request failed: {}".format(error_message))
     
     if not result['Succesvol']:
         # TODO: this is probably never reached anymore. Ask whether Succesvol can be removed from the response
