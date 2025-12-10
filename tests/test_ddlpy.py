@@ -122,6 +122,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn onder: Periode."}' in str(e.value)
 
     # TODO: this error is not properly handled by ddapi20
+    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/19
     request_invalid_periode_format = {k:v for k,v in request_valid.items()}
     request_invalid_periode_format["Periode"] = {
         "Begindatumtijd": "2015-01-01T00:00:00.000",
