@@ -146,7 +146,7 @@ def _get_request_dicts(location):
     # generate aquometadata dict from location "*.Code" values
     key_list = [x.replace(".Code","") for x in location.index if x.endswith(".Code")]
     aquometadata_dict = {key:{"Code":location[f"{key}.Code"]} for key in key_list}
-    # TODO: additional code required for ProcesType since this does not adhere to
+    # additional code required for ProcesType since this does not adhere to the
     # Code/Omschrijving convention.
     if "ProcesType" in location.index:
         aquometadata_dict["ProcesType"] = location["ProcesType"]
