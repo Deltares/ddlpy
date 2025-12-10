@@ -8,6 +8,7 @@ import pytest
 import ddlpy
 import dateutil
 import numpy as np
+from ddlpy.ddlpy import _send_post_request, NoDataError
 
 DTYPES_NONSTRING = {
     'Locatie_MessageID': np.int64,
@@ -41,6 +42,97 @@ def measurements(location):
     end_date = dt.datetime(1953, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
     return measurements
+
+
+def test_send_post_request_errors_wrongapi():
+    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenCatalogus"
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=None)
+    assert "404 Not Found" in str(e.value)
+    assert "No endpoint POST /ONLINEWAARNEMINGENSERVICES/OphalenCatalogus." in str(e.value)
+
+
+def test_send_post_request_errors_ophalenwaarnemingen():
+    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen"
+    request_valid = {"AquoPlusWaarnemingMetadata": {
+        "AquoMetadata": {
+            "Compartiment": {"Code": "OW"}, "Grootheid": {"Code": "WATHTE"}, "Eenheid": {"Code": "cm"}, "Hoedanigheid": {"Code": "NAP"}, "Parameter": {"Code": "NVT"}, "Groepering": {"Code": ""}, "ProcesType": "meting"}
+        }, 
+        "Locatie": {"Code": "denhelder.marsdiep"}, 
+        "Periode": {"Begindatumtijd": "2015-01-01T00:00:00.000+00:00", "Einddatumtijd": "2015-01-02T00:00:00.000+00:00"},
+        }
+
+    request_empty = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty)
+    assert '400 Bad Request' in str(e.value)
+    assert "Er moet een periode worden meegegeven als: Periode" in str(e.value)
+    assert "Er moet een locatie worden meegegeven als: Locatie" in str(e.value)
+    assert "Er moet een AquoPlusObservationMetadata worden meegegeven onder: AquoPlusWaarnemingMetadata" in str(e.value)
+
+    request_empty_aquoplus = {k:v for k,v in request_valid.items()}
+    request_empty_aquoplus["AquoPlusWaarnemingMetadata"] = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty_aquoplus)
+    assert '400 Bad Request: {"aquoPlusObservationMetadata.aquoMetadata":' in str(e.value)
+    
+    request_invalid_locatie = {k:v for k,v in request_valid.items()}
+    request_invalid_locatie["Locatie"] = {"Code": "nonexistent"}
+    with pytest.raises(NoDataError) as e:
+        _send_post_request(url, request=request_invalid_locatie)
+    assert '204 No Content:' in str(e.value)
+
+    request_invalid_periode_order = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_order["Periode"] = {
+        "Begindatumtijd": "2020-01-01T00:00:00.000+00:00",
+        "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_order)
+    assert '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn onder: Periode."}' in str(e.value)
+
+    # TODO: this error is not properly handled by ddapi20
+    request_invalid_periode_format = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_format["Periode"] = {
+        "Begindatumtijd": "2015-01-01T00:00:00.000",
+        "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_format)
+    assert '500 Internal Server Error: Onverwachte fout opgetreden' in str(e.value)
+
+    request_invalid_periode_wrongkeys = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_wrongkeys["Periode"] = {
+        "Begindatum": "2015-01-01T00:00:00.000+00:00",
+        "Einddatum": "2015-01-02T00:00:00.000+00:00",
+        }
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_invalid_periode_wrongkeys)
+    assert '400 Bad Request: {"period.endDateTime":' in str(e.value)
+
+
+def test_send_post_request_errors_ophalencatalogus():
+    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/METADATASERVICES/OphalenCatalogus"
+
+    request_empty = {}
+    with pytest.raises(IOError) as e:
+        _send_post_request(url, request=request_empty)
+    assert '400 Bad Request' in str(e.value)
+    assert "Het ophalen van de catalogus is mislukt, geen catalogusFilter opgegeven" in str(e.value)
+
+    # TODO: this should result in an error by ddapi
+    request_incorrectkeys = {'CatalogusFilter': {
+        # 'Eenheden': True, 'Grootheden': True, 'Hoedanigheden': True,
+        # 'Groeperingen': True, 'Parameters': True, 'Compartimenten': True,
+        'ProcesTypes': True, 'BioTaxonType': True,
+        'ProcesType': True, 'BioTaxonTypes': True, # both incorrect in new ddapi
+        }}
+    result = _send_post_request(url, request=request_incorrectkeys)
+    assert result['Succesvol']
+    assert result['AquoMetadataLijst'] == []
+    assert result['AquoMetadataLocatieLijst'] == []
+    assert result['LocatieLijst'] == []
+    assert result['StatuswaardeLijst'] == ['Ongecontroleerd', 'Gecontroleerd', 'Definitief']
 
 
 def test_locations(locations):

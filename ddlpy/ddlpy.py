@@ -38,15 +38,17 @@ def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
 
+    if not resp.ok:
+        # in case of for instance
+        # resp.status_code: 400, resp.reason: Bad Request, resp.text: {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
+        # resp.status_code: 500, resp.reason: Internal Server Error
+        raise IOError(f"{resp.status_code} {resp.reason}: {resp.text}")
+    
     if resp.status_code==204:
         # "204 No Content" is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
-        raise NoDataError(resp.reason)
+        raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
     
-    try:
-        result = resp.json()
-    except requests.JSONDecodeError:
-        # decoding fails for instance in case of a status_code 500 (Internal Server Error)
-        resp.raise_for_status()
+    result = resp.json()
     
     if not resp.ok:
         # bijv Foutmelding: "Het max aantal waarnemingen (160000) is overschreven. Beperk uw request."
