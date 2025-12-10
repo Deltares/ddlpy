@@ -51,9 +51,10 @@ def test_locations(locations):
 
     # check presence of columns
     expected_columns = [
-        'Locatie_MessageID', 'Lat', 'Lon', 'Coordinatenstelsel', 'Naam',
-        'Omschrijving', # TODO: Omschrijving is often the same as Naam, but not always. Speed up catalog retrieval by removing Omschrijving
-        'Parameter_Wat_Omschrijving', 
+        'Locatie_MessageID',
+        'Lat', 'Lon', 'Coordinatenstelsel',
+        'Naam', 'Omschrijving',
+        'Parameter_Wat_Omschrijving',
         'ProcesType',
         'Compartiment.Code', 'Compartiment.Omschrijving',
         'Grootheid.Code', 'Grootheid.Omschrijving', 
