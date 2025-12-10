@@ -4,6 +4,7 @@ History
 
 UNRELEASED
 ----------
+* updated to new waterwebservices (ddapi20-waterwebservices.rijkswaterstaat.nl) in https://github.com/Deltares/ddlpy/pull/124
 
 0.7.0 (2025-06-12)
 ------------------
