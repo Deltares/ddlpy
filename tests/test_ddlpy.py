@@ -100,19 +100,19 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert "Er moet een locatie worden meegegeven als: Locatie" in str(e.value)
     assert "Er moet een AquoPlusObservationMetadata worden meegegeven onder: AquoPlusWaarnemingMetadata" in str(e.value)
 
-    request_empty_aquoplus = {k:v for k,v in request_valid.items()}
+    request_empty_aquoplus = dict(request_valid)
     request_empty_aquoplus["AquoPlusWaarnemingMetadata"] = {}
     with pytest.raises(IOError) as e:
         _send_post_request(url, request=request_empty_aquoplus)
     assert '400 Bad Request: {"aquoPlusObservationMetadata.aquoMetadata":' in str(e.value)
     
-    request_invalid_locatie = {k:v for k,v in request_valid.items()}
+    request_invalid_locatie = dict(request_valid)
     request_invalid_locatie["Locatie"] = {"Code": "nonexistent"}
     with pytest.raises(NoDataError) as e:
         _send_post_request(url, request=request_invalid_locatie)
     assert '204 No Content:' in str(e.value)
 
-    request_invalid_periode_order = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_order = dict(request_valid)
     request_invalid_periode_order["Periode"] = {
         "Begindatumtijd": "2020-01-01T00:00:00.000+00:00",
         "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
@@ -123,7 +123,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
 
     # TODO: this error is not properly handled by ddapi20
     # https://github.com/Rijkswaterstaat/WaterWebservices/issues/19
-    request_invalid_periode_format = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_format = dict(request_valid)
     request_invalid_periode_format["Periode"] = {
         "Begindatumtijd": "2015-01-01T00:00:00.000",
         "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
@@ -132,7 +132,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
         _send_post_request(url, request=request_invalid_periode_format)
     assert '500 Internal Server Error: Onverwachte fout opgetreden' in str(e.value)
 
-    request_invalid_periode_wrongkeys = {k:v for k,v in request_valid.items()}
+    request_invalid_periode_wrongkeys = dict(request_valid)
     request_invalid_periode_wrongkeys["Periode"] = {
         "Begindatum": "2015-01-01T00:00:00.000+00:00",
         "Einddatum": "2015-01-02T00:00:00.000+00:00",
@@ -143,7 +143,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
 
     # TODO: succesful=false is duplicate of resp.ok=False
     # https://github.com/Rijkswaterstaat/WaterWebservices/issues/14
-    request_toolarge = {k:v for k,v in request_valid.items()}
+    request_toolarge = dict(request_valid)
     request_toolarge["Periode"] = {
         "Begindatumtijd": "2015-01-01T00:00:00.000+00:00",
         "Einddatumtijd": "2020-01-01T00:00:00.000+00:00",
@@ -155,7 +155,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert '"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request."' in str(e.value)
     assert '"WaarnemingenLijst":[]' in str(e.value)
 
-    request_nodata = {k:v for k,v in request_valid.items()}
+    request_nodata = dict(request_valid)
     request_nodata["Periode"] = {
         "Begindatumtijd": "2180-01-01T00:00:00.000+00:00",
         "Einddatumtijd": "2180-01-02T00:00:00.000+00:00",
