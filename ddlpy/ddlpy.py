@@ -16,6 +16,7 @@ from .utils import date_series
 
 BASE_URL = "https://waterwebservices.rijkswaterstaat.nl/"
 ENDPOINTS_PATH = pathlib.Path(__file__).with_name("endpoints.json")
+logger = logging.getLogger(__name__)
 
 with ENDPOINTS_PATH.open() as f:
     ENDPOINTS = json.load(f)
@@ -23,15 +24,6 @@ with ENDPOINTS_PATH.open() as f:
 
 class NoDataError(ValueError):
     pass
-
-
-class UnsuccessfulRequestError(ValueError):
-    pass
-
-
-# Web Feature Service
-# Web Mapping Service
-logger = logging.getLogger(__name__)
 
 
 def _send_post_request(url, request, timeout=None):
