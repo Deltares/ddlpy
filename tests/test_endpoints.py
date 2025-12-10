@@ -69,7 +69,7 @@ def test_collect_number_of_observations(collect_number_of_observations_resp):
     assert collect_number_of_observations_resp.status_code == 200
 
 
-# TODO: AanvragenBulkWaarnemingen not present in beta WaterWebservices
+# TODO: AanvragenBulkWaarnemingen not present in new WaterWebservices
 # https://github.com/Deltares/ddlpy/issues/145
 # @pytest.fixture
 # def request_bulk_observations_resp(endpoints):
