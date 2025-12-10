@@ -49,18 +49,6 @@ def _send_post_request(url, request, timeout=None):
         raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
     
     result = resp.json()
-    
-    if not result['Succesvol']:
-        # TODO: this is probably never reached anymore. Ask whether Succesvol can be removed from the response
-        # if not it can be false if resp.ok=True, add a testcase
-        # https://github.com/Deltares/ddlpy/issues/147
-        # https://github.com/Rijkswaterstaat/WaterWebservices/issues/14
-        logger.debug('Response result is unsuccessful: {}'.format(result))
-        error_message = result.get('Foutmelding', 'No error returned')
-        # or any other possible error message are raised here
-        raise UnsuccessfulRequestError(error_message)
-        
-    # continue if request was successful
     return result
 
 
