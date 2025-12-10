@@ -71,6 +71,7 @@ def test_collect_number_of_observations(collect_number_of_observations_resp):
 
 # TODO: AanvragenBulkWaarnemingen not present in new WaterWebservices
 # https://github.com/Deltares/ddlpy/issues/145
+# https://github.com/Rijkswaterstaat/WaterWebservices/issues/15
 # @pytest.fixture
 # def request_bulk_observations_resp(endpoints):
 #     endpoint = endpoints['request_bulk_observations']
