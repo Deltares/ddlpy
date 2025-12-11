@@ -53,6 +53,8 @@ def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
     
     # preserve some columns (even if their values are constant) by setting them as not constant
     for colname in always_preserve:
+        if colname not in df.columns:
+            raise ValueError(f"column '{colname}' not present in dataframe")
         bool_constant[colname] = False
     
     # constant columns are flattened and converted to dict of attrs
