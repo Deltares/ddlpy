@@ -103,7 +103,10 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     # add drop_if_constant colums to list if values are indeed constant, will be dropped (added as ds.attrs)
     cols_constant = []
     for colname in drop_if_constant:
-        assert colname in df.columns
+        if colname not in df.columns:
+            raise ValueError(
+                f"column '{colname}' not present in dataframe so will not be dropped"
+                )
         if len(df[colname].drop_duplicates()) == 1:
             cols_constant.append(colname)
     
