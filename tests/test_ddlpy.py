@@ -508,7 +508,39 @@ def test_simplify_dataframe(measurements):
     # https://github.com/Rijkswaterstaat/WaterWebservices/issues/16
     assert len(meas_simple.attrs) == 45
     assert len(meas_simple.columns) == 3
+    expected_columns = [
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'Meetwaarde.Waarde_Alfanumeriek',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    assert set(meas_simple.columns) == set(expected_columns)
 
+
+def test_simplify_dataframe_always_preserve(measurements):
+    """
+    should be in test_utils.py
+    """
+    assert len(measurements.columns) == 48
+    always_preserve = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode', 'Groepering.Code',
+        'BemonsteringsApparaat.Code', 'Meetwaarde.Waarde_Numeriek',
+        ]
+    meas_simple = ddlpy.simplify_dataframe(measurements, always_preserve=always_preserve)
+    assert hasattr(meas_simple, "attrs")
+    assert len(meas_simple.attrs) == 42
+    assert len(meas_simple.columns) == 6
+    expected_columns = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Groepering.Code',
+        'BemonsteringsApparaat.Code',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    assert set(meas_simple.columns) == set(expected_columns)
+    
 
 def test_dataframe_to_xarray(measurements):
     """
