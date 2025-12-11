@@ -550,3 +550,10 @@ def test_dataframe_to_xarray(measurements):
     ds_firsttime = ds_clean.time.to_pandas().iloc[0]
     assert refdate_utc == ds_firsttime
     assert ds_firsttime.tz is None
+
+
+def test_dataframe_to_xarray_invalid_drop_key(measurements):
+    drop_if_constant = ["nonexistent-key"]
+    with pytest.raises(ValueError) as e:
+        _ = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
+    assert "not present in dataframe so will not be dropped" in str(e.value)
