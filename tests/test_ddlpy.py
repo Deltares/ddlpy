@@ -502,73 +502,95 @@ def test_simplify_dataframe(measurements):
     assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
-    # TODO: the below should be 46 and 2, but there are still RIKZ_WAT instances in
+    # TODO: the below should be 47 and 1, but there are still RIKZ_WAT instances in
     # OpdrachtgevendeInstantie column, which is different from RIKZMON_WAT
     # this also probably partly causes the 96 duplicated timestamps
     # https://github.com/Rijkswaterstaat/WaterWebservices/issues/16
-    assert len(meas_simple.attrs) == 45
-    assert len(meas_simple.columns) == 3
+    assert len(meas_simple.attrs) == 46
+    assert len(meas_simple.columns) == 2
+    expected_columns = [
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    assert set(meas_simple.columns) == set(expected_columns)
+
+
+def test_simplify_dataframe_always_preserve(measurements):
+    """
+    should be in test_utils.py
+    """
+    assert len(measurements.columns) == 48
+    always_preserve = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode', 'Groepering.Code',
+        'BemonsteringsApparaat.Code', 'Meetwaarde.Waarde_Numeriek',
+        ]
+    meas_simple = ddlpy.simplify_dataframe(measurements, always_preserve=always_preserve)
+    assert hasattr(meas_simple, "attrs")
+    assert len(meas_simple.attrs) == 42
+    assert len(meas_simple.columns) == 6
+    expected_columns = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.OpdrachtgevendeInstantie',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Groepering.Code',
+        'BemonsteringsApparaat.Code',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    assert set(meas_simple.columns) == set(expected_columns)
+
+
+def test_simplify_dataframe_always_preserve_invalid_key(measurements):
+    """
+    should be in test_utils.py
+    """
+    assert len(measurements.columns) == 48
+    always_preserve = ['invalid_key']
+    with pytest.raises(ValueError) as e:
+        _ = ddlpy.simplify_dataframe(measurements, always_preserve=always_preserve)
+    assert "column 'invalid_key' not present in dataframe" in str(e.value)
 
 
 def test_dataframe_to_xarray(measurements):
     """
     should be in test_utils.py
     """
-    drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantie",
-                        "WaarnemingMetadata.Bemonsteringshoogte",
-                        "WaarnemingMetadata.Referentievlak",
-                        "BemonsteringsSoort.Code", 
-                        "Compartiment.Code", "Eenheid.Code", "Grootheid.Code", "Hoedanigheid.Code",
-                        'Meetwaarde.Waarde_Numeriek',
-                        ]
-    ds_clean = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
+    always_preserve = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'MeetApparaat.Code',
+        'WaardeBepalingsMethode.Code',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    ds_clean = ddlpy.dataframe_to_xarray(
+        df=measurements,
+        always_preserve=always_preserve,
+        )
     
-    # check if constant value that was not in drop_if_constant list is indeed not dropped
-    assert "MeetApparaat.Code" in ds_clean.data_vars
-    assert len(ds_clean["MeetApparaat.Code"]) > 0
+    non_constant_columns = [
+        "WaarnemingMetadata.OpdrachtgevendeInstantie",
+        "Meetwaarde.Waarde_Numeriek",
+        ]
     
-    for varname in drop_if_constant:
-        # OpdrachtgevendeInstantie is not constant (contains RIKZMON_WAT vs RIKZ_WAT)
-        # remove this when the dataset is cleaned and therefore only contains RIKZMON_WAT
-        if varname == "WaarnemingMetadata.OpdrachtgevendeInstantie":
-            continue
-        # Meetwaarde.Waarde_Numeriek will never be constant so can be used to check if
-        # indeed only constant variables are dropped
-        if varname == "Meetwaarde.Waarde_Numeriek":
-            continue
-        assert varname not in ds_clean.data_vars
-        assert varname in ds_clean.attrs.keys()
-        varname_oms = varname.replace(".Code", ".Omschrijving")
-        assert varname_oms in ds_clean.attrs.keys()
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
-    assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
+    preserved = always_preserve + non_constant_columns
     
-    data_vars_list = ['WaarnemingMetadata.Statuswaarde',
-     'WaarnemingMetadata.Kwaliteitswaardecode',
-     'MeetApparaat.Code',
-     'WaardeBepalingsMethode.Code',
-     'Meetwaarde.Waarde_Numeriek']
-    for varname in data_vars_list:
-        assert varname in ds_clean.data_vars
-    
-    assert "Lon" in ds_clean.attrs.keys()
-    
+    for varname in measurements.columns:
+        # check if all varnames in always_preserve and non-constant columns are indeed preserved as variables
+        if varname in preserved:
+            assert varname in ds_clean.data_vars
+            assert varname not in ds_clean.attrs.keys()
+        else:
+            assert varname not in ds_clean.data_vars
+            assert varname in ds_clean.attrs.keys()
+            varname_oms = varname.replace(".Code", ".Omschrijving")
+            assert varname_oms in ds_clean.attrs.keys()
+
     # check if times and timezone are correct
     refdate_utc = measurements.tz_convert(None).index[0]
     ds_firsttime = ds_clean.time.to_pandas().iloc[0]
     assert refdate_utc == ds_firsttime
     assert ds_firsttime.tz is None
-
-
-def test_dataframe_to_xarray_invalid_drop_key(measurements):
-    """
-    should be in test_utils.py
-    https://github.com/Deltares/ddlpy/issues/152
-    """
-    drop_if_constant = ["nonexistent-key"]
-    with pytest.raises(ValueError) as e:
-        _ = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
-    assert "not present in dataframe so will not be dropped" in str(e.value)
 
 
 def test_code_description_attrs_from_dataframe_prevent_empty(measurements):

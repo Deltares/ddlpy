@@ -30,13 +30,32 @@ def date_series(start, end, freq=dateutil.rrule.MONTHLY):
     return result
 
 
-def simplify_dataframe(df: pd.DataFrame):
+def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
     """
     Drop columns with constant values from the dataframe and collect them 
     in a dictionary which is added as attrs of the dataframe.
+    The column Meetwaarde.Waarde_Alfanumeriek is also dropped if it is a duplicate of
+    Meetwaarde.Waarde_Numeriek.
+    The column names passed in `always_preserve` are preserved even if they are constant.
     """
     
-    bool_constant = (df == df.iloc[0]).all()
+    # define which columns are constant
+    bool_constant = (df == df.iloc[0]).all(axis=0)
+    
+    # drop Waarde_Alfanumeriek if duplicate of Waarde_Numeriek
+    str_num = "Meetwaarde.Waarde_Numeriek"
+    str_alf = 'Meetwaarde.Waarde_Alfanumeriek'
+    if str_num in df.columns and str_alf in df.columns:
+        df_num = df[str_num]
+        df_alf = df[str_alf].astype(float)
+        if (df_num == df_alf).all():
+            bool_constant[str_alf] = True
+    
+    # preserve some columns (even if their values are constant) by setting them as not constant
+    for colname in always_preserve:
+        if colname not in df.columns:
+            raise ValueError(f"column '{colname}' not present in dataframe")
+        bool_constant[colname] = False
     
     # constant columns are flattened and converted to dict of attrs
     df_attrs = df.loc[:, bool_constant].iloc[0].to_dict()
@@ -65,17 +84,10 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
     return var_attrs_dict
 
 
-def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
+def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     """
-    Converts the measurement dataframe to a xarray dataset,
-    including several cleanups to minimize the size of the netcdf dataset on disk:
-    
-    - The column 'Parameter_Wat_Omschrijving' is dropped (combination of information in other columns)
-    - The column 'Meetwaarde.Waarde_Alfanumeriek' is dropped if 'Meetwaarde.Waarde_Numeriek' is present (contains duplicate values in that case)
-    - All Omschrijving columns are dropped and added as attributes to the Code variables
-    - All NVT-only Code columns are dropped and added as ds attributes
-    - All location columns are dropped and added as ds attributes
-    - All drop_if_constant columns are dropped and added as ds attributes (if the values are indeed constant)
+    Converts the measurement dataframe to a xarray dataset. The dataframe is first
+    simplified to minimize the size of the netcdf dataset on disk:
     
     The timestamps are converted to UTC since xarray does not support non-UTC timestamps.
     These can be converted to different timezones after loading the netcdf and converting 
@@ -85,48 +97,9 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     `format="NETCDF3_CLASSIC"` or `format="NETCDF4_CLASSIC"` since this automatically
     converts variables of dtype <U to |S which saves a lot of disk space for DDL data.
     """
+    
+    df_simple = simplify_dataframe(df, always_preserve=always_preserve)
 
-    # create list of columns with duplicate info (often not constant), will be dropped
-    cols_bulky = ["Parameter_Wat_Omschrijving"]
-    if "Meetwaarde.Waarde_Alfanumeriek" in df.columns and 'Meetwaarde.Waarde_Numeriek' in df.columns:
-        # drop alfanumeriek if duplicate of numeriek # TODO: should not be returned by ddl
-        cols_bulky.append("Meetwaarde.Waarde_Alfanumeriek")
-    
-    # create list of all omschrijving columns, will be dropped (added as ds[varn].attrs via code_description_attrs_from_dataframe())
-    cols_omschrijving = df.columns[df.columns.str.contains(".Omschrijving")].tolist()
-    
-    # create list of all-NVT *.Code columns, will be dropped (codes added as ds.attrs)
-    bool_onlynvt_code = (df=='NVT').all(axis=0)
-    cols_onlynvt_code = df.columns[bool_onlynvt_code].tolist()
-    cols_onlynvt_code = [x for x in cols_onlynvt_code if x.endswith(".Code")]
-    
-    # create list of location columns, will be dropped (added as ds.attrs)
-    cols_location = ['Code', 'Naam', 'Coordinatenstelsel', 'Lon', 'Lat']
-    
-    # add drop_if_constant colums to list if values are indeed constant, will be dropped (added as ds.attrs)
-    cols_constant = []
-    for colname in drop_if_constant:
-        if colname not in df.columns:
-            raise ValueError(
-                f"column '{colname}' not present in dataframe so will not be dropped"
-                )
-        if len(df[colname].drop_duplicates()) == 1:
-            cols_constant.append(colname)
-    
-    # create ds attrs for all nvt/location/constant columns
-    ds_attrs = {}
-    attrs_columns = cols_onlynvt_code + cols_constant + cols_location
-    for colname in attrs_columns:
-        ds_attrs[colname] = df[colname].iloc[0]
-        if colname.endswith(".Code"):
-            colname_oms = colname.replace(".Code", ".Omschrijving")
-            ds_attrs[colname_oms] = df[colname_oms].iloc[0]
-    
-    # drop columns 
-    drop_columns = (cols_bulky + cols_location + cols_constant +
-                    cols_onlynvt_code + cols_omschrijving)
-    df_simple = df.drop(drop_columns, axis=1, errors='ignore')
-    
     # convert to UTC to please xarray/netcdf4 (otherwise we get invalid timestamps)
     # adding a refdate with tzinfo is also possible but adds confusion and timestamps still have to be stored as UTC
     if df_simple.index.tz is not None:
@@ -134,7 +107,7 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     
     # convert to xarray dataset and add ds_attrs
     ds = df_simple.to_xarray()
-    ds = ds.assign_attrs(ds_attrs)
+    ds = ds.assign_attrs(df_simple.attrs)
 
     # assign attrs with code+omschrijving to each *.Code variable
     var_attrs_dict = code_description_attrs_from_dataframe(df)
