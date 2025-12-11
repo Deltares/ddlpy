@@ -58,6 +58,9 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
         colname_oms = colname_code.replace(".Code",".Omschrijving")
         meas_twocol = df[[colname_code,colname_oms]].drop_duplicates()
         attr_dict = meas_twocol.set_index(colname_code)[colname_oms].to_dict()
+        # drop empty attribute names/keys since these are not supported when writing to netcdf file
+        if "" in attr_dict.keys():
+            attr_dict.pop("")
         var_attrs_dict[colname_code] = attr_dict
     return var_attrs_dict
 

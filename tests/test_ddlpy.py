@@ -496,6 +496,9 @@ def test_check_convert_wrongorder():
 
 
 def test_simplify_dataframe(measurements):
+    """
+    should be in test_utils.py
+    """
     assert len(measurements.columns) == 48
     meas_simple = ddlpy.simplify_dataframe(measurements)
     assert hasattr(meas_simple, "attrs")
@@ -508,6 +511,9 @@ def test_simplify_dataframe(measurements):
 
 
 def test_dataframe_to_xarray(measurements):
+    """
+    should be in test_utils.py
+    """
     drop_if_constant = ["WaarnemingMetadata.OpdrachtgevendeInstantie",
                         "WaarnemingMetadata.Bemonsteringshoogte",
                         "WaarnemingMetadata.Referentievlak",
@@ -555,7 +561,23 @@ def test_dataframe_to_xarray(measurements):
 
 
 def test_dataframe_to_xarray_invalid_drop_key(measurements):
+    """
+    should be in test_utils.py
+    https://github.com/Deltares/ddlpy/issues/152
+    """
     drop_if_constant = ["nonexistent-key"]
     with pytest.raises(ValueError) as e:
         _ = ddlpy.dataframe_to_xarray(measurements, drop_if_constant)
     assert "not present in dataframe so will not be dropped" in str(e.value)
+
+
+
+def test_code_description_attrs_from_dataframe_prevent_empty(measurements):
+    """
+    should be in test_utils.py
+    https://github.com/Deltares/ddlpy/issues/156
+    """
+    assert "" in measurements["Groepering.Code"].unique()
+    attr_dict = ddlpy.utils.code_description_attrs_from_dataframe(measurements)
+    for attr_key_value_pairs in attr_dict.values():
+        assert "" not in attr_key_value_pairs.keys()
