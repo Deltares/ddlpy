@@ -532,6 +532,8 @@ def test_dataframe_to_xarray(measurements):
             continue
         assert varname not in ds_clean.data_vars
         assert varname in ds_clean.attrs.keys()
+        varname_oms = varname.replace(".Code", ".Omschrijving")
+        assert varname_oms in ds_clean.attrs.keys()
     assert "WaarnemingMetadata.OpdrachtgevendeInstantie" in ds_clean.data_vars
     assert "WaarnemingMetadata.OpdrachtgevendeInstantie" not in ds_clean.attrs.keys()
     
