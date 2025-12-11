@@ -287,6 +287,23 @@ def test_measurements(measurements):
     assert set(measurements["ProcesType"].unique()) == {'meting'}
 
 
+def test_measurements_invalid_to_nan(locations):
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_groepering = locations['Groepering.Code'] == ''
+    bool_procestype = locations['ProcesType'] == 'meting'
+    location = locations[bool_grootheid & bool_groepering & bool_procestype].loc['a12']
+    
+    start_date = dt.datetime(2009, 1, 1)
+    end_date = dt.datetime(2009, 4, 1)
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    values = measurements['Meetwaarde.Waarde_Numeriek']
+    qc = measurements['WaarnemingMetadata.Kwaliteitswaardecode']
+    
+    assert "99" in qc.tolist() # there are invalid values in the dataframe
+    assert values.max() < 1000 # but the 999999999.0 have been replaced with nan
+    assert values.isnull().any()
+
+
 def test_measurements_freq_yearly(location, measurements):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)

@@ -306,8 +306,8 @@ def _combine_waarnemingenlijst(result, location):
         df[name] = location[name]
 
     # set NA value
-    if "WaarnemingMetadata.KwaliteitswaardecodeLijst" in df.columns:
-        bool_nan = df["WaarnemingMetadata.KwaliteitswaardecodeLijst"] == "99"
+    if "WaarnemingMetadata.Kwaliteitswaardecode" in df.columns:
+        bool_nan = df["WaarnemingMetadata.Kwaliteitswaardecode"] == "99"
         if "Meetwaarde.Waarde_Numeriek" in df.columns:
             df.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
     
