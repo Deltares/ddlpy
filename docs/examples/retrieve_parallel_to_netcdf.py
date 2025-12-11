@@ -29,14 +29,14 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
 
     print(f'{station_id}: writing retrieved data to netcdf file')
     
-    # simplyfy dataframe (drop constant columns and add these properties as attributes)
-    simplified = ddlpy.simplify_dataframe(measurements)
-    # dropping timezone is required to get proper encoding in time variable (in netcdf file)
-    simplified.index = simplified.index.tz_convert(None)
-    
-    # convert to xarray
-    ds = simplified.to_xarray()
-    ds = ds.assign_attrs(simplified.attrs)
+    # convert to xarray: constant columns are converted to attributes to save disk space, except the columns in always_preserve
+    always_preserve = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'WaardeBepalingsMethode.Code',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    ds = ddlpy.dataframe_to_xarray(measurements, always_preserve=always_preserve)
     
     # write to netcdf file. NETCDF3_CLASSIC or NETCDF4_CLASSIC automatically converts 
     # variables of dtype <U to |S which saves a lot of disk space
@@ -75,4 +75,5 @@ if __name__ == "__main__":
         station_code = ds.attrs["Code"]
         station_naam = ds.attrs["Naam"]
         ds["Meetwaarde.Waarde_Numeriek"].plot(ax=ax, label=f"{station_code} ({station_naam})")
+        ds.close()
     ax.legend(loc=1)
