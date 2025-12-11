@@ -115,6 +115,9 @@ def dataframe_to_xarray(df: pd.DataFrame, drop_if_constant=[]):
     attrs_columns = cols_onlynvt_code + cols_constant + cols_location
     for colname in attrs_columns:
         ds_attrs[colname] = df[colname].iloc[0]
+        if colname.endswith(".Code"):
+            colname_oms = colname.replace(".Code", ".Omschrijving")
+            ds_attrs[colname_oms] = df[colname_oms].iloc[0]
     
     # drop columns 
     drop_columns = (cols_bulky + cols_location + cols_constant +
