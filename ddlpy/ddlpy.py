@@ -398,13 +398,6 @@ def measurements(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(st
     
     measurements = []
 
-    # data_present = measurements_available(
-    #         location, start_date=start_date, end_date=end_date)
-    # if not data_present:
-    #     # early return in case of no data
-    #     logger.debug("no data found for this station and time extent")
-    #     return
-    
     if freq is None:
         date_series_iterator = tqdm.tqdm([(start_date, end_date)])
     else:
