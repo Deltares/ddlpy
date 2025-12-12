@@ -306,11 +306,17 @@ def _combine_waarnemingenlijst(result, location):
         df[name] = location[name]
 
     # set NA value
-    if "WaarnemingMetadata.Kwaliteitswaardecode" in df.columns:
-        bool_nan = df["WaarnemingMetadata.Kwaliteitswaardecode"] == "99"
-        if "Meetwaarde.Waarde_Numeriek" in df.columns:
-            df.loc[bool_nan,"Meetwaarde.Waarde_Numeriek"] = np.nan
-    
+    colname_qc = "WaarnemingMetadata.Kwaliteitswaardecode"
+    colname_num = "Meetwaarde.Waarde_Numeriek"
+    colname_alf = "Meetwaarde.Waarde_Alfanumeriek"
+    if colname_qc in df.columns:
+        bool_nan = df[colname_qc] == "99"
+        if colname_num in df.columns:
+            df.loc[bool_nan, colname_num] = np.nan
+        if colname_alf in df.columns:
+            # float("NaN") translates to nan
+            df.loc[bool_nan, colname_alf] = "NaN"
+
     try:
         df["time"] = pd.to_datetime(df["Tijdstip"], format="ISO8601")
         df = df.set_index("time")

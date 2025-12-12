@@ -296,12 +296,16 @@ def test_measurements_invalid_to_nan(locations):
     start_date = dt.datetime(2009, 1, 1)
     end_date = dt.datetime(2009, 4, 1)
     measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
-    values = measurements['Meetwaarde.Waarde_Numeriek']
     qc = measurements['WaarnemingMetadata.Kwaliteitswaardecode']
+    num = measurements['Meetwaarde.Waarde_Numeriek']
+    alf = measurements['Meetwaarde.Waarde_Alfanumeriek']
+    alf_num = alf.astype(float)
     
     assert "99" in qc.tolist() # there are invalid values in the dataframe
-    assert values.max() < 1000 # but the 999999999.0 have been replaced with nan
-    assert values.isnull().any()
+    assert num.max() < 1000 # but the 999999999.0 have been replaced with nan
+    assert num.isnull().any()
+    assert alf_num.max() < 1000 # but the 999999999.0 have been replaced with nan
+    assert alf_num.isnull().any()
 
 
 def test_measurements_freq_yearly(location, measurements):
