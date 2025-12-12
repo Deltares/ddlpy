@@ -1,6 +1,7 @@
 import dateutil.rrule
 import itertools
 import pandas as pd
+import numpy as np
 
 
 def date_series(start, end, freq=dateutil.rrule.MONTHLY):
@@ -48,7 +49,7 @@ def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
     if str_num in df.columns and str_alf in df.columns:
         df_num = df[str_num]
         df_alf = df[str_alf].astype(float)
-        if (df_num == df_alf).all():
+        if np.allclose(df_num, df_alf, equal_nan=True):
             bool_constant[str_alf] = True
     
     # preserve some columns (even if their values are constant) by setting them as not constant

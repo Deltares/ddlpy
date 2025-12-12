@@ -306,6 +306,7 @@ def test_measurements_invalid_to_nan(locations):
     assert num.isnull().any()
     assert alf_num.max() < 1000 # but the 999999999.0 have been replaced with nan
     assert alf_num.isnull().any()
+    assert np.allclose(num, alf_num, equal_nan=True)
 
 
 def test_measurements_freq_yearly(location, measurements):
