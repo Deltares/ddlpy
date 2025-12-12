@@ -307,7 +307,7 @@ def test_measurements_invalid_to_nan(locations):
     assert alf_num.max() < 1000 # but the 999999999.0 have been replaced with nan
     assert alf_num.isnull().any()
     assert np.allclose(num, alf_num, equal_nan=True)
-
+    
 
 def test_measurements_freq_yearly(location, measurements):
     start_date = dt.datetime(1953, 1, 1)
@@ -555,6 +555,23 @@ def test_simplify_dataframe_always_preserve_invalid_key(measurements):
     with pytest.raises(ValueError) as e:
         _ = ddlpy.simplify_dataframe(measurements, always_preserve=always_preserve)
     assert "column 'invalid_key' not present in dataframe" in str(e.value)
+
+
+def test_simplify_dataframe_alfanumeriek_with_nan_dropped(locations):
+    bool_grootheid = locations['Grootheid.Code'] == 'WATHTE'
+    bool_groepering = locations['Groepering.Code'] == ''
+    bool_procestype = locations['ProcesType'] == 'meting'
+    location = locations[bool_grootheid & bool_groepering & bool_procestype].loc['a12']
+    
+    start_date = dt.datetime(2009, 1, 1)
+    end_date = dt.datetime(2009, 4, 1)
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
+    meas_simple = ddlpy.simplify_dataframe(df=measurements)
+    expected_columns = [
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    assert set(meas_simple.columns) == set(expected_columns)
 
 
 def test_dataframe_to_xarray(measurements):
