@@ -7,7 +7,7 @@ UNRELEASED
 * updated to new waterwebservices (ddapi20-waterwebservices.rijkswaterstaat.nl) in https://github.com/Deltares/ddlpy/pull/124
 * ddapi20: fix conversion of invalid values to nan in https://github.com/Deltares/ddlpy/issues/149
 * prevent empty attribute names in `ddlpy.dataframe_to_xarray()` in https://github.com/Deltares/ddlpy/commit/95b0a2f0ab7e3f76a0ed33542c5e65217388215b
-* `always_preserve` instead of `drop_if_constant` in `ddlpy.dataframe_to_xarray()` in https://github.com/Deltares/ddlpy/pull/158
+* `always_preserve` instead of `drop_if_constant` in `ddlpy.dataframe_to_xarray()` in https://github.com/Deltares/ddlpy/pull/158 and https://github.com/Deltares/ddlpy/pull/160
 
 0.7.0 (2025-06-12)
 ------------------

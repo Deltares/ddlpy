@@ -594,6 +594,10 @@ def test_dataframe_to_xarray(measurements):
 
 
 def test_dataframe_to_xarray_drop_omschrijving(measurements):
+    """
+    in case of non-unique Code/Omschrijving pairs, the Omschrijving variable should be
+    dropped also. The information it contains is added as attrs to the Code value.
+    """
     # make MeetApparaat non-unique
     measurements.loc["1953-01-01 02:40:00+01:00",'MeetApparaat.Code'] = "newcode"
     measurements.loc["1953-01-01 02:40:00+01:00",'MeetApparaat.Omschrijving'] = "newoms"
@@ -608,6 +612,9 @@ def test_dataframe_to_xarray_drop_omschrijving(measurements):
     ds = ddlpy.dataframe_to_xarray(measurements, always_preserve=always_preserve)
     for varn in ds.data_vars:
         assert not varn.endswith(".Omschrijving")
+    
+    expected_attrs = {'newcode': 'newoms', '10272': 'other:Vlotterniveaumeter'}
+    assert ds["MeetApparaat.Code"].attrs == expected_attrs
 
 
 def test_code_description_attrs_from_dataframe_prevent_empty(measurements):
