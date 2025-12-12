@@ -593,6 +593,23 @@ def test_dataframe_to_xarray(measurements):
     assert ds_firsttime.tz is None
 
 
+def test_dataframe_to_xarray_drop_omschrijving(measurements):
+    # make MeetApparaat non-unique
+    measurements.loc["1953-01-01 02:40:00+01:00",'MeetApparaat.Code'] = "newcode"
+    measurements.loc["1953-01-01 02:40:00+01:00",'MeetApparaat.Omschrijving'] = "newoms"
+    
+    always_preserve = [
+        'WaarnemingMetadata.Statuswaarde',
+        'WaarnemingMetadata.Kwaliteitswaardecode',
+        'WaardeBepalingsMethode.Code',
+        'Meetwaarde.Waarde_Numeriek',
+        ]
+    
+    ds = ddlpy.dataframe_to_xarray(measurements, always_preserve=always_preserve)
+    for varn in ds.data_vars:
+        assert not varn.endswith(".Omschrijving")
+
+
 def test_code_description_attrs_from_dataframe_prevent_empty(measurements):
     """
     should be in test_utils.py

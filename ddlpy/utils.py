@@ -72,9 +72,9 @@ def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
 def code_description_attrs_from_dataframe(df: pd.DataFrame):
     # create var_attrs_dict
     colname_code_list = df.columns[df.columns.str.contains(".Code")]
+    colname_oms_list = df.columns[df.columns.str.contains(".Omschrijving")]
     var_attrs_dict = {}
-    for colname_code in colname_code_list:
-        colname_oms = colname_code.replace(".Code",".Omschrijving")
+    for colname_code, colname_oms in zip(colname_code_list, colname_oms_list):
         meas_twocol = df[[colname_code,colname_oms]].drop_duplicates()
         attr_dict = meas_twocol.set_index(colname_code)[colname_oms].to_dict()
         # drop empty attribute names/keys since these are not supported when writing to netcdf file
@@ -87,11 +87,15 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
 def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     """
     Converts the measurement dataframe to a xarray dataset. The dataframe is first
-    simplified to minimize the size of the netcdf dataset on disk:
+    simplified with `simplify_dataframe()` to minimize the size of the netcdf dataset on
+    disk.
     
     The timestamps are converted to UTC since xarray does not support non-UTC timestamps.
     These can be converted to different timezones after loading the netcdf and converting 
     to a pandas dataframe with df.index.tz_convert().
+    
+    Furthermore, all ".Omschrijving" variables are dropped and the information is added
+    as attributes to the Code variables.
 
     When writing the dataset to disk with ds.to_netcdf() it is recommended to use
     `format="NETCDF3_CLASSIC"` or `format="NETCDF4_CLASSIC"` since this automatically
@@ -115,5 +119,12 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
         if varn in var_attrs_dict.keys():
             var_attrs = var_attrs_dict[varn]
             ds[varn] = ds[varn].assign_attrs(var_attrs)
+    
+    # drop .Omschrijving variables
+    omschrijving_vars = []
+    for varn in ds.data_vars:
+        if varn.endswith(".Omschrijving"):
+            omschrijving_vars.append(varn)
+    ds = ds.drop_vars(omschrijving_vars)
 
     return ds
