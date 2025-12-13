@@ -2,7 +2,7 @@
 History
 =======
 
-UNRELEASED
+0.8.0 (2025-12-13)
 ----------
 * updated to new waterwebservices (ddapi20-waterwebservices.rijkswaterstaat.nl) in https://github.com/Deltares/ddlpy/pull/124
 * ddapi20: fix conversion of invalid values to nan in https://github.com/Deltares/ddlpy/issues/149

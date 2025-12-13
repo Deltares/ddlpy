@@ -7,13 +7,9 @@ Contributing
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
-You can contribute in many ways:
-
-Types of Contributions
-----------------------
 
 Report Bugs
-~~~~~~~~~~~
+-----------
 
 Report bugs at https://github.com/deltares/ddlpy/issues.
 
@@ -23,36 +19,6 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
-Fix Bugs
-~~~~~~~~
-
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
-wanted" is open to whoever wants to implement it.
-
-Implement Features
-~~~~~~~~~~~~~~~~~~
-
-Look through the GitHub issues for features. Anything tagged with "enhancement"
-and "help wanted" is open to whoever wants to implement it.
-
-Write Documentation
-~~~~~~~~~~~~~~~~~~~
-
-Data Distributie Laag. Service from Rijkswaterstaat for distributing water quantity data. could always use more documentation, whether as part of the
-official Data Distributie Laag. Service from Rijkswaterstaat for distributing water quantity data. docs, in docstrings, or even on the web in blog posts,
-articles, and such.
-
-Submit Feedback
-~~~~~~~~~~~~~~~
-
-The best way to send feedback is to file an issue at https://github.com/deltares/ddlpy/issues.
-
-If you are proposing a feature:
-
-* Explain in detail how it would work.
-* Keep the scope as narrow as possible, to make it easier to implement.
-* Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
 
 Get Started!
 ------------
@@ -93,58 +59,43 @@ Ready to contribute? Here's how to set up `ddlpy` for local development.
 
 7. Submit a pull request through the GitHub website.
 
-Pull Request Guidelines
------------------------
 
-Before you submit a pull request, check that it meets these guidelines:
+Testing
+-------
 
-1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4, 3.5 and 3.6, and for PyPy. Check
-   https://travis-ci.org/deltares/ddlpy/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+To run all the tests::
 
-Tips
-----
+$ pytest
+
 
 To run a subset of tests::
 
-$ py.test tests.test_ddlpy
-
-
-Deploying (old)
----------------
-
-A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
-Then run::
-
-$ bumpversion patch # possible: major / minor / patch
-$ git push
-$ git push --tags
-
-Travis will then deploy to PyPI if tests pass.
+$ pytest tests/test_ddlpy.py
 
 
 Generate documentation
 ----------------------
-- `sphinx-build docs docs/_build`
+
+To generate the documentation::
+
+$ sphinx-build docs docs/_build
 
 
-Releasing (non-travis)
-----------------------
+Create release
+--------------
 
-- make sure the ``main`` branch is up to date
+- make sure the ``main`` branch is up to date (check pytest warnings, important issues solved, all pullrequests and branches closed)
+- create and checkout branch for release
 - bump the versionnumber with ``bumpversion minor``
 - update heading (including date) in ``HISTORY.rst``
 - run testbank
 - local check with: ``python -m build`` and ``twine check dist/*``
-- push+merge all changes
+- commit+push to branch and merge PR
+- copy the ddlpy version from pyproject.toml (e.g. ``0.3.0``)
 - create a new release at https://github.com/Deltares/ddlpy/releases/new
 - click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag on publish``
 - set the release title to the tagname (e.g. ``v0.3.0``)
-- click `Generate release notes`
+- click ``Generate release notes`` and replace the ``What's Changed`` info by a tagged link to ``HISTORY.rst``
 - if all is set, click ``Publish release``
 - a release is created and published on PyPI by the github action
+- post-release: commit+push ``bumpversion patch`` and ``UNRELEASED`` header in ``HISTORY.rst`` to distinguish between release and dev version
