@@ -35,7 +35,7 @@ In the examples/notebooks folders you will find the following examples to get yo
 
 With `ddlpy locations` you can generate a (subsetted) locations.json file, for instance:
 
-	ddlpy locations --quantity WATHTE --station HOEKVHLD
+	ddlpy locations --quantity WATHTE --station hoekvanholland
 
 With `ddlpy measurements` you can obtain measurements for locations/parameters in an existing locations.json, for instance:
 
