@@ -30,7 +30,7 @@ end_date = dt.datetime(2023, 1, 15)
 measurements = ddlpy.measurements(selected.iloc[0], start_date=start_date, end_date=end_date)
 
 if not measurements.empty:
-    print('Data was found in Waterbase')
+    print('Data was found in RWS Waterwebservices/DDL')
     measurements.plot(y="Meetwaarde.Waarde_Numeriek", linewidth=0.8)
 else:
     print('No Data!')
