@@ -130,7 +130,7 @@ Travis will then deploy to PyPI if tests pass.
 
 Generate documentation
 ----------------------
-- `sphinx-build docs docs/_build`
+- ``sphinx-build docs docs/_build``
 
 
 Releasing (non-travis)
