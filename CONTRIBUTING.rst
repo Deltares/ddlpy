@@ -7,7 +7,6 @@ Contributing
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
-You can contribute in many ways:
 
 Report Bugs
 -----------
@@ -61,8 +60,13 @@ Ready to contribute? Here's how to set up `ddlpy` for local development.
 7. Submit a pull request through the GitHub website.
 
 
-Tips
-----
+Testing
+-------
+
+To run all the tests::
+
+$ pytest
+
 
 To run a subset of tests::
 
@@ -71,11 +75,14 @@ $ pytest tests/test_ddlpy.py
 
 Generate documentation
 ----------------------
-- ``sphinx-build docs docs/_build``
+
+To generate the documentation::
+
+$ sphinx-build docs docs/_build
 
 
-Releasing (non-travis)
-----------------------
+Create release
+--------------
 
 - make sure the ``main`` branch is up to date (check pytest warnings, important issues solved, all pullrequests and branches closed)
 - create and checkout branch for release
