@@ -143,7 +143,7 @@ Releasing (non-travis)
 - run testbank
 - local check with: ``python -m build`` and ``twine check dist/*``
 - commit+push to branch and merge PR
-- copy the ddlpy version from pyproject.toml (e.g. `0.3.0`)
+- copy the ddlpy version from pyproject.toml (e.g. ``0.3.0``)
 - create a new release at https://github.com/Deltares/ddlpy/releases/new
 - click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag on publish``
 - set the release title to the tagname (e.g. ``v0.3.0``)
