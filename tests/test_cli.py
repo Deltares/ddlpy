@@ -29,8 +29,11 @@ def test_command_line_interface(tmp_path):
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output
 
-    locations_command = 'locations --procestype astronomisch --grootheid-code WATHTE --station hoekvanholland'
-    locations_result = runner.invoke(cli.cli, locations_command.split())
+    locations_command = 'locations --procestype astronomisch --grootheid-code WATHTE --station hoekvanholland --groepering-code ""'
+    # replace empty string representation ('""') with empty string ("")
+    locations_command_split = locations_command.split()
+    locations_command_split = ["" if x == '""' else x for x in locations_command_split]
+    locations_result = runner.invoke(cli.cli, locations_command_split)
     assert locations_result.exit_code == 0
     file_locs = "locations.json"
     assert os.path.exists(file_locs)
@@ -40,9 +43,3 @@ def test_command_line_interface(tmp_path):
     assert measurements_result.exit_code == 0
     file_meas = "hoekvanholland_astronomisch_OW_cm_WATHTE__NAP_NVT.csv"
     assert os.path.exists(file_meas)
-    file_ext = "hoekvanholland_astronomisch_OW_cm_WATHTE_GETETBRKD2_NAP_NVT.csv"
-    assert os.path.exists(file_ext)
-    
-    # TODO: this currently retrieves two files, one for measurement timeseries, one for extremes.
-    # subsetting `--groepering-code ""` (measurement timeseries) results in an empty locations.json, this is because it is being parsed as '""', which is not present in the columns
-    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/13 and https://github.com/Deltares/ddlpy/issues/146
