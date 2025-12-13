@@ -136,15 +136,18 @@ Generate documentation
 Releasing (non-travis)
 ----------------------
 
-- make sure the ``main`` branch is up to date
+- make sure the ``main`` branch is up to date (check pytest warnings, important issues solved, all pullrequests and branches closed)
+- create and checkout branch for release
 - bump the versionnumber with ``bumpversion minor``
 - update heading (including date) in ``HISTORY.rst``
 - run testbank
 - local check with: ``python -m build`` and ``twine check dist/*``
-- push+merge all changes
+- commit+push to branch and merge PR
+- copy the ddlpy version from pyproject.toml (e.g. `0.3.0`)
 - create a new release at https://github.com/Deltares/ddlpy/releases/new
 - click ``choose a tag`` and type v+versionnumber (e.g. ``v0.3.0``), click ``create new tag on publish``
 - set the release title to the tagname (e.g. ``v0.3.0``)
-- click `Generate release notes`
+- click ``Generate release notes`` and replace the ``What's Changed`` info by a tagged link to ``HISTORY.rst``
 - if all is set, click ``Publish release``
 - a release is created and published on PyPI by the github action
+- post-release: commit+push ``bumpversion patch`` and ``UNRELEASED`` header in ``HISTORY.rst`` to distinguish between release and dev version
