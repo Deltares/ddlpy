@@ -10,6 +10,7 @@
         "Hoedanigheden": true,
         "Groeperingen": true,
         "Parameters": true,
+        "Typeringen":true,
         "ProcesTypes": true,
         "Compartimenten": true
       }
