@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
+import os
 import json
 import pathlib
 import logging
-
 import requests
 import pandas as pd
 import pytz
 import tqdm
 import dateutil
 import numpy as np
+import platformdirs
 
 from .utils import date_series
 
@@ -59,6 +60,38 @@ def catalog(catalog_filter=None):
     return result
 
 
+def retrieve_or_load_catalog(catalog_filter:list = None):
+    # create cache dir like %USERPROFILE%/AppData/Local/ddlpy/Cache
+    cachedir = os.path.join(platformdirs.user_cache_dir(), 'ddlpy', 'Cache')
+    os.makedirs(cachedir, exist_ok=True)
+    catalogfile = os.path.join(cachedir, "locations_default_catalog_filter.json")
+    
+    # only try to load from cache if the default catalog_filter was used,
+    # if the cachefile is present and if it is less than 4 hours old
+    use_cache = False
+    if catalog_filter is None and os.path.exists(catalogfile):
+        cache_mtime = os.path.getmtime(catalogfile)
+        cache_mtime_dt = pd.Timestamp.fromtimestamp(cache_mtime)
+        tdiff_hours = (pd.Timestamp.now() - cache_mtime_dt).total_seconds() / 3600
+        if tdiff_hours < 4:
+            use_cache = True
+    
+    # load or retrieve the catalog
+    if use_cache:
+        logger.info("Loading Waterwebservices catalog from cache")
+        with open(catalogfile, 'r') as f:
+            result = json.load(f)
+    else:
+        logger.info("Retrieving Waterwebservices catalog, this can take 30 seconds")
+        result = catalog(catalog_filter=catalog_filter)
+        if catalog_filter is None:
+            # only write the catalogfile if the default catalog_filter was used 
+            with open(catalogfile, 'w') as f:
+                json.dump(result, f)
+
+    return result
+
+
 def locations(catalog_filter:list = None) -> pd.DataFrame:
     """
     Get station information from DDL (metadata from Catalogue). All metadata regarding stations.
@@ -76,7 +109,7 @@ def locations(catalog_filter:list = None) -> pd.DataFrame:
 
     """
 
-    result = catalog(catalog_filter=catalog_filter)
+    result = retrieve_or_load_catalog(catalog_filter=catalog_filter)
     
     df_locations = pd.DataFrame(result["LocatieLijst"])
 
