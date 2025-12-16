@@ -34,7 +34,8 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
 
     print(f'{station_id}: writing retrieved data to netcdf file')
     
-    # convert to xarray: constant columns are converted to attributes to save disk space, except the columns in always_preserve
+    # convert to xarray: constant columns are converted to attributes to save disk space
+    # except the columns in always_preserve
     always_preserve = [
         'WaarnemingMetadata.Statuswaarde',
         'WaarnemingMetadata.Kwaliteitswaardecode',
