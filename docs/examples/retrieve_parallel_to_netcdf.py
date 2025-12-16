@@ -11,6 +11,11 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 import glob
 
+# enabling debug logging so we can see what happens in the background
+import logging
+logging.basicConfig()
+logging.getLogger("ddlpy").setLevel(logging.DEBUG)
+
 
 def get_data(location, start_date, end_date, dir_output, overwrite=True):
     station_id = location.name

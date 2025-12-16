@@ -5,6 +5,11 @@ This is a minimal example on how to retrieve data from the DDL with ddlpy.
 import ddlpy
 import datetime as dt
 
+# enabling debug logging so we can see what happens in the background
+import logging
+logging.basicConfig()
+logging.getLogger("ddlpy").setLevel(logging.DEBUG)
+
 # get the dataframe with locations and their available parameters
 locations = ddlpy.locations()
 
