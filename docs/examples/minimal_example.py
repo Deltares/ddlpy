@@ -13,14 +13,13 @@ logging.getLogger("ddlpy").setLevel(logging.DEBUG)
 # get the dataframe with locations and their available parameters
 locations = ddlpy.locations()
 
-#select a set of parameters 
 # Filter the locations dataframe with the desired parameters and stations.
 bool_stations = locations.index.isin(['ijmuiden.buitenhaven', 'dantziggat.zuid', 'hoekvanholland', 'ameland.nes'])
 # meting/astronomisch/verwachting
 bool_procestype = locations['ProcesType'].isin(['meting'])
 # waterlevel/waterhoogte (WATHTE)
 bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE'])
-# timeseries (NVT) versus extremes
+# timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
 bool_groepering = locations['Groepering.Code'].isin([''])
 # vertical reference (NAP/MSL)
 bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP'])

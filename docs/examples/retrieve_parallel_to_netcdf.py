@@ -58,7 +58,7 @@ if __name__ == "__main__":
     bool_stations = locations.index.isin(['ijmuiden.buitenhaven', 'dantziggat.zuid', 'hoekvanholland', 'ameland.nes', 'vlissingen', 'olst'])
     bool_procestype = locations['ProcesType'].isin(['meting']) # meting/astronomisch/verwachting
     bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE']) # waterlevel (WATHTE)
-    bool_groepering = locations['Groepering.Code'].isin(['']) # timeseries (NVT) versus extremes
+    bool_groepering = locations['Groepering.Code'].isin(['']) # timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
     bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP']) # vertical reference (NAP/MSL)
     selected = locations.loc[bool_stations & bool_procestype & bool_grootheid & bool_groepering & bool_hoedanigheid]
     
