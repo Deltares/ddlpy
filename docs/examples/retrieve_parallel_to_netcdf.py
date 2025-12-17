@@ -11,6 +11,11 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 import glob
 
+# enabling debug logging so we can see what happens in the background
+import logging
+logging.basicConfig()
+logging.getLogger("ddlpy").setLevel(logging.DEBUG)
+
 
 def get_data(location, start_date, end_date, dir_output, overwrite=True):
     station_id = location.name
@@ -29,7 +34,8 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
 
     print(f'{station_id}: writing retrieved data to netcdf file')
     
-    # convert to xarray: constant columns are converted to attributes to save disk space, except the columns in always_preserve
+    # convert to xarray: constant columns are converted to attributes to save disk space
+    # except the columns in always_preserve
     always_preserve = [
         'WaarnemingMetadata.Statuswaarde',
         'WaarnemingMetadata.Kwaliteitswaardecode',
@@ -52,7 +58,7 @@ if __name__ == "__main__":
     bool_stations = locations.index.isin(['ijmuiden.buitenhaven', 'dantziggat.zuid', 'hoekvanholland', 'ameland.nes', 'vlissingen', 'olst'])
     bool_procestype = locations['ProcesType'].isin(['meting']) # meting/astronomisch/verwachting
     bool_grootheid = locations['Grootheid.Code'].isin(['WATHTE']) # waterlevel (WATHTE)
-    bool_groepering = locations['Groepering.Code'].isin(['']) # timeseries (NVT) versus extremes
+    bool_groepering = locations['Groepering.Code'].isin(['']) # timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
     bool_hoedanigheid = locations['Hoedanigheid.Code'].isin(['NAP']) # vertical reference (NAP/MSL)
     selected = locations.loc[bool_stations & bool_procestype & bool_grootheid & bool_groepering & bool_hoedanigheid]
     
