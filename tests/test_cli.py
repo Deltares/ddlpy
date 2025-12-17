@@ -17,7 +17,10 @@ def test_command_line_interface(tmp_path):
     os.chdir(tmp_path)
     
     runner = CliRunner()
+
+    # running ddlpy without commands shows help
     result = runner.invoke(cli.cli)
+    assert 'Show this message and exit.' in result.output
     click_version = Version(importlib.metadata.version("click"))
     # TODO: require click>=8.2.0 after dropping support for Python 3.8 and 3.9
     if click_version >= Version("8.2.0"):
@@ -25,6 +28,8 @@ def test_command_line_interface(tmp_path):
     else:
         assert result.exit_code == 0
     assert 'Show this message and exit.' in result.output
+
+    # running ddlpy with help command shows help
     help_result = runner.invoke(cli.cli, ['--help'])
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output
@@ -55,6 +60,12 @@ def test_command_line_interface(tmp_path):
     
     # running ddlpy-measurements for a period with data succeeds and gives a datafile
     measurements_command = 'measurements 2023-01-01 2023-01-03'
+    measurements_result = runner.invoke(cli.cli, measurements_command.split())
+    assert measurements_result.exit_code == 0
+    assert os.path.exists(file_meas)
+    
+    # running ddlpy-measurements in verbose mode to add test coverage
+    measurements_command = '--verbose measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
     assert os.path.exists(file_meas)
