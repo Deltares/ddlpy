@@ -354,13 +354,8 @@ def _combine_waarnemingenlijst(result, location):
             # float("NaN") translates to nan
             df.loc[bool_nan, colname_alf] = "NaN"
 
-    try:
-        df["time"] = pd.to_datetime(df["Tijdstip"], format="ISO8601")
-        df = df.set_index("time")
-    except KeyError:
-        logger.exception(
-            "Cannot add time variable time because variable Tijdstip is not found"
-        )
+    df["time"] = pd.to_datetime(df["Tijdstip"], format="ISO8601")
+    df = df.set_index("time")
 
     return df
 

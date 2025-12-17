@@ -336,7 +336,15 @@ def test_measurements_available(location):
     start_date = dt.datetime(1953, 1, 1)
     end_date = dt.datetime(1953, 4, 1)
     data_present = ddlpy.measurements_available(location, start_date=start_date, end_date=end_date)
-    assert isinstance(data_present, bool)
+    assert data_present is True
+
+
+def test_measurements_available_false(location):
+    # request period for which data is not available
+    start_date = dt.datetime(2050, 1, 1)
+    end_date = dt.datetime(2050, 4, 1)
+    data_present = ddlpy.measurements_available(location, start_date=start_date, end_date=end_date)
+    assert data_present is False
 
 
 def test_measurements_amount(location):
@@ -351,6 +359,14 @@ def test_measurements_amount(location):
     data_amount_jaar = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="Jaar")
     assert data_amount_jaar.shape[0] == 1
     assert data_amount_jaar.index.str.len()[0] == 4
+
+
+def test_measurements_amount_invalidperiod(location):
+    start_date = dt.datetime(1953, 1, 1)
+    end_date = dt.datetime(1953, 4, 5)
+    with pytest.raises(ValueError) as e:
+        _ = ddlpy.measurements_amount(location, start_date=start_date, end_date=end_date, period="invalid")
+    assert "period should be one of ['Jaar', 'Maand', 'Dag']" in str(e.value)
 
 
 def test_measurements_amount_multipleblocks(location):
