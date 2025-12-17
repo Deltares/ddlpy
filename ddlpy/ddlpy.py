@@ -98,13 +98,17 @@ def retrieve_or_load_catalog(catalog_filter:list = None):
 
 def locations(catalog_filter:list = None) -> pd.DataFrame:
     """
-    Get station information from DDL (metadata from Catalogue). All metadata regarding stations.
+    Get station information from DDL (metadata from Catalogue). It conains all metadata
+    regarding stations. The catalog is locally cached for maximum 4 hours, corresponding
+    to the update frequency of the Waterwebservices catalog. If you want to avoid using
+    the cache, pass a valid `catalog_filter` or delete the caching file manually.
 
     Parameters
     ----------
     catalog_filter : list, optional
         list of catalogs to pass on to OphalenCatalogus CatalogusFilter, 
-        if None the list form endpoints.json is retrieved. The default is None.
+        if None the list form endpoints.json is retrieved. The cache cannot be used when
+        passing anything other than None. The default is None.
 
     Returns
     -------
