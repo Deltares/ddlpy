@@ -60,13 +60,13 @@ def catalog(catalog_filter=None):
     return result
 
 
-def retrieve_or_load_catalog(catalog_filter:list = None):
+def get_catalogfile_cache(catalog_filter):
     # create cache dir like %USERPROFILE%/AppData/Local/ddlpy/Cache
     cachedir = os.path.join(platformdirs.user_cache_dir(), 'ddlpy', 'Cache')
     os.makedirs(cachedir, exist_ok=True)
     catalogfile = os.path.join(cachedir, "locations_default_catalog_filter.json")
     
-    # only try to load from cache if the default catalog_filter was used,
+    # only allow to load catalog from cache if the default catalog_filter was used,
     # if the cachefile is present and if it is less than 4 hours old
     use_cache = False
     if catalog_filter is None and os.path.exists(catalogfile):
@@ -75,6 +75,11 @@ def retrieve_or_load_catalog(catalog_filter:list = None):
         tdiff_hours = (pd.Timestamp.now() - cache_mtime_dt).total_seconds() / 3600
         if tdiff_hours < 4:
             use_cache = True
+    return catalogfile, use_cache
+
+
+def retrieve_or_load_catalog(catalog_filter:list = None):
+    catalogfile, use_cache = get_catalogfile_cache(catalog_filter=catalog_filter)
     
     # load or retrieve the catalog
     if use_cache:
@@ -88,7 +93,6 @@ def retrieve_or_load_catalog(catalog_filter:list = None):
             # only write the catalogfile if the default catalog_filter was used 
             with open(catalogfile, 'w') as f:
                 json.dump(result, f)
-
     return result
 
 

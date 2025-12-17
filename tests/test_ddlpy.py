@@ -8,7 +8,7 @@ import pytest
 import ddlpy
 import dateutil
 import numpy as np
-from ddlpy.ddlpy import _send_post_request, NoDataError
+from ddlpy.ddlpy import _send_post_request, NoDataError, get_catalogfile_cache
 
 DTYPES_NONSTRING = {
     'Locatie_MessageID': np.int64,
@@ -163,6 +163,14 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     with pytest.raises(NoDataError) as e:
         _send_post_request(url, request=request_nodata)
     assert '204 No Content:' in str(e.value)
+
+
+def test_get_catalogfile_cache():
+    catalogfile, use_cache = get_catalogfile_cache(catalog_filter=None)
+    assert use_cache is True
+    
+    catalogfile, use_cache = get_catalogfile_cache(catalog_filter=[])
+    assert use_cache is False
 
 
 def test_nodataerror(location):
