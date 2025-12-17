@@ -204,6 +204,7 @@ def test_locations(locations):
         'Hoedanigheid.Code', 'Hoedanigheid.Omschrijving',
         'Parameter.Code', 'Parameter.Omschrijving',
         'Groepering.Code', 'Groepering.Omschrijving',
+        'Typering.Code', 'Typering.Omschrijving',
         ]
     for colname in expected_columns:
         assert colname in locations.columns
