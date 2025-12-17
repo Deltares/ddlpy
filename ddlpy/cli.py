@@ -148,7 +148,7 @@ def measurements(locations, start_date, end_date):
             selected, start_date=start_date, end_date=end_date)
 
         if len(measurements) > 0:
-            print('Measurements of %s were obtained' % selected['Code'])
+            print('Data for station %s were retrieved from Waterwebservices' % selected['Code'])
             station = selected['Code']
             pt = selected['ProcesType']
             cc = selected['Compartiment.Code']
@@ -162,7 +162,7 @@ def measurements(locations, start_date, end_date):
             measurements.to_csv('%s_%s_%s_%s_%s_%s_%s_%s_%s.csv' %
                                 (station, pt ,cc, ec, gc, grc, hc, pc, tc))
         else:
-            print('No data for station %s were retrieved from Waterwebservices' %
+            print('No data available for station %s in the requested period' %
                   selected['Code'])
 
 

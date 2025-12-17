@@ -57,12 +57,14 @@ def test_command_line_interface(tmp_path):
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
     assert not os.path.exists(file_meas)
+    assert "No data available for station hoekvanholland in the requested period" in measurements_result.output
     
     # running ddlpy-measurements for a period with data succeeds and gives a datafile
     measurements_command = 'measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
     assert os.path.exists(file_meas)
+    assert "Data for station hoekvanholland were retrieved" in measurements_result.output
     
     # running ddlpy-measurements in verbose mode to add test coverage
     measurements_command = '--verbose measurements 2023-01-01 2023-01-03'
