@@ -4,6 +4,7 @@ History
 
 UNRELEASED
 ----------
+* added caching of json catalog for `ddlpy.locations()` in https://github.com/Deltares/ddlpy/pull/167
 
 0.8.0 (2025-12-13)
 ------------------
