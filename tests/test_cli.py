@@ -29,6 +29,13 @@ def test_command_line_interface(tmp_path):
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output
 
+    # running ddlpy-measurements without first running ddlpy-locations fails
+    measurements_command = 'measurements 2023-01-01 2023-01-03'
+    measurements_result = runner.invoke(cli.cli, measurements_command.split())
+    assert measurements_result.exit_code == 1
+    assert "locations.json file not found" in str(measurements_result.exception)
+
+    # run ddlpy-locations
     locations_command = 'locations --procestype astronomisch --grootheid-code WATHTE --station hoekvanholland --groepering-code ""'
     # replace empty string representation ('""') with empty string ("")
     locations_command_split = locations_command.split()
@@ -38,8 +45,16 @@ def test_command_line_interface(tmp_path):
     file_locs = "locations.json"
     assert os.path.exists(file_locs)
     
+    file_meas = "hoekvanholland_astronomisch_OW_cm_WATHTE__NAP_NVT_NVT.csv"
+    
+    # running ddlpy-measurements for period without data succeeds but gives no datafile
+    measurements_command = 'measurements 2050-01-01 2050-01-03'
+    measurements_result = runner.invoke(cli.cli, measurements_command.split())
+    assert measurements_result.exit_code == 0
+    assert not os.path.exists(file_meas)
+    
+    # running ddlpy-measurements for a period with data succeeds and gives a datafile
     measurements_command = 'measurements 2023-01-01 2023-01-03'
     measurements_result = runner.invoke(cli.cli, measurements_command.split())
     assert measurements_result.exit_code == 0
-    file_meas = "hoekvanholland_astronomisch_OW_cm_WATHTE__NAP_NVT.csv"
     assert os.path.exists(file_meas)
