@@ -24,6 +24,7 @@ dependencies = [
 	"tqdm",
 	"click",
 	"requests",
+	"platformdirs", # to create cache dir
 ]
 classifiers = [
 	"Development Status :: 3 - Alpha",
