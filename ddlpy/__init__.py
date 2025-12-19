@@ -2,7 +2,7 @@
 
 """Top-level package for Data Distributie Laag. Service from Rijkswaterstaat for distributing water quantity data.."""
 
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 
 from ddlpy.ddlpy import locations
 from ddlpy.ddlpy import (

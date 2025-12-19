@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rws-ddlpy"
-version = "0.9.3"
+version = "0.9.4"
 maintainers = [
 	{ name = "Fedor Baart", email = "fedor.baart@deltares.nl"},
 	{ name = "Jelmer Veenstra", email = "jelmer.veenstra@deltares.nl"},
