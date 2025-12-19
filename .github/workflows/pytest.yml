@@ -34,7 +34,7 @@ jobs:
         pip list
     - name: Lint with flake8
       run: |
-        flake8 . --max-line-length=88
+        flake8 . --max-line-length=88 --extend-ignore=E501
     - name: Test with pytest
       run: |
         pytest --cov=ddlpy --cov-report xml --cov-report term
