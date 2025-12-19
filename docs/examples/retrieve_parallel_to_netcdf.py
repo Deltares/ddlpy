@@ -6,14 +6,14 @@ This script gets data from ddl on multiple cores and generates a netcdf file per
 import ddlpy
 import datetime as dt
 import matplotlib.pyplot as plt
+plt.close("all")
 import xarray as xr
 import os
 from concurrent.futures import ProcessPoolExecutor
 import glob
-import logging
 
-plt.close("all")
 # enabling debug logging so we can see what happens in the background
+import logging
 logging.basicConfig()
 logging.getLogger("ddlpy").setLevel(logging.DEBUG)
 
@@ -27,9 +27,7 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
         print("{station_id}: netcdf file already exists and overwrite=False, skipping")
         return
 
-    measurements = ddlpy.measurements(
-        location, start_date=start_date, end_date=end_date
-    )
+    measurements = ddlpy.measurements(location, start_date=start_date, end_date=end_date)
 
     if measurements.empty:
         print(f"{station_id}: no measurements found")
@@ -68,16 +66,10 @@ if __name__ == "__main__":
             "olst",
         ]
     )
-    bool_procestype = locations["ProcesType"].isin(
-        ["meting"]
-    )  # meting/astronomisch/verwachting
+    bool_procestype = locations["ProcesType"].isin(["meting"])  # meting/astronomisch/verwachting
     bool_grootheid = locations["Grootheid.Code"].isin(["WATHTE"])  # waterlevel (WATHTE)
-    bool_groepering = locations["Groepering.Code"].isin(
-        [""]
-    )  # timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
-    bool_hoedanigheid = locations["Hoedanigheid.Code"].isin(
-        ["NAP"]
-    )  # vertical reference (NAP/MSL)
+    bool_groepering = locations["Groepering.Code"].isin([""])  # timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
+    bool_hoedanigheid = locations["Hoedanigheid.Code"].isin(["NAP"])  # vertical reference (NAP/MSL)
     selected = locations.loc[
         bool_stations
         & bool_procestype
@@ -104,8 +96,6 @@ if __name__ == "__main__":
         ds = xr.open_dataset(file_nc)
         station_code = ds.attrs["Code"]
         station_naam = ds.attrs["Naam"]
-        ds["Meetwaarde.Waarde_Numeriek"].plot(
-            ax=ax, label=f"{station_code} ({station_naam})"
-        )
+        ds["Meetwaarde.Waarde_Numeriek"].plot(ax=ax, label=f"{station_code} ({station_naam})")
         ds.close()
     ax.legend(loc=1)
