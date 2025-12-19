@@ -615,9 +615,7 @@ def test_check_convert_wrongorder():
 
     # assert output
     with pytest.raises(ValueError):
-        start_date_out, end_date_out = ddlpy.ddlpy._check_convert_dates(
-            end_date, start_date
-        )
+        _, _ = ddlpy.ddlpy._check_convert_dates(end_date, start_date)
 
 
 def test_simplify_dataframe(measurements):
