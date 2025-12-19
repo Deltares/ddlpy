@@ -16,7 +16,7 @@ def test_date_series():
     result = date_series(start, end)
     expected = [
         (datetime.datetime(2018, 1, 1, 0, 0), datetime.datetime(2018, 2, 1, 0, 0)),
-        (datetime.datetime(2018, 2, 1, 0, 0), datetime.datetime(2018, 3, 1, 0, 0))
+        (datetime.datetime(2018, 2, 1, 0, 0), datetime.datetime(2018, 3, 1, 0, 0)),
     ]
     assert result == expected
 
@@ -27,6 +27,6 @@ def test_date_series():
         (datetime.datetime(2017, 11, 15, 0, 0), datetime.datetime(2017, 12, 15, 0, 0)),
         (datetime.datetime(2017, 12, 15, 0, 0), datetime.datetime(2018, 1, 15, 0, 0)),
         (datetime.datetime(2018, 1, 15, 0, 0), datetime.datetime(2018, 2, 15, 0, 0)),
-        (datetime.datetime(2018, 2, 15, 0, 0), datetime.datetime(2018, 3, 5, 0, 0))
+        (datetime.datetime(2018, 2, 15, 0, 0), datetime.datetime(2018, 3, 5, 0, 0)),
     ]
     assert result == expected
