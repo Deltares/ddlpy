@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 
 
-def waterinfo_read(f, encoding="latin"):
+def waterinfo_read(f, encoding="latin", block=True):
     """
     Load RWS csv data of https://waterinfo.rws.nl into xarray
 
@@ -36,6 +36,14 @@ def waterinfo_read(f, encoding="latin"):
     >> df.head()
 
     """
+    # TODO: update this function to the new Waterwebservices or remove from ddlpy
+    # https://github.com/Deltares/ddlpy/issues/173
+    if block:
+        raise DeprecationWarning(
+            "ddlpy.waterinfo_read() is not maintained. You can still use it by passing "
+            "the argument `block=False`. Please also create an issue on the ddlpy "
+            "github to let us know you are using it."
+        )
 
     dfall = pd.read_csv(f, delimiter=";", encoding=encoding)
 
