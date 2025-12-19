@@ -28,13 +28,16 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -e .[dev,netcdf]
+        python -m pip install -e .[dev]
     - name: list env contents
       run: |
         pip list
     - name: Lint with flake8
       run: |
         flake8 . --max-line-length=88 --extend-ignore=E501 --exclude=docs/examples
+    - name: Minimal test with pytest
+      run: |
+        pytest tests/test_ddlpy.py
     - name: Test with pytest
       run: |
         pytest --cov=ddlpy --cov-report xml --cov-report term
