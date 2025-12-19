@@ -2,8 +2,8 @@
 History
 =======
 
-UNRELEASED
-----------
+0.9.0 (2025-12-19)
+------------------
 This version supports Python 3.9 and above
 * added caching of json catalog for `ddlpy.locations()` in https://github.com/Deltares/ddlpy/pull/167
 * dropped support for Python 3.8 in https://github.com/Deltares/ddlpy/pull/168
