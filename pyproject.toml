@@ -30,7 +30,6 @@ classifiers = [
 	"Intended Audience :: Developers",
 	"Intended Audience :: Science/Research",
 	"Operating System :: OS Independent",
-	"License-Expression: GPL-3.0",
     "Natural Language :: English",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
