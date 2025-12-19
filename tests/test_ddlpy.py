@@ -514,9 +514,9 @@ def test_measurements_sorted(measurements):
     measurements["Tijdstip"] = measurements.index
     # sort dataframe on values so it will not be sorted on time
     meas_wrongorder = measurements.sort_values("Meetwaarde.Waarde_Numeriek")
-    assert meas_wrongorder.index.is_monotonic_increasing == False
+    assert meas_wrongorder.index.is_monotonic_increasing is False
     meas_clean = ddlpy.ddlpy._clean_dataframe(meas_wrongorder)
-    assert meas_clean.index.is_monotonic_increasing == True
+    assert meas_clean.index.is_monotonic_increasing is True
     # assert meas_clean.index.duplicated().sum() == 0
 
     # check wheter indexes are DatetimeIndex

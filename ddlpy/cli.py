@@ -6,6 +6,7 @@ Console script for ddlpy.
     - ``ddlpy locations --help``
     - ``ddlpy measurements --help``
 """
+import os
 import sys
 import logging
 import click
@@ -109,10 +110,11 @@ def measurements(locations, start_date, end_date):
     The arguments start_date and end_date should be formatted
     like "YYYY-MM-DD" or something else that `pandas.Timestamp` understands.
     """
-    try:
-        locations_df = pd.read_json(locations, orient="records")
-    except:
-        raise ValueError('locations.json file not found. First run "ddlpy locations"')
+    if not os.path.exists(locations):
+        raise FileNotFoundError(
+            'locations.json file not found. First run "ddlpy locations"'
+        )
+    locations_df = pd.read_json(locations, orient="records")
 
     for irow, selected in locations_df.iterrows():  # goes through rows in table
         measurements = ddlpy.measurements(
