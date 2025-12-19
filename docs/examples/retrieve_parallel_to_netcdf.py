@@ -56,16 +56,7 @@ if __name__ == "__main__":
 
     # get locations
     locations = ddlpy.locations()
-    bool_stations = locations.index.isin(
-        [
-            "ijmuiden.buitenhaven",
-            "dantziggat.zuid",
-            "hoekvanholland",
-            "ameland.nes",
-            "vlissingen",
-            "olst",
-        ]
-    )
+    bool_stations = locations.index.isin(["ijmuiden.buitenhaven", "dantziggat.zuid", "hoekvanholland", "ameland.nes"])
     bool_procestype = locations["ProcesType"].isin(["meting"])  # meting/astronomisch/verwachting
     bool_grootheid = locations["Grootheid.Code"].isin(["WATHTE"])  # waterlevel (WATHTE)
     bool_groepering = locations["Groepering.Code"].isin([""])  # timeseries ("") versus extremes (GETETM2/GETETMSL2/GETETBRKD2/GETETBRKDMSL2)
