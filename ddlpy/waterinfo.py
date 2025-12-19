@@ -36,9 +36,8 @@ def waterinfo_read(f, encoding="latin", block=True):
     >> df.head()
 
     """
-    # TODO: Waterinfo probably uses bulkwaarnemingen from ddapi, but this is not yet
-    # supported in ddapi20. After that is implemented, also test ddlpy.read_waterinfo()
-    # with newly retrieved data.
+    # TODO: update this function to the new Waterwebservices or remove from ddlpy
+    # https://github.com/Deltares/ddlpy/issues/173
     if block:
         raise DeprecationWarning(
             "ddlpy.waterinfo_read() is not maintained. You can still use it by passing "
