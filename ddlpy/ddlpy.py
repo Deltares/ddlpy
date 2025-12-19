@@ -30,42 +30,42 @@ class NoDataError(ValueError):
 def _send_post_request(url, request, timeout=None):
     logger.debug("Requesting at {} with request: {}".format(url, json.dumps(request)))
     resp = requests.post(url, json=request, timeout=timeout)
-    
+
     if not resp.ok:
         # in case of for instance
         # resp.status_code: 400, resp.reason: Bad Request, resp.text: {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
         # resp.status_code: 500, resp.reason: Internal Server Error
         raise IOError(f"{resp.status_code} {resp.reason}: {resp.text}")
-    
-    if resp.status_code==204:
+
+    if resp.status_code == 204:
         # "204 No Content" is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
         raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
-    
+
     result = resp.json()
     return result
 
 
 def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
-    
+
     if catalog_filter is None:
         # use the default request from endpoints.json
         request = endpoint["request"]
     else:
         assert isinstance(catalog_filter, list)
-        request = {"CatalogusFilter": {x:True for x in catalog_filter}}
-    
+        request = {"CatalogusFilter": {x: True for x in catalog_filter}}
+
     result = _send_post_request(endpoint["url"], request, timeout=None)
-    
+
     return result
 
 
 def get_catalogfile_cache(catalog_filter):
     # create cache dir like %USERPROFILE%/AppData/Local/ddlpy/Cache
-    cachedir = os.path.join(platformdirs.user_cache_dir(), 'ddlpy', 'Cache')
+    cachedir = os.path.join(platformdirs.user_cache_dir(), "ddlpy", "Cache")
     os.makedirs(cachedir, exist_ok=True)
     catalogfile = os.path.join(cachedir, "locations_default_catalog_filter.json")
-    
+
     # only allow to load catalog from cache if the default catalog_filter was used,
     # if the cachefile is present and if it is less than 4 hours old
     use_cache = False
@@ -78,25 +78,25 @@ def get_catalogfile_cache(catalog_filter):
     return catalogfile, use_cache
 
 
-def retrieve_or_load_catalog(catalog_filter:list = None):
+def retrieve_or_load_catalog(catalog_filter: list = None):
     catalogfile, use_cache = get_catalogfile_cache(catalog_filter=catalog_filter)
-    
+
     # load or retrieve the catalog
     if use_cache:
         logger.info("Loading Waterwebservices catalog from cache")
-        with open(catalogfile, 'r') as f:
+        with open(catalogfile, "r") as f:
             result = json.load(f)
     else:
         logger.info("Retrieving Waterwebservices catalog, this can take 30 seconds")
         result = catalog(catalog_filter=catalog_filter)
         if catalog_filter is None:
-            # only write the catalogfile if the default catalog_filter was used 
-            with open(catalogfile, 'w') as f:
+            # only write the catalogfile if the default catalog_filter was used
+            with open(catalogfile, "w") as f:
                 json.dump(result, f)
     return result
 
 
-def locations(catalog_filter:list = None) -> pd.DataFrame:
+def locations(catalog_filter: list = None) -> pd.DataFrame:
     """
     Get station information from DDL (metadata from Catalogue). It conains all metadata
     regarding stations. The catalog is locally cached for maximum 4 hours, corresponding
@@ -106,7 +106,7 @@ def locations(catalog_filter:list = None) -> pd.DataFrame:
     Parameters
     ----------
     catalog_filter : list, optional
-        list of catalogs to pass on to OphalenCatalogus CatalogusFilter, 
+        list of catalogs to pass on to OphalenCatalogus CatalogusFilter,
         if None the list form endpoints.json is retrieved. The cache cannot be used when
         passing anything other than None. The default is None.
 
@@ -118,7 +118,7 @@ def locations(catalog_filter:list = None) -> pd.DataFrame:
     """
 
     result = retrieve_or_load_catalog(catalog_filter=catalog_filter)
-    
+
     df_locations = pd.DataFrame(result["LocatieLijst"])
 
     df_metadata = pd.json_normalize(result["AquoMetadataLijst"])
@@ -140,52 +140,53 @@ def locations(catalog_filter:list = None) -> pd.DataFrame:
 def _check_convert_dates(start_date, end_date, return_str=True):
     start_date = pd.Timestamp(start_date)
     end_date = pd.Timestamp(end_date)
-    
+
     # check if timezones are the same
     assert start_date.tz == end_date.tz
-    
+
     # set UTC timezone if tz is None
     if start_date.tz is None:
         start_date = pytz.UTC.localize(start_date)
     if end_date.tz is None:
         end_date = pytz.UTC.localize(end_date)
-    
+
     if start_date > end_date:
         raise ValueError(f"start_date {start_date} is larger than end_date {end_date}")
-    
+
     if return_str:
-        start_date_str = start_date.isoformat(timespec='milliseconds')
-        end_date_str = end_date.isoformat(timespec='milliseconds')
+        start_date_str = start_date.isoformat(timespec="milliseconds")
+        end_date_str = end_date.isoformat(timespec="milliseconds")
         return start_date_str, end_date_str
     else:
         return start_date, end_date
 
 
 def _get_request_dicts(location):
-    
+
     # generate aquometadata dict from location "*.Code" values
-    key_list = [x.replace(".Code","") for x in location.index if x.endswith(".Code")]
-    aquometadata_dict = {key:{"Code":location[f"{key}.Code"]} for key in key_list}
+    key_list = [x.replace(".Code", "") for x in location.index if x.endswith(".Code")]
+    aquometadata_dict = {key: {"Code": location[f"{key}.Code"]} for key in key_list}
     # additional code required for ProcesType since this does not adhere to the
     # Code/Omschrijving convention.
     if "ProcesType" in location.index:
         aquometadata_dict["ProcesType"] = location["ProcesType"]
-    
+
     # generate location dict from relevant values
     locatie_dict = {
         # assert code is used as index
         "Code": location.get("Code", location.name),
     }
-    
-    request_dicts = {"AquoMetadata": aquometadata_dict,
-                     "Locatie": locatie_dict}
+
+    request_dicts = {"AquoMetadata": aquometadata_dict, "Locatie": locatie_dict}
     return request_dicts
 
 
-def measurements_available(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp)) -> bool:
+def measurements_available(
+    location: pd.Series, start_date: (str, pd.Timestamp), end_date: (str, pd.Timestamp)
+) -> bool:
     """
     Checks if there are measurements available for a location in the requested period.
-    
+
     Parameters
     ----------
     location : pd.Series
@@ -201,33 +202,36 @@ def measurements_available(location:pd.Series, start_date:(str,pd.Timestamp), en
         Whether there are measurements available or not.
 
     """
-    endpoint = ENDPOINTS['check_observations_available']
+    endpoint = ENDPOINTS["check_observations_available"]
 
-    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
+    start_date_str, end_date_str = _check_convert_dates(
+        start_date, end_date, return_str=True
+    )
 
     request_dicts = _get_request_dicts(location)
 
     request = {
         "AquoMetadataLijst": [request_dicts["AquoMetadata"]],
         "LocatieLijst": [request_dicts["Locatie"]],
-        "Periode": {
-            "Begindatumtijd": start_date_str,
-            "Einddatumtijd": end_date_str
-        }
+        "Periode": {"Begindatumtijd": start_date_str, "Einddatumtijd": end_date_str},
     }
 
     result = _send_post_request(endpoint["url"], request, timeout=5)
-    
+
     # continue if request was successful
-    logger.debug('Got response: {}'.format(result))
-    if result['WaarnemingenAanwezig'] == 'true' :
+    logger.debug("Got response: {}".format(result))
+    if result["WaarnemingenAanwezig"] == "true":
         return True
     else:
-        return False  
+        return False
 
 
-def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp), 
-                        period:str = "Jaar") -> pd.DataFrame:
+def measurements_amount(
+    location: pd.Series,
+    start_date: (str, pd.Timestamp),
+    end_date: (str, pd.Timestamp),
+    period: str = "Jaar",
+) -> pd.DataFrame:
     """
     Retrieves the amount of measurements available for a location for the requested period.
 
@@ -249,13 +253,15 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
 
     """
     # TODO: there are probably more Groeperingsperiodes accepted by ddl, but not supported by ddlpy yet
-    accepted_period = ["Jaar","Maand","Dag"]
+    accepted_period = ["Jaar", "Maand", "Dag"]
     if period not in accepted_period:
         raise ValueError(f"period should be one of {accepted_period}, not '{period}'")
-    
-    endpoint = ENDPOINTS['collect_number_of_observations']
-    
-    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
+
+    endpoint = ENDPOINTS["collect_number_of_observations"]
+
+    start_date_str, end_date_str = _check_convert_dates(
+        start_date, end_date, return_str=True
+    )
 
     request_dicts = _get_request_dicts(location)
 
@@ -263,36 +269,41 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
         "AquoMetadataLijst": [request_dicts["AquoMetadata"]],
         "LocatieLijst": [request_dicts["Locatie"]],
         "Groeperingsperiode": period,
-        "Periode": {
-            "Begindatumtijd": start_date_str,
-            "Einddatumtijd": end_date_str
-        }
+        "Periode": {"Begindatumtijd": start_date_str, "Einddatumtijd": end_date_str},
     }
 
     result = _send_post_request(endpoint["url"], request, timeout=None)
 
     # continue if request was successful
     df_list = []
-    for one in result['AantalWaarnemingenPerPeriodeLijst']:
-        df = pd.json_normalize(one['AantalMetingenPerPeriodeLijst'])
-        
+    for one in result["AantalWaarnemingenPerPeriodeLijst"]:
+        df = pd.json_normalize(one["AantalMetingenPerPeriodeLijst"])
+
         # combine columns to a period string
-        df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(lambda x: f"{x:04d}")
+        df["Groeperingsperiode"] = df["Groeperingsperiode.Jaarnummer"].apply(
+            lambda x: f"{x:04d}"
+        )
         if period in ["Maand", "Dag"]:
-            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                        df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}"))
+            df["Groeperingsperiode"] = (
+                df["Groeperingsperiode"]
+                + "-"
+                + df["Groeperingsperiode.Maandnummer"].apply(lambda x: f"{x:02d}")
+            )
         if period in ["Dag"]:
-            df["Groeperingsperiode"] = (df["Groeperingsperiode"] + "-" + 
-                                        df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}"))
-        
+            df["Groeperingsperiode"] = (
+                df["Groeperingsperiode"]
+                + "-"
+                + df["Groeperingsperiode.Dag"].apply(lambda x: f"{x:02d}")
+            )
+
         # select columns from dataframe and append to list
         df = df.set_index("Groeperingsperiode")
         df = df[["AantalMetingen"]]
         df_list.append(df)
-    
+
     if len(df_list) == 0:
         raise NoDataError("no measurements available returned")
-    
+
     # concatenate and sum duplicated index
     df_amount = pd.concat(df_list).sort_index()
     df_amount = df_amount.groupby(df_amount.index).sum()
@@ -301,7 +312,7 @@ def measurements_amount(location:pd.Series, start_date:(str,pd.Timestamp), end_d
 
 def _combine_waarnemingenlijst(result, location):
     assert "WaarnemingenLijst" in result
-    
+
     # flatten the datastructure
     rows = []
     for waarneming in result["WaarnemingenLijst"]:
@@ -334,7 +345,7 @@ def _combine_waarnemingenlijst(result, location):
             rows.append(new_row)
     # normalize and return
     df = pd.json_normalize(rows)
-    
+
     # add other info
     df["Code"] = location.get("Code", location.name)
 
@@ -368,17 +379,16 @@ def _measurements_slice(location, start_date, end_date):
     """get measurements for location, for the period start_date, end_date, use measurements instead"""
     endpoint = ENDPOINTS["collect_observations"]
 
-    start_date_str, end_date_str = _check_convert_dates(start_date, end_date, return_str=True)
+    start_date_str, end_date_str = _check_convert_dates(
+        start_date, end_date, return_str=True
+    )
 
     request_dicts = _get_request_dicts(location)
-    
+
     request = {
-        "AquoPlusWaarnemingMetadata": {
-            "AquoMetadata": request_dicts["AquoMetadata"]
-            },
+        "AquoPlusWaarnemingMetadata": {"AquoMetadata": request_dicts["AquoMetadata"]},
         "Locatie": request_dicts["Locatie"],
-        "Periode": {"Begindatumtijd": start_date_str, 
-                    "Einddatumtijd": end_date_str},
+        "Periode": {"Begindatumtijd": start_date_str, "Einddatumtijd": end_date_str},
     }
 
     result = _send_post_request(endpoint["url"], request, timeout=None)
@@ -391,10 +401,10 @@ def _clean_dataframe(measurements):
     len_raw = len(measurements)
     # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
     measurements = measurements.drop_duplicates()
-    
+
     # remove Tijdstip column, has to be done after drop_duplicates to avoid too much to be dropped
     measurements = measurements.drop("Tijdstip", axis=1)
-    
+
     # sort dataframe on time, ddl returns non-sorted data
     measurements = measurements.sort_index()
     ndropped = len_raw - len(measurements)
@@ -402,8 +412,13 @@ def _clean_dataframe(measurements):
     return measurements
 
 
-def measurements(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(str,pd.Timestamp), 
-                 freq:int = dateutil.rrule.MONTHLY, clean_df:bool = True):
+def measurements(
+    location: pd.Series,
+    start_date: (str, pd.Timestamp),
+    end_date: (str, pd.Timestamp),
+    freq: int = dateutil.rrule.MONTHLY,
+    clean_df: bool = True,
+):
     """
     Returns measurements for the given location and requested period.
 
@@ -418,36 +433,36 @@ def measurements(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(st
     freq : int, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
         The frequency in which to divide the requested period (e.g. yearly or monthly).
         Can also be None, in which case the entire dataset will be retrieved at once.
-        Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks 
+        Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks
         since the DDL limits the responses to 157681 values and several stations have duplicated timesteps.
         In that case the query will fail with an error or timeout or just return an empty result (as if there was no data).
         In that case, the user should fallback to monthly chunks.
         This is significantly slower but it is also much more robust. The default is dateutil.rrule.MONTHLY.
     clean_df : bool, optional
         Whether to sort the dataframe and remove duplicate rows. The default is True.
-    
+
     Returns
     -------
     measurements : pd.DataFrame
         DataFrame with measurements.
     """
-    
+
     if isinstance(location, pd.DataFrame):
-        raise TypeError("The provided location is a pandas.DataFrame, but should be a pandas.Series, "
-                        "supply only one location/row instead, for instance by doing 'location.iloc[0]'")
-    
+        raise TypeError(
+            "The provided location is a pandas.DataFrame, but should be a pandas.Series, "
+            "supply only one location/row instead, for instance by doing 'location.iloc[0]'"
+        )
+
     start_date, end_date = _check_convert_dates(start_date, end_date, return_str=False)
-    
+
     measurements = []
 
     if freq is None:
         date_series_iterator = tqdm.tqdm([(start_date, end_date)])
     else:
-        date_series_iterator = tqdm.tqdm(
-            date_series(start_date, end_date, freq=freq)
-        )
-    
-    for (start_date_i, end_date_i) in date_series_iterator:
+        date_series_iterator = tqdm.tqdm(date_series(start_date, end_date, freq=freq))
+
+    for start_date_i, end_date_i in date_series_iterator:
         try:
             measurement = _measurements_slice(
                 location, start_date=start_date_i, end_date=end_date_i
@@ -460,16 +475,16 @@ def measurements(location:pd.Series, start_date:(str,pd.Timestamp), end_date:(st
         # return empty dataframe in case of no data
         logger.debug("no data found for this station and time extent")
         return pd.DataFrame()
-    
+
     measurements = pd.concat(measurements)
 
     if clean_df:
         measurements = _clean_dataframe(measurements)
-    
+
     return measurements
 
 
-def measurements_latest(location:pd.Series) -> pd.DataFrame:
+def measurements_latest(location: pd.Series) -> pd.DataFrame:
     """
     Returns the latest available measurement for the given location.
 
@@ -484,16 +499,19 @@ def measurements_latest(location:pd.Series) -> pd.DataFrame:
         DataFrame with measurements.
 
     """
-    endpoint = ENDPOINTS['collect_latest_observations']
+    endpoint = ENDPOINTS["collect_latest_observations"]
 
     request_dicts = _get_request_dicts(location)
-    
-    request = {"AquoPlusWaarnemingMetadataLijst":[{"AquoMetadata":request_dicts["AquoMetadata"]}],
-               "LocatieLijst":[request_dicts["Locatie"]]
-               }
+
+    request = {
+        "AquoPlusWaarnemingMetadataLijst": [
+            {"AquoMetadata": request_dicts["AquoMetadata"]}
+        ],
+        "LocatieLijst": [request_dicts["Locatie"]],
+    }
 
     result = _send_post_request(endpoint["url"], request, timeout=5)
-    
+
     # continue if request was successful
     df = _combine_waarnemingenlijst(result, location)
     return df

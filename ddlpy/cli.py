@@ -6,6 +6,7 @@ Console script for ddlpy.
     - ``ddlpy locations --help``
     - ``ddlpy measurements --help``
 """
+import os
 import sys
 import logging
 import click
@@ -14,8 +15,8 @@ import ddlpy
 
 
 @click.group()
-@click.option('-v', '--verbose', count=True)
-def cli(verbose,  args=None):
+@click.option("-v", "--verbose", count=True)
+def cli(verbose, args=None):
     """Console script for ddlpy."""
     level = logging.INFO
     if verbose >= 1:
@@ -28,66 +29,35 @@ def cli(verbose,  args=None):
 # Each command has options which are read from the console.
 @cli.command()
 @click.option(
-    '--output', 
-    help='the locations json filename that will be created',
-    default='locations.json'
-    )
-@click.option(
-    '--station',
-    help='Station codes, e.g. HOEKVHLD',
-    multiple=True
+    "--output",
+    help="the locations json filename that will be created",
+    default="locations.json",
 )
+@click.option("--station", help="Station codes, e.g. HOEKVHLD", multiple=True)
 @click.option(
-    '--procestype',
-    help='Procestype, e.g. meting, astronomisch, verwachting',
-    multiple=True
+    "--procestype",
+    help="Procestype, e.g. meting, astronomisch, verwachting",
+    multiple=True,
 )
-@click.option(
-    '--grootheid-code',
-    help='Grootheid code, e.g. WATHTE',
-    multiple=True
-)
-@click.option(
-    '--groepering-code',
-    help='Groepering code, e.g. NVT',
-    multiple=True
-)
-@click.option(
-    '--hoedanigheid-code',
-    help='Hoedanigheid code, e.g. NAP',
-    multiple=True
-)
-@click.option(
-    '--eenheid-code',
-    help='Eenheid code, e.g. cm',
-    multiple=True
-)
-@click.option(
-    '--parameter-code',
-    help='Parameter code',
-    multiple=True
-)
-@click.option(
-    '--compartiment-code',
-    help='Compartiment code, e.g. OW',
-    multiple=True
-)
-@click.option(
-    '--typering-code',
-    help='Typering code, e.g. GETETTPE',
-    multiple=True
-)
-def locations(output,
-              station,
-              procestype,
-              grootheid_code,
-              groepering_code,
-              hoedanigheid_code,
-              eenheid_code,
-              parameter_code,
-              compartiment_code,
-              typering_code,
-              ):
+@click.option("--grootheid-code", help="Grootheid code, e.g. WATHTE", multiple=True)
+@click.option("--groepering-code", help="Groepering code, e.g. NVT", multiple=True)
+@click.option("--hoedanigheid-code", help="Hoedanigheid code, e.g. NAP", multiple=True)
+@click.option("--eenheid-code", help="Eenheid code, e.g. cm", multiple=True)
+@click.option("--parameter-code", help="Parameter code", multiple=True)
+@click.option("--compartiment-code", help="Compartiment code, e.g. OW", multiple=True)
+@click.option("--typering-code", help="Typering code, e.g. GETETTPE", multiple=True)
+def locations(
+    output,
+    station,
+    procestype,
+    grootheid_code,
+    groepering_code,
+    hoedanigheid_code,
+    eenheid_code,
+    parameter_code,
+    compartiment_code,
+    typering_code,
+):
     """
     Subset locations dataframe based on input codes and write locations.json.
 
@@ -95,75 +65,86 @@ def locations(output,
     locations_df = ddlpy.locations()
 
     stations = station
-    quantities = {'ProcesType':list(procestype),
-                  'Grootheid.Code': list(grootheid_code),
-                  'Groepering.Code': list(groepering_code),
-                  'Hoedanigheid.Code': list(hoedanigheid_code),
-                  'Eenheid.Code': list(eenheid_code),
-                  'Parameter.Code': list(parameter_code),
-                  'Compartiment.Code': list(compartiment_code),
-                  'Typering.Code': list(typering_code),
-                  }
+    quantities = {
+        "ProcesType": list(procestype),
+        "Grootheid.Code": list(grootheid_code),
+        "Groepering.Code": list(groepering_code),
+        "Hoedanigheid.Code": list(hoedanigheid_code),
+        "Eenheid.Code": list(eenheid_code),
+        "Parameter.Code": list(parameter_code),
+        "Compartiment.Code": list(compartiment_code),
+        "Typering.Code": list(typering_code),
+    }
 
     selected = locations_df.copy()
 
-    if (stations):
+    if stations:
         selected = selected[selected.index.isin(stations)]
 
     for q in quantities.keys():
-        if (len(quantities[q]) != 0):
+        if len(quantities[q]) != 0:
             selected = selected[selected[q].isin(quantities[q])]
 
     selected.reset_index(inplace=True)
 
-    output= output.split('.')[0] # make sure that extension is always json
-    selected.to_json(output+'.json', orient='records')
+    output = output.split(".")[0]  # make sure that extension is always json
+    selected.to_json(output + ".json", orient="records")
+
 
 # Another command to get the measurements from locations
 @cli.command()
 @click.argument(
-    'start-date',
+    "start-date",
 )
 @click.argument(
-    'end-date',
+    "end-date",
 )
 @click.option(
-    '--locations',
-    default='locations.json',
-    help='file in json or parquet format containing locations and codes'
+    "--locations",
+    default="locations.json",
+    help="file in json or parquet format containing locations and codes",
 )
 def measurements(locations, start_date, end_date):
     """
-    Obtain measurements from file with locations and codes. 
-    The arguments start_date and end_date should be formatted 
+    Obtain measurements from file with locations and codes.
+    The arguments start_date and end_date should be formatted
     like "YYYY-MM-DD" or something else that `pandas.Timestamp` understands.
     """
-    try:
-        locations_df = pd.read_json(locations, orient='records')
-    except:
-        raise ValueError('locations.json file not found. First run "ddlpy locations"')
-        
-    for irow, selected in locations_df.iterrows(): #goes through rows in table
+    if not os.path.exists(locations):
+        raise FileNotFoundError(
+            'locations.json file not found. First run "ddlpy locations"'
+        )
+    locations_df = pd.read_json(locations, orient="records")
+
+    for irow, selected in locations_df.iterrows():  # goes through rows in table
         measurements = ddlpy.measurements(
-            selected, start_date=start_date, end_date=end_date)
+            selected, start_date=start_date, end_date=end_date
+        )
 
         if len(measurements) > 0:
-            print('Data for station %s were retrieved from Waterwebservices' % selected['Code'])
-            station = selected['Code']
-            pt = selected['ProcesType']
-            cc = selected['Compartiment.Code']
-            ec = selected['Eenheid.Code']
-            gc = selected['Grootheid.Code']
-            grc = selected['Groepering.Code']
-            hc = selected['Hoedanigheid.Code']
-            pc = selected['Parameter.Code']
-            tc = selected['Typering.Code']
+            print(
+                "Data for station %s were retrieved from Waterwebservices"
+                % selected["Code"]
+            )
+            station = selected["Code"]
+            pt = selected["ProcesType"]
+            cc = selected["Compartiment.Code"]
+            ec = selected["Eenheid.Code"]
+            gc = selected["Grootheid.Code"]
+            grc = selected["Groepering.Code"]
+            hc = selected["Hoedanigheid.Code"]
+            pc = selected["Parameter.Code"]
+            tc = selected["Typering.Code"]
 
-            measurements.to_csv('%s_%s_%s_%s_%s_%s_%s_%s_%s.csv' %
-                                (station, pt ,cc, ec, gc, grc, hc, pc, tc))
+            measurements.to_csv(
+                "%s_%s_%s_%s_%s_%s_%s_%s_%s.csv"
+                % (station, pt, cc, ec, gc, grc, hc, pc, tc)
+            )
         else:
-            print('No data available for station %s in the requested period' %
-                  selected['Code'])
+            print(
+                "No data available for station %s in the requested period"
+                % selected["Code"]
+            )
 
 
 if __name__ == "__main__":
