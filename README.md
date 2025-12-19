@@ -7,8 +7,7 @@
 
 # ddlpy
 
-(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data. This package provides an API for Python. See also https://github.com/wstolte/rwsapi for the R API.
-
+(D)ata (D)istributie (L)aag is a service from Rijkswaterstaat for distributing water quantity data, more information is available at https://rijkswaterstaatdata.nl/waterdata. This package provides an API for Python and includes easy filtering of available data and stations, convenient conversion to pandas and xarray objects, automatic chunking of large data requests, error handling and much more nifty features. See also https://github.com/wstolte/rwsapi for the R API.
 
 # Install
 
@@ -44,4 +43,4 @@ With `ddlpy measurements` you can obtain measurements for locations/parameters i
 
 # Something broke?
 
-Check the [status of the DDL](https://rijkswaterstaatdata.nl/waterdata/#hfd2f5e23-5092-4169-9f36-41e9734e7d87) (at the *Updates* heading). If you have a suggestion or found a bug in ddlpy, please [create an issue](https://github.com/Deltares/ddlpy/issues).
+First check the [status of the DDL](https://rijkswaterstaatdata.nl/waterdata/#hfd2f5e23-5092-4169-9f36-41e9734e7d87) (at the *Updates* section). If you found an issue in the data or with the Waterwebservices, please [start a discussion at the Waterwebservices github](https://github.com/Rijkswaterstaat/WaterWebservices/discussions). If you have a suggestion or found a bug in ddlpy, please [create a issue at the ddlpy Github](https://github.com/Deltares/ddlpy/issues).
