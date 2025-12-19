@@ -16,8 +16,8 @@ def test_waterinfo_read():
     f = os.path.join(dir_tests, "20200608_069_20200507.csv")
     g = os.path.join(dir_tests, "NVT_WATHTE_SCHE_20200507.csv")
 
-    dxf_list = waterinfo_read(f)
-    dxg_list = waterinfo_read(g)
+    dxf_list = waterinfo_read(f, block=False)
+    dxg_list = waterinfo_read(g, block=False)
 
     dxf0 = dxf_list[0]
     dxg0 = dxg_list[0]

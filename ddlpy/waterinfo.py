@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 
 
-def waterinfo_read(f, encoding="latin"):
+def waterinfo_read(f, encoding="latin", block=True):
     """
     Load RWS csv data of https://waterinfo.rws.nl into xarray
 
@@ -36,7 +36,16 @@ def waterinfo_read(f, encoding="latin"):
     >> df.head()
 
     """
-
+    # TODO: Waterinfo probably uses bulkwaarnemingen from ddapi, but this is not yet
+    # supported in ddapi20. After that is implemented, also test ddlpy.read_waterinfo()
+    # with newly retrieved data.
+    if block:
+        raise DeprecationWarning(
+            "ddlpy.waterinfo_read() is not maintained. You can still use it by passing "
+            "the argument `block=False`. Please also create an issue on the ddlpy "
+            "github to let us know you are using it."
+            )
+        
     dfall = pd.read_csv(f, delimiter=";", encoding=encoding)
 
     if "WAARNEMINGDATUM" in dfall.keys():
