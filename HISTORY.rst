@@ -2,8 +2,9 @@
 History
 =======
 
-UNRELEASED
-----------
+0.9.3 (2025-12-19)
+------------------
+* added missing platformdirs dependency in https://github.com/Deltares/ddlpy/pull/178
 
 0.9.0 (2025-12-19)
 ------------------
