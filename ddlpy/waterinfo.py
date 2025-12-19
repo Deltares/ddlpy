@@ -43,8 +43,8 @@ def waterinfo_read(f, encoding="latin", block=True):
             "ddlpy.waterinfo_read() is not maintained. You can still use it by passing "
             "the argument `block=False`. Please also create an issue on the ddlpy "
             "github to let us know you are using it."
-            )
-        
+        )
+
     dfall = pd.read_csv(f, delimiter=";", encoding=encoding)
 
     if "WAARNEMINGDATUM" in dfall.keys():
