@@ -5,14 +5,17 @@
     "type": "POST",
     "request": {
       "CatalogusFilter": {
-        "Eenheden": true,
+        "WaardeBewerkingsMethoden": true,
+        "Typeringen": true,
         "Grootheden": true,
-        "Hoedanigheden": true,
-        "Groeperingen": true,
         "Parameters": true,
-        "Typeringen":true,
         "ProcesTypes": true,
-        "Compartimenten": true
+        "Compartimenten": true,
+        "Hoedanigheden": true,
+        "Organen": true,
+        "BioTaxon": true,
+        "Eenheden": true,
+        "Groeperingen": true
       }
     }
   },
