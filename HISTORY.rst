@@ -2,8 +2,8 @@
 History
 =======
 
-UNRELEASED
-----------
+0.10.0 (2025-12-23)
+-------------------
 * expanded default catalog_filter for ddlpy.locations() in https://github.com/Deltares/ddlpy/pull/182
 
 0.9.3 (2025-12-19)
