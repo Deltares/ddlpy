@@ -72,16 +72,3 @@ def collect_number_of_observations_resp(endpoints):
 
 def test_collect_number_of_observations(collect_number_of_observations_resp):
     assert collect_number_of_observations_resp.status_code == 200
-
-
-# TODO: AanvragenBulkWaarnemingen not present in new WaterWebservices
-# https://github.com/Deltares/ddlpy/issues/145
-# https://github.com/Rijkswaterstaat/WaterWebservices/issues/15
-# @pytest.fixture
-# def request_bulk_observations_resp(endpoints):
-#     endpoint = endpoints['request_bulk_observations']
-#     resp = requests.post(endpoint['url'], json=endpoint['request'])
-#     return resp
-
-# def test_request_bulk_observations(request_bulk_observations_resp):
-#     assert request_bulk_observations_resp.status_code == 200
