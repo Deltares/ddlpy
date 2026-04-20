@@ -2,7 +2,6 @@
 
 """Main module."""
 
-import os
 import json
 import pathlib
 import logging
