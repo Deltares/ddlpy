@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `ddlpy` package."""
+
 import datetime as dt
 import pandas as pd
 import pytest
