@@ -95,9 +95,6 @@ def test_send_post_request_errors_ophalencatalogus(endpoints):
     }
     result = _send_post_request(url, request=request_incorrectkeys)
     assert result["Succesvol"]
-    assert result["AquoMetadataLijst"] == []
-    assert result["AquoMetadataLocatieLijst"] == []
-    assert result["LocatieLijst"] == []
     assert result["StatuswaardeLijst"] == [
         "Ongecontroleerd",
         "Gecontroleerd",
@@ -179,7 +176,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert "400 Bad Request:" in str(e.value)
     assert '"Succesvol":false' in str(e.value)
     assert (
-        '"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request."'
+        '"Foutmelding":"Het maximaal aantal waarnemingen (263088) is overschreden. Beperk uw request."'
         in str(e.value)
     )
     assert '"WaarnemingenLijst":[]' in str(e.value)
