@@ -6,6 +6,7 @@ Console script for ddlpy.
     - ``ddlpy locations --help``
     - ``ddlpy measurements --help``
 """
+
 import os
 import sys
 import logging
