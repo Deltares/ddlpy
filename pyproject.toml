@@ -73,6 +73,7 @@ examples = [
 netcdf = [
 	"xarray",
 	"h5netcdf",
+	"h5py",
 ]
 
 [project.scripts]
