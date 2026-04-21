@@ -735,7 +735,7 @@ def test_dataframe_to_xarray(measurements):
     assert ds_firsttime.tz is None
 
 
-def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path):
+def test_dataframe_to_xarray_to_netcdf_h5netcdf(measurements, tmp_path):
     """
     should be in test_utils.py
     """
@@ -744,6 +744,28 @@ def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path):
     )
     file_out = tmp_path / "test.nc"
     ds_clean.to_netcdf(file_out, engine="h5netcdf")
+
+
+def test_dataframe_to_xarray_to_netcdf_netcdf4(measurements, tmp_path):
+    """
+    should be in test_utils.py
+    """
+    ds_clean = ddlpy.dataframe_to_xarray(
+        df=measurements,
+    )
+    file_out = tmp_path / "test.nc"
+    ds_clean.to_netcdf(file_out, engine="netcdf4")
+
+
+def test_dataframe_to_xarray_to_netcdf_netcdf4_classic(measurements, tmp_path):
+    """
+    should be in test_utils.py
+    """
+    ds_clean = ddlpy.dataframe_to_xarray(
+        df=measurements,
+    )
+    file_out = tmp_path / "test.nc"
+    ds_clean.to_netcdf(file_out, engine="netcdf4", format="NETCDF4_CLASSIC")
 
 
 def test_dataframe_to_xarray_drop_omschrijving(measurements):

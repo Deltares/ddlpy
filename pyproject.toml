@@ -74,6 +74,7 @@ netcdf = [
 	"xarray",
 	"h5netcdf",
 	"h5py",
+	"netcdf4",
 ]
 
 [project.scripts]
@@ -87,6 +88,9 @@ testpaths = ["tests"]
 addopts = "--durations=0"
 filterwarnings = [
 	"error",
+	# temporarily ignore numpy incompatibility: https://github.com/Deltares/dfm_tools/issues/1243
+	# this warning broke github tests for python 3.11, 3.12 and 3.13
+	"ignore:numpy.ndarray size changed:RuntimeWarning",
 	]
 
 [tool.flake8]
