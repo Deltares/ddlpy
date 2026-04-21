@@ -743,7 +743,7 @@ def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path):
         df=measurements,
     )
     file_out = tmp_path / "test.nc"
-    ds_clean.to_netcdf(file_out)
+    ds_clean.to_netcdf(file_out, engine="h5netcdf")
 
 
 def test_dataframe_to_xarray_drop_omschrijving(measurements):
