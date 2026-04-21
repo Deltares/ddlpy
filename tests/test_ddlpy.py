@@ -735,6 +735,17 @@ def test_dataframe_to_xarray(measurements):
     assert ds_firsttime.tz is None
 
 
+def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path):
+    """
+    should be in test_utils.py
+    """
+    ds_clean = ddlpy.dataframe_to_xarray(
+        df=measurements,
+    )
+    file_out = tmp_path / "test.nc"
+    ds_clean.to_netcdf(file_out)
+
+
 def test_dataframe_to_xarray_drop_omschrijving(measurements):
     """
     in case of non-unique Code/Omschrijving pairs, the Omschrijving variable should be
