@@ -75,6 +75,7 @@ netcdf = [
 	"h5netcdf",
 	"h5py",
 	"netcdf4",
+	"scipy",
 ]
 
 [project.scripts]
