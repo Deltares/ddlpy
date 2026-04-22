@@ -72,7 +72,7 @@ examples = [
 ]
 netcdf = [
 	"xarray",
-	"h5netcdf",
+	"h5netcdf[h5py]",
 	"netcdf4",
 ]
 
