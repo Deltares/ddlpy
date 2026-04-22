@@ -96,7 +96,7 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
 
     Furthermore, all ".Omschrijving" variables are dropped and the information is added
     as attributes to the Code variables.
-    
+
     Lastly, all string variables are converted to char arrays to save space when writing
     the netcdf with engines netcdf4/h5netcdf. Char arrays are used per default with
     engine scipy or engine netcdf4 with format="NETCDF4_CLASSIC".
@@ -131,6 +131,7 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     # char arrays are used per default with engine scipy/netcdf4_classic
     for var in ds.data_vars:
         if ds[var].dtype.kind == "O":
-            ds[var].encoding = {"dtype": "S1"}
+            maxlen = int(ds[var].str.len().max())
+            ds[var].encoding = {"dtype": f"S{maxlen}"}
 
     return ds
