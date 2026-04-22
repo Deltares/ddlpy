@@ -174,9 +174,9 @@ def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path, engine):
     ds_clean = ddlpy.dataframe_to_xarray(
         df=measurements,
     )
-    
+
     file_out = tmp_path / f"test_{engine}.nc"
-    
+
     if engine == "netcdf4_classic":
         ds_clean.to_netcdf(file_out, engine="netcdf4", format="NETCDF4_CLASSIC")
     else:
