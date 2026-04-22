@@ -20,7 +20,6 @@ DTYPES_NONSTRING = {
 }
 
 
-
 def test_send_post_request_errors_wrongapi():
     url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenCatalogus"
     with pytest.raises(IOError) as e:
@@ -574,4 +573,3 @@ def test_check_convert_wrongorder():
     # assert output
     with pytest.raises(ValueError):
         _, _ = ddlpy.ddlpy._check_convert_dates(end_date, start_date)
-
