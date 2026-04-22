@@ -49,7 +49,7 @@ Issues = "https://github.com/deltares/ddlpy/issues"
 [project.optional-dependencies]
 dev = [
 	"bump2version>=0.5.11",
-	"flake8",
+	"black",
 	"pytest>=3.8.2",
 	"pytest-cov",
 	"twine",
@@ -72,7 +72,8 @@ examples = [
 ]
 netcdf = [
 	"xarray",
-	"h5netcdf",
+	"h5netcdf[h5py]",
+	"netcdf4",
 ]
 
 [project.scripts]
@@ -86,6 +87,9 @@ testpaths = ["tests"]
 addopts = "--durations=0"
 filterwarnings = [
 	"error",
+	# temporarily ignore numpy incompatibility: https://github.com/Deltares/ddlpy/issues/192
+	# this warning broke github tests for python 3.11, 3.12 and 3.13
+	"ignore:numpy.ndarray size changed:RuntimeWarning",
 	]
 
 [tool.flake8]
