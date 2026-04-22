@@ -130,7 +130,7 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     # enforce char arrays to reduce filesize for strings with engine netcdf4/h5netcdf
     # char arrays are used per default with engine scipy/netcdf4_classic
     for var in ds.data_vars:
-        if ds[var].dtype.kind == "O":
+        if ds[var].dtype.kind in {"O", "U"}:
             maxlen = int(ds[var].str.len().max())
             ds[var].encoding = {"dtype": f"S{maxlen}"}
 
