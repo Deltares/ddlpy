@@ -45,9 +45,7 @@ def get_data(location, start_date, end_date, dir_output, overwrite=True):
     ]
     ds = ddlpy.dataframe_to_xarray(measurements, always_preserve=always_preserve)
 
-    # write to netcdf file. NETCDF3_CLASSIC or NETCDF4_CLASSIC automatically converts
-    # variables of dtype <U to |S which saves a lot of disk space
-    ds.to_netcdf(filename, format="NETCDF4_CLASSIC")
+    ds.to_netcdf(filename)
 
 
 if __name__ == "__main__":

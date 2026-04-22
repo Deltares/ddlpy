@@ -97,9 +97,9 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     Furthermore, all ".Omschrijving" variables are dropped and the information is added
     as attributes to the Code variables.
 
-    When writing the dataset to disk with ds.to_netcdf() it is recommended to use
-    `format="NETCDF3_CLASSIC"` or `format="NETCDF4_CLASSIC"` since this automatically
-    converts variables of dtype <U to |S which saves a lot of disk space for DDL data.
+    Lastly, all string variables are converted to char arrays to minimize filesizes when
+    writing the netcdf with engine="netcdf4" or engine="h5netcdf". Char arrays are
+    always used with engine="scipy" or engine="netcdf4" with format="NETCDF4_CLASSIC".
     """
 
     df_simple = simplify_dataframe(df, always_preserve=always_preserve)
@@ -126,5 +126,12 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
         if varn.endswith(".Omschrijving"):
             omschrijving_vars.append(varn)
     ds = ds.drop_vars(omschrijving_vars)
+
+    # enforce char arrays to reduce filesize for strings with engine netcdf4/h5netcdf
+    # char arrays are used per default with engine scipy/netcdf4_classic
+    for var in ds.data_vars:
+        if ds[var].dtype.kind == "O":
+            maxlen = int(ds[var].str.len().max())
+            ds[var].encoding = {"dtype": f"S{maxlen}"}
 
     return ds

@@ -169,7 +169,7 @@ def test_dataframe_to_xarray_drop_omschrijving(measurements):
     assert ds["MeetApparaat.Code"].attrs == expected_attrs
 
 
-@pytest.mark.parametrize("engine", [None, "h5netcdf", "netcdf4", "netcdf4_classic"])
+@pytest.mark.parametrize("engine", [None, "scipy", "h5netcdf", "netcdf4", "netcdf4_classic"])
 def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path, engine):
     ds_clean = ddlpy.dataframe_to_xarray(
         df=measurements,

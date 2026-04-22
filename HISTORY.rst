@@ -5,6 +5,7 @@ History
 UNRELEASED
 ----------
 * removed caching again in https://github.com/Deltares/ddlpy/pull/189
+* enforce conversion of strings to char arrays in `ddlpy.dataframe_to_xarray()` in  https://github.com/Deltares/ddlpy/pull/194
 
 0.10.0 (2025-12-23)
 -------------------
