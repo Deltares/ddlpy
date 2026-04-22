@@ -97,9 +97,9 @@ def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     Furthermore, all ".Omschrijving" variables are dropped and the information is added
     as attributes to the Code variables.
 
-    Lastly, all string variables are converted to char arrays to save space when writing
-    the netcdf with engines netcdf4/h5netcdf. Char arrays are used per default with
-    engine scipy or engine netcdf4 with format="NETCDF4_CLASSIC".
+    Lastly, all string variables are converted to char arrays to minimize filesizes when
+    writing the netcdf with engine="netcdf4" or engine="h5netcdf". Char arrays are
+    always used with engine="scipy" or engine="netcdf4" with format="NETCDF4_CLASSIC".
     """
 
     df_simple = simplify_dataframe(df, always_preserve=always_preserve)
