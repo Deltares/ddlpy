@@ -80,7 +80,6 @@ netcdf = [
 	"scipy>=1.13.0",
     # h5netcdf>=1.7.1" fixes "ValueError: Size must be positive"
 	"h5netcdf[h5py]>=1.7.1",
-    "h5py",
     #netcdf4>=1.7.2 supports numpy 2
 	"netcdf4>=1.7.2",
 ]
