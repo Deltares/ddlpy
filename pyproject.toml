@@ -74,7 +74,8 @@ examples = [
 	"matplotlib",
 ]
 netcdf = [
-	"xarray>=2024.07.0", # latest release supporting py39
+    #xarray>=2024.07.0 is the latest release supporting py39
+	"xarray>=2024.07.0",
 	#scipy>=1.13.0 is the first version to support py310 (1.8.0 also) and including numpy v2 support
 	"scipy>=1.13.0",
     # h5netcdf>=1.7.1" fixes "ValueError: Size must be positive"
