@@ -75,9 +75,12 @@ examples = [
 ]
 netcdf = [
 	"xarray>=2024.07.0", # latest release supporting py39
-	"scipy",
-	"h5netcdf[h5py]",
-	"netcdf4",
+	#scipy>=1.13.0 is the first version to support py310 (1.8.0 also) and including numpy v2 support
+	"scipy>=1.13.0",
+    # h5netcdf>=1.7.1" fixes "ValueError: Size must be positive"
+	"h5netcdf[h5py]>=1.7.1",
+    #netcdf4>=1.7.2 supports numpy 2
+	"netcdf4>=1.7.2",
 ]
 
 [project.scripts]
@@ -131,9 +134,10 @@ python-dateutil = "==2.8.2"
 #requests = "=="
 # netcdf dependency group
 xarray = "==2024.07.0"
-#scipy = "=="
-#h5netcdf[h5py] = "=="
-#netcdf4 = "=="
+scipy = "==1.13.0"
+h5netcdf = "==1.7.1"
+h5py = "*"
+netcdf4 = "==1.7.2"
 
 # Define features for different Python versions and Hydromt versions
 [tool.pixi.feature.py39.dependencies]
