@@ -5,7 +5,10 @@ import numpy as np
 
 
 def date_series(start, end, freq=dateutil.rrule.MONTHLY):
-    """return a list of start and end date over the timespan start[->end following the frequency rule"""
+    """
+    return a list of start and end date over the timespan start[->end following
+    the frequency rule.
+    """
 
     def pairwise(it):
         """return all sequential pairs"""
@@ -35,8 +38,8 @@ def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
     Drop columns with constant values from the dataframe and collect them
     in a dictionary which is added as attrs of the dataframe.
     The column Meetwaarde.Waarde_Alfanumeriek is also dropped if it is a duplicate of
-    Meetwaarde.Waarde_Numeriek.
-    The column names passed in `always_preserve` are preserved even if they are constant.
+    Meetwaarde.Waarde_Numeriek. The column names passed in `always_preserve` are
+    preserved even if they are constant.
     """
 
     # define which columns are constant
@@ -51,7 +54,8 @@ def simplify_dataframe(df: pd.DataFrame, always_preserve=[]):
         if np.allclose(df_num, df_alf, equal_nan=True):
             bool_constant[str_alf] = True
 
-    # preserve some columns (even if their values are constant) by setting them as not constant
+    # preserve some columns (even if their values are constant) by setting them as not
+    #  constant
     for colname in always_preserve:
         if colname not in df.columns:
             raise ValueError(f"column '{colname}' not present in dataframe")
@@ -77,7 +81,8 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
     for colname_code, colname_oms in zip(colname_code_list, colname_oms_list):
         meas_twocol = df[[colname_code, colname_oms]].drop_duplicates()
         attr_dict = meas_twocol.set_index(colname_code)[colname_oms].to_dict()
-        # drop empty attribute names/keys since these are not supported when writing to netcdf file
+        # drop empty attribute names/keys since these are not supported when writing
+        #  to netcdf file
         if "" in attr_dict.keys():
             attr_dict.pop("")
         var_attrs_dict[colname_code] = attr_dict
@@ -87,25 +92,26 @@ def code_description_attrs_from_dataframe(df: pd.DataFrame):
 def dataframe_to_xarray(df: pd.DataFrame, always_preserve=[]):
     """
     Converts the measurement dataframe to a xarray dataset. The dataframe is first
-    simplified with `simplify_dataframe()` to minimize the size of the netcdf dataset on
-    disk.
+    simplified with `simplify_dataframe()` to minimize the size of the netcdf dataset
+    on disk.
 
-    The timestamps are converted to UTC since xarray does not support non-UTC timestamps.
-    These can be converted to different timezones after loading the netcdf and converting
-    to a pandas dataframe with df.index.tz_convert().
+    The timestamps are converted to UTC since xarray does not support non-UTC
+    timestamps. These can be converted to different timezones after loading the
+    netcdf and converting to a pandas dataframe with df.index.tz_convert().
 
     Furthermore, all ".Omschrijving" variables are dropped and the information is added
     as attributes to the Code variables.
 
-    Lastly, all string variables are converted to char arrays to minimize filesizes when
-    writing the netcdf with engine="netcdf4" or engine="h5netcdf". Char arrays are
+    Lastly, all string variables are converted to char arrays to minimize filesizes
+    when writing the netcdf with engine="netcdf4" or engine="h5netcdf". Char arrays are
     always used with engine="scipy" or engine="netcdf4" with format="NETCDF4_CLASSIC".
     """
 
     df_simple = simplify_dataframe(df, always_preserve=always_preserve)
 
     # convert to UTC to please xarray/netcdf4 (otherwise we get invalid timestamps)
-    # adding a refdate with tzinfo is also possible but adds confusion and timestamps still have to be stored as UTC
+    # adding a refdate with tzinfo is also possible but adds confusion and timestamps
+    # still have to be stored as UTC.
     if df_simple.index.tz is not None:
         df_simple.index = df_simple.index.tz_convert(None)
 

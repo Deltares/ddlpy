@@ -41,7 +41,10 @@ def test_command_line_interface(tmp_path):
     assert "locations.json file not found" in str(measurements_result.exception)
 
     # run ddlpy-locations
-    locations_command = 'locations --procestype astronomisch --grootheid-code WATHTE --station hoekvanholland --groepering-code ""'
+    locations_command = (
+        'locations --procestype astronomisch --grootheid-code WATHTE '
+        '--station hoekvanholland --groepering-code ""'
+    )
     # replace empty string representation ('""') with empty string ("")
     locations_command_split = locations_command.split()
     locations_command_split = ["" if x == '""' else x for x in locations_command_split]

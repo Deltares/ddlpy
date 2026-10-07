@@ -16,10 +16,12 @@ license = "GPL-3.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
 dependencies = [
-	#numpy 1.21 is EOL since june 2023
-	"numpy>=1.22",
-	"pandas",
-	"python-dateutil>=2.8",
+	#numpy 2.0 is EOL since June 2026, last version supporting py39
+	"numpy>=2.0",
+    #pandas>=2.2.2 supports numpy 2: https://github.com/Deltares/dfm_tools/issues/1330
+	"pandas>=2.2.2",
+    #pandas==2.2.2 depends on python-dateutil>=2.8.2
+	"python-dateutil>=2.8.2",
 	"pytz",
 	"tqdm",
 	"click",
@@ -30,7 +32,7 @@ classifiers = [
 	"Intended Audience :: Developers",
 	"Intended Audience :: Science/Research",
 	"Operating System :: OS Independent",
-    "Natural Language :: English",
+	"Natural Language :: English",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
 	"Programming Language :: Python :: 3.9",
@@ -55,6 +57,7 @@ dev = [
 	"twine",
 	"build",
 	"flake8>=3.5.0",
+	"flake8-pyproject", # required to read the config from pyproject.toml
 	"tox>=3.5.2",
 	"twine>=1.12.1",
 ]
@@ -71,10 +74,14 @@ examples = [
 	"matplotlib",
 ]
 netcdf = [
-	"xarray",
-	"scipy",
-	"h5netcdf[h5py]",
-	"netcdf4",
+    #xarray>=2024.07.0 is the latest release supporting py39
+	"xarray>=2024.07.0",
+	#scipy>=1.13.0 is the first version to support py310 (1.8.0 also) and including numpy v2 support
+	"scipy>=1.13.0",
+    # h5netcdf>=1.7.1" fixes "ValueError: Size must be positive"
+	"h5netcdf[h5py]>=1.7.1",
+    #netcdf4>=1.7.2 supports numpy 2
+	"netcdf4>=1.7.2",
 ]
 
 [project.scripts]
@@ -91,7 +98,81 @@ filterwarnings = [
 	# temporarily ignore numpy incompatibility: https://github.com/Deltares/ddlpy/issues/192
 	# this warning broke github tests for python 3.11, 3.12 and 3.13
 	"ignore:numpy.ndarray size changed:RuntimeWarning",
-	]
+    # TODO: ignore numpy warning until it is fixed in netcdf4: https://github.com/Unidata/netcdf4-python/issues/1468
+    "ignore:Setting the shape on a NumPy array has been deprecated in NumPy 2.5:DeprecationWarning",
+]
 
 [tool.flake8]
-exclude = "docs"
+exclude = "docs,.pixi"
+# same maxlinelenght as black.
+max-line-length = 88
+
+## Pixi related entries
+[tool.pixi.workspace]
+channels  = ["conda-forge"]
+platforms = ["linux-64", "win-64"] #, "osx-64", "osx-arm64"]
+
+[tool.pixi.feature.test.tasks]
+test = { cmd = ["pytest", "--cov=ddlpy", "--cov-report=xml", "--cov-report=term"] }
+
+[tool.pixi.feature.docs.tasks]
+docs-build = { cmd = ["sphinx-build", "docs", "docs/_build"] }
+
+# Install your code in editable mode, dependencies here are installed in all environments
+# Takes the dependencies from pyproject.toml, which will be overridden in the features below.
+[tool.pixi.pypi-dependencies]
+rws-ddlpy = { path = ".", editable = true }
+
+[tool.pixi.feature.minimal.pypi-dependencies]
+# the versions are a manual copy of [project.dependencies],
+# but with == to test with the lowest versions of direct dependencies
+numpy = "==2.0"
+pandas = "==2.2.2"
+python-dateutil = "==2.8.2"
+#pytz = "=="
+#tqdm = "=="
+#click = "=="
+#requests = "=="
+# netcdf dependency group
+xarray = "==2024.07.0"
+scipy = "==1.13.0"
+h5netcdf = "==1.7.1"
+h5py = "*"
+netcdf4 = "==1.7.2"
+
+# Define features for different Python versions and Hydromt versions
+[tool.pixi.feature.py39.dependencies]
+python = "3.9.*"
+
+[tool.pixi.feature.py310.dependencies]
+python = "3.10.*"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
+
+[tool.pixi.feature.docs.dependencies]
+pandoc = "*"
+
+# Define environments to combine features
+[tool.pixi.environments]
+default = { features = ["py314", "dev", "docs", "examples", "netcdf", "test"]}
+
+dev = { features = ["py314", "dev"]}
+
+py39 = { features = ["py39", "dev", "netcdf", "test"]}
+py310 = { features = ["py310", "dev", "netcdf", "test"]}
+py311 = { features = ["py311", "dev", "netcdf", "test"]}
+py312 = { features = ["py312", "dev", "netcdf", "test"]}
+py313 = { features = ["py313", "dev", "netcdf", "test"]}
+py314 = { features = ["py314", "dev", "netcdf", "test"]}
+
+py39-mindeps = { features = ["py39", "dev", "test", "minimal"]}
