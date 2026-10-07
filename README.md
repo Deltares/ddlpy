@@ -1,5 +1,5 @@
 [![pypi-image](https://img.shields.io/pypi/v/rws-ddlpy.svg)](https://pypi.python.org/pypi/rws-ddlpy)
-[![pytest](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/pytest.yml)
+[![test](https://github.com/Deltares/ddlpy/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Deltares/ddlpy/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/github/deltares/ddlpy.svg?style=flat-square)](https://app.codecov.io/gh/deltares/ddlpy?displayType=list)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Deltares_ddlpy&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Deltares_ddlpy)
 [![Supported versions](https://img.shields.io/pypi/pyversions/rws-ddlpy.svg)](https://pypi.org/project/rws-ddlpy)
