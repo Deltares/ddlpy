@@ -16,7 +16,7 @@ jobs:
       matrix:
 #        python-version: ['py39', 'py310', 'py312', 'py314']
 #        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['py314']
+        python-version: ['py39', 'py314']
         os: [macos-latest]
 
     name: py-${{ matrix.python-version }} ${{ matrix.os }}
