@@ -94,9 +94,10 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
 
     request_invalid_locatie = dict(request_valid)
     request_invalid_locatie["Locatie"] = {"Code": "nonexistent"}
-    with pytest.raises(NoDataError) as e:
+    with pytest.raises(OSError) as e:
         _send_post_request(url, request=request_invalid_locatie)
-    assert "204 No Content:" in str(e.value)
+    assert "400 Bad Request:" in str(e.value)
+    assert "Locatie 'nonexistent' niet gevonden" in str(e.value)
 
     request_invalid_periode_order = dict(request_valid)
     request_invalid_periode_order["Periode"] = {
@@ -111,16 +112,15 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
         in str(e.value)
     )
 
-    # TODO: this error is not properly handled by ddapi20
-    # https://github.com/Rijkswaterstaat/WaterWebservices/issues/19
     request_invalid_periode_format = dict(request_valid)
     request_invalid_periode_format["Periode"] = {
         "Begindatumtijd": "2015-01-01T00:00:00.000",
         "Einddatumtijd": "2015-01-02T00:00:00.000+00:00",
     }
-    with pytest.raises(IOError) as e:
+    with pytest.raises(OSError) as e:
         _send_post_request(url, request=request_invalid_periode_format)
-    assert "500 Internal Server Error: Onverwachte fout opgetreden" in str(e.value)
+    assert "400 Bad Request:" in str(e.value)
+    assert "Het parsen van 'Begindatumtijd' is mislukt" in str(e.value)
 
     request_invalid_periode_wrongkeys = dict(request_valid)
     request_invalid_periode_wrongkeys["Periode"] = {
@@ -142,11 +142,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
         _send_post_request(url, request=request_toolarge)
     assert "400 Bad Request:" in str(e.value)
     assert '"Succesvol":false' in str(e.value)
-    assert (
-        '"Foutmelding":"Het maximaal aantal waarnemingen (263088) is overschreden. '
-        'Beperk uw request."'
-        in str(e.value)
-    )
+    assert "Het maximaal aantal waarnemingen (263088) is overschreden" in str(e.value)
     assert '"WaarnemingenLijst":[]' in str(e.value)
 
     request_nodata = dict(request_valid)
