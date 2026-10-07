@@ -32,12 +32,15 @@ def _send_post_request(url, request, timeout=None):
 
     if not resp.ok:
         # in case of for instance
-        # resp.status_code: 400, resp.reason: Bad Request, resp.text: {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
+        # resp.status_code: 400, resp.reason: Bad Request, resp.text:
+        #  {"Succesvol":false,"Foutmelding":"Het maximaal aantal waarnemingen
+        #  (160000) is overschreden. Beperk uw request.","WaarnemingenLijst":[]}
         # resp.status_code: 500, resp.reason: Internal Server Error
         raise IOError(f"{resp.status_code} {resp.reason}: {resp.text}")
 
     if resp.status_code == 204:
-        # "204 No Content" is raised here, but catched in ddlpy.ddlpy.measurements() so the process can continue.
+        # "204 No Content" is raised here, but catched in
+        #  ddlpy.ddlpy.measurements() so the process can continue.
         raise NoDataError(f"{resp.status_code} {resp.reason}: {resp.text}")
 
     result = resp.json()
@@ -196,7 +199,8 @@ def measurements_amount(
     period: str = "Jaar",
 ) -> pd.DataFrame:
     """
-    Retrieves the amount of measurements available for a location for the requested period.
+    Retrieves the amount of measurements available for a location for the requested
+    period.
 
     Parameters
     ----------
@@ -212,10 +216,12 @@ def measurements_amount(
     Returns
     -------
     df_amount : pd.DataFrame
-        A DataFrame with the number of mesurements (AantalMetingen) per period (Groeperingsperiode).
+        A DataFrame with the number of mesurements (AantalMetingen) per
+        period (Groeperingsperiode).
 
     """
-    # TODO: there are probably more Groeperingsperiodes accepted by ddl, but not supported by ddlpy yet
+    # TODO: there are probably more Groeperingsperiodes accepted by ddl,
+    #  but not supported by ddlpy yet
     accepted_period = ["Jaar", "Maand", "Dag"]
     if period not in accepted_period:
         raise ValueError(f"period should be one of {accepted_period}, not '{period}'")
@@ -339,7 +345,10 @@ def _combine_waarnemingenlijst(result, location):
 
 
 def _measurements_slice(location, start_date, end_date):
-    """get measurements for location, for the period start_date, end_date, use measurements instead"""
+    """
+    get measurements for location, for the period start_date, end_date, use
+    measurements instead
+    """
     endpoint = ENDPOINTS["collect_observations"]
 
     start_date_str, end_date_str = _check_convert_dates(
@@ -362,10 +371,12 @@ def _measurements_slice(location, start_date, end_date):
 
 def _clean_dataframe(measurements):
     len_raw = len(measurements)
-    # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same timestep)
+    # drop duplicate rows (preserves e.g. different Grootheden/Groeperingen at same
+    #  timestep)
     measurements = measurements.drop_duplicates()
 
-    # remove Tijdstip column, has to be done after drop_duplicates to avoid too much to be dropped
+    # remove Tijdstip column, has to be done after drop_duplicates to avoid too much
+    #  to be dropped
     measurements = measurements.drop("Tijdstip", axis=1)
 
     # sort dataframe on time, ddl returns non-sorted data
@@ -396,11 +407,14 @@ def measurements(
     freq : int, dateutil.rrule.MONTHLY, dateutil.rrule.YEARLY, etc., optional
         The frequency in which to divide the requested period (e.g. yearly or monthly).
         Can also be None, in which case the entire dataset will be retrieved at once.
-        Please note that 10-minute measurements can often not be downloaded in yearly (or larger) chunks
-        since the DDL limits the responses to 157681 values and several stations have duplicated timesteps.
-        In that case the query will fail with an error or timeout or just return an empty result (as if there was no data).
+        Please note that 10-minute measurements can often not be downloaded in yearly
+        (or larger) chunks since the DDL limits the responses to 157681 values and
+        several stations have duplicated timesteps.
+        In that case the query will fail with an error or timeout or just return an
+        empty result (as if there was no data).
         In that case, the user should fallback to monthly chunks.
-        This is significantly slower but it is also much more robust. The default is dateutil.rrule.MONTHLY.
+        This is significantly slower but it is also much more robust.
+        The default is dateutil.rrule.MONTHLY.
     clean_df : bool, optional
         Whether to sort the dataframe and remove duplicate rows. The default is True.
 
@@ -412,8 +426,9 @@ def measurements(
 
     if isinstance(location, pd.DataFrame):
         raise TypeError(
-            "The provided location is a pandas.DataFrame, but should be a pandas.Series, "
-            "supply only one location/row instead, for instance by doing 'location.iloc[0]'"
+            "The provided location is a pandas.DataFrame, but should be a "
+            "pandas.Series, supply only one location/row instead, for instance "
+            "by doing 'location.iloc[0]'"
         )
 
     start_date, end_date = _check_convert_dates(start_date, end_date, return_str=False)

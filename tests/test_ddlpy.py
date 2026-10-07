@@ -21,7 +21,10 @@ DTYPES_NONSTRING = {
 
 
 def test_send_post_request_errors_wrongapi():
-    url = "https://ddapi20-waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES/OphalenCatalogus"
+    url = (
+        "https://ddapi20-waterwebservices.rijkswaterstaat.nl/"
+        "ONLINEWAARNEMINGENSERVICES/OphalenCatalogus"
+    )
     with pytest.raises(IOError) as e:
         _send_post_request(url, request=None)
     assert "404 Not Found" in str(e.value)
@@ -76,7 +79,8 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert "Er moet een periode worden meegegeven als: Periode" in str(e.value)
     assert "Er moet een locatie worden meegegeven als: Locatie" in str(e.value)
     assert (
-        "Er moet een AquoPlusObservationMetadata worden meegegeven onder: AquoPlusWaarnemingMetadata"
+        "Er moet een AquoPlusObservationMetadata worden meegegeven "
+        "onder: AquoPlusWaarnemingMetadata"
         in str(e.value)
     )
 
@@ -103,7 +107,8 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     with pytest.raises(IOError) as e:
         _send_post_request(url, request=request_invalid_periode_order)
     assert (
-        '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn onder: Periode."}'
+        '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn '
+        'onder: Periode."}'
         in str(e.value)
     )
 
@@ -139,7 +144,8 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert "400 Bad Request:" in str(e.value)
     assert '"Succesvol":false' in str(e.value)
     assert (
-        '"Foutmelding":"Het maximaal aantal waarnemingen (263088) is overschreden. Beperk uw request."'
+        '"Foutmelding":"Het maximaal aantal waarnemingen (263088) is overschreden. '
+        'Beperk uw request."'
         in str(e.value)
     )
     assert '"WaarnemingenLijst":[]' in str(e.value)
@@ -165,12 +171,14 @@ def test_nodataerror(location):
     end_date = dt.datetime(2180, 4, 1)
     # same response as testing _send_post_request
     with pytest.raises(NoDataError) as e:
-        # ddlpy.measurements() catches NoDataError, so we have to test it with _measurements_slice
+        # ddlpy.measurements() catches NoDataError, so we have to test it with
+        # _measurements_slice
         _ = ddlpy.ddlpy._measurements_slice(
             location, start_date=start_date, end_date=end_date
         )
     assert "204 No Content: " in str(e.value)
-    # different response than testing _send_post_request, since empty result will also raise NoDataError
+    # different response than testing _send_post_request, since empty result will
+    # also raise NoDataError
     with pytest.raises(NoDataError) as e:
         _ = ddlpy.ddlpy.measurements_amount(
             location, start_date=start_date, end_date=end_date

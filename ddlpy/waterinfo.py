@@ -12,7 +12,8 @@ def waterinfo_read(f, encoding="latin", block=True):
 
     Can handle two types of files
     - direct download from https://waterinfo.rws.nl, first column is 'Datum'
-    - request via https://waterinfo.rws.nl for link per email, first column is 'MONSTER_IDENTIFICATIE'
+    - request via https://waterinfo.rws.nl for link per email, first column is
+      'MONSTER_IDENTIFICATIE'
     If multiple variables are present, a list of xarrays is returned.
 
     An xarray that can be transformed into a dataframe:
@@ -68,9 +69,6 @@ def waterinfo_read(f, encoding="latin", block=True):
         print(len(df), " rows for variable: ", variable)
 
         if "WAARNEMINGDATUM" in df.keys():
-            # MONSTER_IDENTIFICATIE;MEETPUNT_IDENTIFICATIE;TYPERING_OMSCHRIJVING;TYPERING_CODE;GROOTHEID_OMSCHRIJVING;GROOTHEID_ CODE;PARAMETER_OMSCHRIJVING;PARAMETER_ CODE;EENHEID_CODE;HOEDANIGHEID_OMSCHRIJVING;HOEDANIGHEID_CODE;COMPARTIMENT_OMSCHRIJVING;COMPARTIMENT_CODE;WAARDEBEWERKINGSMETHODE_OMSCHRIJVING;WAARDEBEWERKINGSMETHODE_CODE;WAARDEBEPALINGSMETHODE_OMSCHRIJVING;WAARDEBEPALINGSMETHODE_CODE;BEMONSTERINGSSOORT_OMSCHRIJVING;BEMONSTERINGSSOORT_CODE;WAARNEMINGDATUM;WAARNEMINGTIJD;LIMIETSYMBOOL;NUMERIEKEWAARDE;ALFANUMERIEKEWAARDE;KWALITEITSOORDEEL_CODE;STATUSWAARDE;OPDRACHTGEVENDE_INSTANTIE;MEETAPPARAAT_OMSCHRIJVING;MEETAPPARAAT_CODE;BEMONSTERINGSAPPARAAT_OMSCHRIJVING;BEMONSTERINGSAPPARAAT_CODE;PLAATSBEPALINGSAPPARAAT_OMSCHRIJVING;PLAATSBEPALINGSAPPARAAT_CODE;BEMONSTERINGSHOOGTE;REFERENTIEVLAK;EPSG;X;Y;ORGAAN_OMSCHRIJVING;ORGAAN_CODE;TAXON_NAME
-            # ;Scheveningen;;;Waterhoogte berekend;WATHTBRKD;;;cm;t.o.v. Normaal Amsterdams Peil;NAP;Oppervlaktewater;OW;;;Astronomische waterhoogte mbv harmonische analyse;other:F012;;;01-05-2020;00:00:00;;-44;;Normale waarde;Ongecontroleerd;RIKZMON_WAT;;;;;;;-999999999;NVT;25831;586550,994420996;5772806,43069697;;;
-
             t = [
                 datetime.strptime(t, "%d-%m-%Y%H:%M:%S")
                 for t in df["WAARNEMINGDATUM"] + df["WAARNEMINGTIJD"]
@@ -100,8 +98,10 @@ def waterinfo_read(f, encoding="latin", block=True):
             ]
 
         elif "Datum" in df.keys():
-            # Datum;Tijd;Parameter;Locatie;Meting;Verwachting;Astronomisch getijden;Eenheid;Bemonsteringshoogte;Referentievlak;
-            # 5-5-2020;21:10:00;Waterhoogte Oppervlaktewater t.o.v. Normaal Amsterdams Peil in cm;Den Helder;-1;;;cm;-999999999;NAP;
+            # Datum;Tijd;Parameter;Locatie;Meting;Verwachting;Astronomisch getijden;
+            # Eenheid;Bemonsteringshoogte;Referentievlak;
+            # 5-5-2020;21:10:00;Waterhoogte Oppervlaktewater t.o.v. Normaal Amsterdams
+            # Peil in cm;Den Helder;-1;;;cm;-999999999;NAP;
 
             # handle trailing ;
             df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
@@ -128,15 +128,17 @@ def waterinfo_read(f, encoding="latin", block=True):
             raise
 
         if isinstance(tzone, type("a")):
-            # does not apply DST t = [t1.replace(tzinfo=pytz.timezone(tzone)).astimezone(pytz.timezone('UTC')) for t1 in t]
+            # does not apply DST t = [t1.replace(tzinfo=pytz.timezone(tzone))
+            # .astimezone(pytz.timezone('UTC')) for t1 in t]
             t = [t1 - pytz.timezone("CET").utcoffset(t1) for t1 in t]
         else:
             t = [t1 - timedelta(seconds=3600) * tzone for t1 in t]
         t = [t1.replace(tzinfo=None) for t1 in t]  # make datetime64 again
 
         # The array values in a DataArray have a single (homogeneous) data type.
-        # To work with heterogeneous or structured data types in xarray, use coordinates,
-        # or put separate DataArray objects in a single Dataset (see below).
+        # To work with heterogeneous or structured data types in xarray, use
+        # coordinates, or put separate DataArray objects in a single Dataset
+        # (see below).
         # ds2 = xr.DataArray(data, coords=[t], dims=['time'])
 
         d = xr.Dataset({"data": (("time"), data)}, {"time": t})  # make datetime64 again
