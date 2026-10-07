@@ -163,11 +163,11 @@ default = { features = ["py314", "dev", "docs", "examples", "netcdf", "test"]}
 
 dev = { features = ["py314", "dev"]}
 
-py39 = { features = ["py39", "dev", "test"]}
-py310 = { features = ["py310", "dev", "test"]}
-py311 = { features = ["py311", "dev", "test"]}
-py312 = { features = ["py312", "dev", "test"]}
-py313 = { features = ["py313", "dev", "test"]}
-py314 = { features = ["py314", "dev", "test"]}
+py39 = { features = ["py39", "dev", "netcdf", "test"]}
+py310 = { features = ["py310", "dev", "netcdf", "test"]}
+py311 = { features = ["py311", "dev", "netcdf", "test"]}
+py312 = { features = ["py312", "dev", "netcdf", "test"]}
+py313 = { features = ["py313", "dev", "netcdf", "test"]}
+py314 = { features = ["py314", "dev", "netcdf", "test"]}
 
 py39-mindeps = { features = ["py39", "dev", "test", "minimal"]}
