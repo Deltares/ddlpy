@@ -100,6 +100,8 @@ filterwarnings = [
 
 [tool.flake8]
 exclude = "docs,.pixi"
+# same maxlinelenght as black.
+max-line-length = 88
 
 ## Pixi related entries
 [tool.pixi.workspace]

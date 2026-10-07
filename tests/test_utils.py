@@ -126,7 +126,8 @@ def test_dataframe_to_xarray(measurements):
     preserved = always_preserve + non_constant_columns
 
     for varname in measurements.columns:
-        # check if all varnames in always_preserve and non-constant columns are indeed preserved as variables
+        # check if all varnames in always_preserve and non-constant columns are indeed
+        #  preserved as variables.
         if varname in preserved:
             assert varname in ds_clean.data_vars
             assert varname not in ds_clean.attrs.keys()
@@ -169,7 +170,10 @@ def test_dataframe_to_xarray_drop_omschrijving(measurements):
     assert ds["MeetApparaat.Code"].attrs == expected_attrs
 
 
-@pytest.mark.parametrize("engine", [None, "scipy", "h5netcdf", "netcdf4", "netcdf4_classic"])
+@pytest.mark.parametrize(
+    "engine",
+    [None, "scipy", "h5netcdf", "netcdf4", "netcdf4_classic"],
+)
 def test_dataframe_to_xarray_to_netcdf(measurements, tmp_path, engine):
     ds_clean = ddlpy.dataframe_to_xarray(
         df=measurements,
