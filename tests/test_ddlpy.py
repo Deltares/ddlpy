@@ -90,9 +90,10 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
 
     request_invalid_locatie = dict(request_valid)
     request_invalid_locatie["Locatie"] = {"Code": "nonexistent"}
-    with pytest.raises(NoDataError) as e:
+    with pytest.raises(OSError) as e:
         _send_post_request(url, request=request_invalid_locatie)
-    assert "204 No Content:" in str(e.value)
+    assert "400 Bad Request:" in str(e.value)
+    assert "Locatie 'nonexistent' niet gevonden" in str(e.value)
 
     request_invalid_periode_order = dict(request_valid)
     request_invalid_periode_order["Periode"] = {
