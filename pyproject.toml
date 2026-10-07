@@ -57,6 +57,7 @@ dev = [
 	"twine",
 	"build",
 	"flake8>=3.5.0",
+	"flake8-pyproject", # required to read the config from pyproject.toml
 	"tox>=3.5.2",
 	"twine>=1.12.1",
 ]
