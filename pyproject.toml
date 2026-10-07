@@ -99,7 +99,7 @@ filterwarnings = [
 ]
 
 [tool.flake8]
-exclude = "docs"
+exclude = "docs,.pixi"
 
 ## Pixi related entries
 [tool.pixi.workspace]
