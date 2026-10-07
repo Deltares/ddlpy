@@ -5483,6 +5483,7 @@ packages:
   - xarray>=2024.7.0 ; extra == 'netcdf'
   - scipy>=1.13.0 ; extra == 'netcdf'
   - h5netcdf[h5py]>=1.7.1 ; extra == 'netcdf'
+  - h5py ; extra == 'netcdf'
   - netcdf4>=1.7.2 ; extra == 'netcdf'
   requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/01/f9/575c8d760eae1fc99651b7cc5efd96ad5379ca4d6b53750b0fb4fe983f34/imagesize-2.0.1-py3-none-any.whl
