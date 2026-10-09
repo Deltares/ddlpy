@@ -1,7 +1,7 @@
 name: test-macos
 
 # macos tests are failing with pixi environments, so temporarily adding the working non-pixi tests back
-# to be resolved in https://github.com/Deltares/ddlpy/pull/204
+# to be resolved in https://github.com/Deltares/ddlpy/issues/202
 
 on:
   push:
