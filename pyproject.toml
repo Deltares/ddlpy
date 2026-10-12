@@ -110,7 +110,9 @@ max-line-length = 88
 ## Pixi related entries
 [tool.pixi.workspace]
 channels  = ["conda-forge"]
-platforms = ["linux-64", "win-64", { platform = "osx-arm64", macos = "14.0" }]
+# temporarily use platform table for macos to avoid netcdf4 .tar.gz files in the pixi.lock file
+# netcdf4>1.7.4 probably supports macos 26 so then this can be removed again
+platforms = ["linux-64", "win-64", "osx-arm64"]
 
 [tool.pixi.feature.test.tasks]
 test = { cmd = ["pytest", "--cov=ddlpy", "--cov-report=xml", "--cov-report=term"] }
