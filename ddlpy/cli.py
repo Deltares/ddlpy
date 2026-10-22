@@ -86,7 +86,7 @@ def locations(
         if len(quantities[q]) != 0:
             selected = selected[selected[q].isin(quantities[q])]
 
-    selected.reset_index(inplace=True)
+    selected = selected.reset_index()
 
     output = output.split(".")[0]  # make sure that extension is always json
     selected.to_json(output + ".json", orient="records")

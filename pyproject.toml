@@ -35,8 +35,6 @@ classifiers = [
 	"Natural Language :: English",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
-	"Programming Language :: Python :: 3.9",
-	"Programming Language :: Python :: 3.10",
 	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
 	"Programming Language :: Python :: 3.13",
@@ -80,8 +78,8 @@ netcdf = [
 	"scipy>=1.13.0",
     # h5netcdf>=1.7.1" fixes "ValueError: Size must be positive"
 	"h5netcdf[h5py]>=1.7.1",
-    #netcdf4>=1.7.2 supports numpy 2
-	"netcdf4>=1.7.2",
+    #netcdf4>=1.7.5 resolves numpy 2.5 shape warning
+	"netcdf4>=1.7.5",
 ]
 
 [project.scripts]
@@ -135,7 +133,7 @@ xarray = "==2024.07.0"
 scipy = "==1.13.0"
 h5netcdf = "==1.7.1"
 h5py = "*"
-netcdf4 = "==1.7.2"
+netcdf4 = "==1.7.5"
 
 # Define features for different Python versions and Hydromt versions
 [tool.pixi.feature.py311.dependencies]
