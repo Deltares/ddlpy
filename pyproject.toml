@@ -95,11 +95,6 @@ testpaths = ["tests"]
 addopts = "--durations=0"
 filterwarnings = [
 	"error",
-	# temporarily ignore numpy incompatibility: https://github.com/Deltares/ddlpy/issues/192
-	# this warning broke github tests for python 3.11, 3.12 and 3.13
-	"ignore:numpy.ndarray size changed:RuntimeWarning",
-    # TODO: ignore numpy warning until it is fixed in netcdf4: https://github.com/Unidata/netcdf4-python/issues/1468
-    "ignore:Setting the shape on a NumPy array has been deprecated in NumPy 2.5:DeprecationWarning",
 ]
 
 [tool.flake8]
