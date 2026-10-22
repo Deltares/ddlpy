@@ -148,9 +148,6 @@ python = "3.13.*"
 [tool.pixi.feature.py314.dependencies]
 python = "3.14.*"
 
-[tool.pixi.feature.py315.dependencies]
-python = "3.15.*"
-
 [tool.pixi.feature.docs.dependencies]
 pandoc = "*"
 
