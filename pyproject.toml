@@ -35,8 +35,6 @@ classifiers = [
 	"Natural Language :: English",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
-	"Programming Language :: Python :: 3.9",
-	"Programming Language :: Python :: 3.10",
 	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
 	"Programming Language :: Python :: 3.13",
@@ -95,11 +93,6 @@ testpaths = ["tests"]
 addopts = "--durations=0"
 filterwarnings = [
 	"error",
-	# temporarily ignore numpy incompatibility: https://github.com/Deltares/ddlpy/issues/192
-	# this warning broke github tests for python 3.11, 3.12 and 3.13
-	"ignore:numpy.ndarray size changed:RuntimeWarning",
-    # TODO: ignore numpy warning until it is fixed in netcdf4: https://github.com/Unidata/netcdf4-python/issues/1468
-    "ignore:Setting the shape on a NumPy array has been deprecated in NumPy 2.5:DeprecationWarning",
 ]
 
 [tool.flake8]
@@ -112,7 +105,7 @@ max-line-length = 88
 channels  = ["conda-forge"]
 # temporarily use platform table for macos to avoid netcdf4 .tar.gz files in the pixi.lock file
 # netcdf4>1.7.4 probably supports macos 26 so then this can be removed again
-platforms = ["linux-64", "win-64", { platform = "osx-arm64", macos = "14.0" }]
+platforms = ["linux-64", "win-64", { platform = "osx-arm64", macos = "15.0" }]
 
 [tool.pixi.feature.test.tasks]
 test = { cmd = ["pytest", "--cov=ddlpy", "--cov-report=xml", "--cov-report=term"] }
@@ -140,15 +133,9 @@ xarray = "==2024.07.0"
 scipy = "==1.13.0"
 h5netcdf = "==1.7.1"
 h5py = "*"
-netcdf4 = "==1.7.2"
+netcdf4 = "==1.7.5"
 
 # Define features for different Python versions and Hydromt versions
-[tool.pixi.feature.py39.dependencies]
-python = "3.9.*"
-
-[tool.pixi.feature.py310.dependencies]
-python = "3.10.*"
-
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
 
@@ -161,6 +148,9 @@ python = "3.13.*"
 [tool.pixi.feature.py314.dependencies]
 python = "3.14.*"
 
+[tool.pixi.feature.py315.dependencies]
+python = "3.15.*"
+
 [tool.pixi.feature.docs.dependencies]
 pandoc = "*"
 
@@ -170,11 +160,9 @@ default = { features = ["py314", "dev", "docs", "examples", "netcdf", "test"]}
 
 dev = { features = ["py314", "dev"]}
 
-py39 = { features = ["py39", "dev", "netcdf", "test"]}
-py310 = { features = ["py310", "dev", "netcdf", "test"]}
 py311 = { features = ["py311", "dev", "netcdf", "test"]}
 py312 = { features = ["py312", "dev", "netcdf", "test"]}
 py313 = { features = ["py313", "dev", "netcdf", "test"]}
 py314 = { features = ["py314", "dev", "netcdf", "test"]}
 
-py39-mindeps = { features = ["py39", "dev", "test", "minimal"]}
+py311-mindeps = { features = ["py311", "dev", "test", "minimal"]}
