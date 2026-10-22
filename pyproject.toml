@@ -143,12 +143,6 @@ h5py = "*"
 netcdf4 = "==1.7.2"
 
 # Define features for different Python versions and Hydromt versions
-[tool.pixi.feature.py39.dependencies]
-python = "3.9.*"
-
-[tool.pixi.feature.py310.dependencies]
-python = "3.10.*"
-
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
 
@@ -161,6 +155,9 @@ python = "3.13.*"
 [tool.pixi.feature.py314.dependencies]
 python = "3.14.*"
 
+[tool.pixi.feature.py315.dependencies]
+python = "3.15.*"
+
 [tool.pixi.feature.docs.dependencies]
 pandoc = "*"
 
@@ -170,11 +167,10 @@ default = { features = ["py314", "dev", "docs", "examples", "netcdf", "test"]}
 
 dev = { features = ["py314", "dev"]}
 
-py39 = { features = ["py39", "dev", "netcdf", "test"]}
-py310 = { features = ["py310", "dev", "netcdf", "test"]}
 py311 = { features = ["py311", "dev", "netcdf", "test"]}
 py312 = { features = ["py312", "dev", "netcdf", "test"]}
 py313 = { features = ["py313", "dev", "netcdf", "test"]}
 py314 = { features = ["py314", "dev", "netcdf", "test"]}
+py315 = { features = ["py315", "dev", "netcdf", "test"]}
 
-py39-mindeps = { features = ["py39", "dev", "test", "minimal"]}
+py311-mindeps = { features = ["py311", "dev", "test", "minimal"]}
