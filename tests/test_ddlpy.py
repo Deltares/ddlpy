@@ -80,8 +80,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
     assert "Er moet een locatie worden meegegeven als: Locatie" in str(e.value)
     assert (
         "Er moet een AquoPlusObservationMetadata worden meegegeven "
-        "onder: AquoPlusWaarnemingMetadata"
-        in str(e.value)
+        "onder: AquoPlusWaarnemingMetadata" in str(e.value)
     )
 
     request_empty_aquoplus = dict(request_valid)
@@ -108,8 +107,7 @@ def test_send_post_request_errors_ophalenwaarnemingen(endpoints):
         _send_post_request(url, request=request_invalid_periode_order)
     assert (
         '400 Bad Request: {"period":"De startdatum mag niet na de einddatum zijn '
-        'onder: Periode."}'
-        in str(e.value)
+        'onder: Periode."}' in str(e.value)
     )
 
     request_invalid_periode_format = dict(request_valid)
@@ -179,6 +177,24 @@ def test_nodataerror(location):
             location, start_date=start_date, end_date=end_date
         )
     assert "no measurements available returned" in str(e.value)
+
+
+def test_catalog_filter():
+    catalog_filter = ddlpy.ddlpy.CATALOG_FILTER
+    expected_keys = [
+        "WaardeBewerkingsMethoden",
+        "Typeringen",
+        "Grootheden",
+        "Parameters",
+        "ProcesTypes",
+        "Compartimenten",
+        "Hoedanigheden",
+        "Organen",
+        "BioTaxon",
+        "Eenheden",
+        "Groeperingen",
+    ]
+    assert set(expected_keys) == set(catalog_filter)
 
 
 def test_locations(locations):
