@@ -95,4 +95,4 @@ If you are reporting a bug, please include:
 - click `Generate release notes` and replace the `What's Changed` info by a tagged link to `docs/whats-new.md`
 - if all is set, click `Publish release`
 - a release is created and the github action publishes it [on PyPI](https://pypi.org/project/ddlpy)
-- post-release: commit+push `pixi run bumpversion patch`, `pixi lock` and add `UNRELEASED` header in `docs/whats-new.md` to distinguish between release and dev version
+- post-release: add `UNRELEASED` header in `docs/whats-new.md` to distinguish between release and dev version
