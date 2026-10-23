@@ -94,4 +94,4 @@ If you are reporting a bug, please include:
 - set the release title to the tagname (e.g. `v0.11.0`)
 - click `Generate release notes` and replace the `What's Changed` info by a tagged link to `HISTORY.rst`
 - if all is set, click `Publish release`
-- a release is created and the github action publishes it [on PyPI](https://pypi.org/project/ddlpy)
+- a release is created and the github action publishes it [on PyPI](https://pypi.org/project/rws-ddlpy)
