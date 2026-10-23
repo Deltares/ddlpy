@@ -92,6 +92,6 @@ If you are reporting a bug, please include:
 - create a [new release](https://github.com/Deltares/ddlpy/releases/new)
 - click `choose a tag` and type v+versionnumber (e.g. `v0.11.0`), click `create new tag: v0.11.0 on publish`
 - set the release title to the tagname (e.g. `v0.11.0`)
-- click `Generate release notes` and replace the `What's Changed` info by a tagged link to `docs/whats-new.md`
+- click `Generate release notes` and replace the `What's Changed` info by a tagged link to `HISTORY.rst`
 - if all is set, click `Publish release`
 - a release is created and the github action publishes it [on PyPI](https://pypi.org/project/ddlpy)
