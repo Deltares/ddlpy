@@ -84,15 +84,14 @@ If you are reporting a bug, please include:
 - create and checkout branch for release
 - bump the versionnumber with `pixi run bumpversion minor`
 - update the lockfile with `pixi lock`
-- update `docs/whats-new.md` and add a date to the current release heading
+- update `HISTORY.rst` and with a version+date header for this release (also preserve the `UNRELEASED` header for future PR's)
 - run local testbank with `pixi run test`
-- local check with: `pixi run python -m build` and `pixi run twine check dist/*` ([does not work on WCF](https://github.com/pypa/setuptools/issues/4133))
+- local check with: `pixi run python -m build` and `pixi run twine check dist/*` ([does not work on WCF?](https://github.com/pypa/setuptools/issues/4133))
 - commit+push to branch and merge PR
-- copy the ddlpy version from [pyproject.toml](https://github.com/Deltares/ddlpy/blob/main/pyproject.toml) (e.g. `0.11.0`)
+- copy the ddlpy version from https://github.com/Deltares/ddlpy/blob/main/pyproject.toml (e.g. `0.11.0`)
 - create a [new release](https://github.com/Deltares/ddlpy/releases/new)
 - click `choose a tag` and type v+versionnumber (e.g. `v0.11.0`), click `create new tag: v0.11.0 on publish`
 - set the release title to the tagname (e.g. `v0.11.0`)
 - click `Generate release notes` and replace the `What's Changed` info by a tagged link to `docs/whats-new.md`
 - if all is set, click `Publish release`
 - a release is created and the github action publishes it [on PyPI](https://pypi.org/project/ddlpy)
-- post-release: commit+push `pixi run bumpversion patch`, `pixi lock` and add `UNRELEASED` header in `docs/whats-new.md` to distinguish between release and dev version
