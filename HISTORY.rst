@@ -4,6 +4,7 @@ History
 
 UNRELEASED
 ----------
+* removed obsolete bulkwaarnemingenservices in https://github.com/Deltares/ddlpy/pull/185
 * removed caching again in https://github.com/Deltares/ddlpy/pull/189
 * enforce conversion of strings to char arrays in `ddlpy.dataframe_to_xarray()` in  https://github.com/Deltares/ddlpy/pull/194 and https://github.com/Deltares/ddlpy/pull/195
 
