@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 with ENDPOINTS_PATH.open() as f:
     ENDPOINTS = json.load(f)
 
+CATALOG_FILTER = ENDPOINTS["collect_catalogue"]["request"]["CatalogusFilter"].keys()
+
 
 class NoDataError(ValueError):
     pass
@@ -51,11 +53,11 @@ def catalog(catalog_filter=None):
     endpoint = ENDPOINTS["collect_catalogue"]
 
     if catalog_filter is None:
-        # use the default request from endpoints.json
-        request = endpoint["request"]
-    else:
-        assert isinstance(catalog_filter, list)
-        request = {"CatalogusFilter": {x: True for x in catalog_filter}}
+        # use the default catalog_filter from endpoints.json
+        catalog_filter = list(CATALOG_FILTER)
+
+    assert isinstance(catalog_filter, list)
+    request = {"CatalogusFilter": {x: True for x in catalog_filter}}
 
     result = _send_post_request(endpoint["url"], request, timeout=None)
 
