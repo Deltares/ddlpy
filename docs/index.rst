@@ -6,5 +6,5 @@
 
    usage
    modules
-   .. mdinclude:: CONTRIBUTING.md
-   HISTORY
+   contributing
+   history
