@@ -148,6 +148,9 @@ python = "3.13.*"
 [tool.pixi.feature.py314.dependencies]
 python = "3.14.*"
 
+[tool.pixi.feature.py315.dependencies]
+python = "3.15.*"
+
 [tool.pixi.feature.docs.dependencies]
 pandoc = "*"
 
@@ -161,5 +164,6 @@ py311 = { features = ["py311", "dev", "netcdf", "test"]}
 py312 = { features = ["py312", "dev", "netcdf", "test"]}
 py313 = { features = ["py313", "dev", "netcdf", "test"]}
 py314 = { features = ["py314", "dev", "netcdf", "test"]}
+py315 = { features = ["py315", "dev", "netcdf", "test"]}
 
 py311-mindeps = { features = ["py311", "dev", "test", "minimal"]}
