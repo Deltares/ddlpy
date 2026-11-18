@@ -67,7 +67,8 @@ def waterinfo_read(f, encoding="latin", block=True):
 
         if "WAARNEMINGDATUM" in df.keys():
             df_datetime_str = df["WAARNEMINGDATUM"] + " " + df["WAARNEMINGTIJD"]
-            t = pd.DatetimeIndex(df_datetime_str, tz=tzone, dayfirst=True)
+            t_naive = pd.to_datetime(df_datetime_str, format="%d-%m-%Y %H:%M:%S")
+            t = pd.DatetimeIndex(t_naive, tz=tzone)
 
             data = df["NUMERIEKEWAARDE"] / 1.0
 
@@ -103,7 +104,8 @@ def waterinfo_read(f, encoding="latin", block=True):
 
             # parse time
             df_datetime_str = df["Datum"] + " " + df["Tijd"]
-            t = pd.DatetimeIndex(df_datetime_str, tz=tzone, dayfirst=True)
+            t_naive = pd.to_datetime(df_datetime_str, format="%d-%m-%Y %H:%M:%S")
+            t = pd.DatetimeIndex(t_naive, tz=tzone)
 
             data = df["Meting"]
             key_units = "Eenheid"
