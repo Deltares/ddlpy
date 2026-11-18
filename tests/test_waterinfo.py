@@ -25,3 +25,8 @@ def test_waterinfo_read():
     assert "data" in dxf0.variables
     assert "time" in dxg0.variables
     assert "data" in dxg0.variables
+
+    assert dxf0.time.to_series().index[0].isoformat() == '2020-05-06T23:00:00'
+    assert dxf0.time.to_series().index[-1].isoformat() == '2020-05-07T22:50:00'
+    assert dxg0.time.to_series().index[0].isoformat() == '2020-05-06T22:00:00'
+    assert dxg0.time.to_series().index[-1].isoformat() == '2020-05-07T21:50:00'

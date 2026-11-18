@@ -2,8 +2,6 @@
 
 import pandas as pd
 import xarray as xr
-from datetime import datetime, timedelta
-import pytz
 
 
 def waterinfo_read(f, encoding="latin", block=True):
@@ -50,8 +48,7 @@ def waterinfo_read(f, encoding="latin", block=True):
 
     if "WAARNEMINGDATUM" in dfall.keys():
         variablecolumn = "GROOTHEID_ CODE"
-        tzone = 1
-
+        tzone = "UTC+01:00"
         dfall = dfall.loc[dfall["KWALITEITSOORDEEL_CODE"] == "Normale waarde"]
 
     elif "Datum" in dfall.keys():
@@ -69,10 +66,8 @@ def waterinfo_read(f, encoding="latin", block=True):
         print(len(df), " rows for variable: ", variable)
 
         if "WAARNEMINGDATUM" in df.keys():
-            t = [
-                datetime.strptime(t, "%d-%m-%Y%H:%M:%S")
-                for t in df["WAARNEMINGDATUM"] + df["WAARNEMINGTIJD"]
-            ]
+            df_datetime_str = df["WAARNEMINGDATUM"] + " " + df["WAARNEMINGTIJD"]
+            t = pd.DatetimeIndex(df_datetime_str, tz=tzone, dayfirst=True)
 
             data = df["NUMERIEKEWAARDE"] / 1.0
 
@@ -107,10 +102,8 @@ def waterinfo_read(f, encoding="latin", block=True):
             df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
 
             # parse time
-            t = [
-                datetime.strptime(t, "%d-%m-%Y%H:%M:%S")
-                for t in df["Datum"] + df["Tijd"]
-            ]
+            df_datetime_str = df["Datum"] + " " + df["Tijd"]
+            t = pd.DatetimeIndex(df_datetime_str, tz=tzone, dayfirst=True)
 
             data = df["Meting"]
             key_units = "Eenheid"
@@ -127,13 +120,8 @@ def waterinfo_read(f, encoding="latin", block=True):
             print("Unknown file header.")
             raise
 
-        if isinstance(tzone, type("a")):
-            # does not apply DST t = [t1.replace(tzinfo=pytz.timezone(tzone))
-            # .astimezone(pytz.timezone('UTC')) for t1 in t]
-            t = [t1 - pytz.timezone("CET").utcoffset(t1) for t1 in t]
-        else:
-            t = [t1 - timedelta(seconds=3600) * tzone for t1 in t]
-        t = [t1.replace(tzinfo=None) for t1 in t]  # make datetime64 again
+        # convert to UTC and drop timezone
+        t = t.tz_convert("UTC").tz_localize(None)
 
         # The array values in a DataArray have a single (homogeneous) data type.
         # To work with heterogeneous or structured data types in xarray, use

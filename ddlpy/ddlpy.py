@@ -7,7 +7,6 @@ import pathlib
 import logging
 import requests
 import pandas as pd
-import pytz
 import tqdm
 import dateutil
 import numpy as np
@@ -114,9 +113,9 @@ def _check_convert_dates(start_date, end_date, return_str=True):
 
     # set UTC timezone if tz is None
     if start_date.tz is None:
-        start_date = pytz.UTC.localize(start_date)
+        start_date = start_date.tz_localize("UTC")
     if end_date.tz is None:
-        end_date = pytz.UTC.localize(end_date)
+        end_date = end_date.tz_localize("UTC")
 
     if start_date > end_date:
         raise ValueError(f"start_date {start_date} is larger than end_date {end_date}")
