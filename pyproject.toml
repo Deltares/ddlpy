@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rws-ddlpy"
-version = "0.11.0"
+dynamic = ["version"]
 maintainers = [
 	{ name = "Fedor Baart", email = "fedor.baart@deltares.nl"},
 	{ name = "Jelmer Veenstra", email = "jelmer.veenstra@deltares.nl"},
@@ -86,6 +86,9 @@ ddlpy = "ddlpy.cli:cli"
 
 [tool.setuptools]
 packages = ["ddlpy"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ddlpy.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
