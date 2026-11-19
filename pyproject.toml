@@ -47,7 +47,6 @@ Issues = "https://github.com/deltares/ddlpy/issues"
 
 [project.optional-dependencies]
 dev = [
-	"bump2version>=0.5.11",
 	"black",
 	"pytest>=3.8.2",
 	"pytest-cov",
